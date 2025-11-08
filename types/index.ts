@@ -1,4 +1,12 @@
-export type PackId = 'free' | 'immigration' | 'masterclass' | 'citizenship'
+export type PackId = 'free' | 'immigration' | 'advanced' | 'citizenship'
+
+export interface PricingPack {
+  id: PackId
+  name: string
+  price: number
+  priceId: string | null
+  features: readonly string[]
+}
 
 export interface User {
   id: string

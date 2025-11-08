@@ -42,6 +42,7 @@ export interface LayerContent {
       name: string
       description: string
       icon: string
+      link?: string
     }>
   }
   resources: {

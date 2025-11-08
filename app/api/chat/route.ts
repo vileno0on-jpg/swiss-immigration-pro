@@ -373,13 +373,12 @@ export async function POST(req: NextRequest) {
             { role: 'user', content: message },
           ],
           temperature: CONFIG.ai.temperature,
-          maxTokens: CONFIG.ai.maxTokens,
         })
         
         for await (const chunk of result.textStream) {
           fullResponse += chunk
         }
-        usage = await result.usage || { totalTokens: 0 }
+        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
         
         // Ensure response follows format
         if (!fullResponse.includes('⚠️')) {
@@ -409,7 +408,7 @@ export async function POST(req: NextRequest) {
       for await (const chunk of result.textStream) {
         fullResponse += chunk
       }
-      usage = await result.usage || { totalTokens: 0 }
+      usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
     }
     
     // If still no response, try Google Gemini (FREE tier - 15 requests/min, 1,500 requests/day)

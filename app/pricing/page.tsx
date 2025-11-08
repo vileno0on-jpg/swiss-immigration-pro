@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { CheckCircle, Sparkles, Crown } from 'lucide-react'
 import { PRICING_PACKS } from '@/lib/stripe'
+import { PricingPack } from '@/types'
 
 export default function Pricing() {
   const [selectedPack, setSelectedPack] = useState<string | null>(null)
@@ -61,7 +62,7 @@ export default function Pricing() {
 
         {/* Pricing Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {Object.values(PRICING_PACKS).map((pack, idx) => (
+          {Object.values(PRICING_PACKS).map((pack: PricingPack, idx) => (
             <motion.div
               key={pack.id}
               initial={{ opacity: 0, y: 20 }}

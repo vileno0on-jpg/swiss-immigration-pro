@@ -103,7 +103,7 @@ export default function UserUpgradeModal({ user, onClose, onUpgrade }: UserUpgra
                     )}
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    {pack.valueProp}
+                    {pack.features[0]}
                   </p>
                   <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
                     CHF {pack.price.toFixed(2)}
