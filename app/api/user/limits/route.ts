@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET() {
   try {
@@ -11,27 +11,29 @@ export async function GET() {
       return NextResponse.json({ packId: 'free', messagesToday: 0 })
     }
 
-    // Get user profile
-    const profiles = await sql`
-      SELECT pack_id FROM profiles
-      WHERE id = ${session.user.id}
-    `
+    // Get user profile and limits
+    const supabase = await createClient()
 
-    const profile = profiles[0] as any
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('pack_id')
+      .eq('id', session.user.id)
+      .single()
+
     const packId = profile?.pack_id || 'free'
 
     // Get user limits
-    const limitsResult = await sql`
-      SELECT messages_today, last_reset_date FROM user_limits
-      WHERE user_id = ${session.user.id}
-    `
+    const { data: limitsResult, error: limitsError } = await supabase
+      .from('user_limits')
+      .select('messages_today, last_reset_date')
+      .eq('user_id', session.user.id)
+      .single()
 
     let messagesToday = 0
-    if (limitsResult && limitsResult[0]) {
-      const limits = limitsResult[0] as any
+    if (!limitsError && limitsResult) {
       const today = new Date().toISOString().split('T')[0]
-      if (limits.last_reset_date === today) {
-        messagesToday = limits.messages_today || 0
+      if (limitsResult.last_reset_date === today) {
+        messagesToday = limitsResult.messages_today || 0
       }
     }
 

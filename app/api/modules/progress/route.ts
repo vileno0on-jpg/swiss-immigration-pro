@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,18 +17,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Module ID and Section ID are required' }, { status: 400 })
     }
 
-    // Store section completion in a JSON structure
-    const progressKey = `module_${moduleId}_progress`
-    
+    const supabase = await createClient()
+
     // Get existing progress
-    const existing = await sql`
-      SELECT * FROM masterclass_progress
-      WHERE user_id = ${session.user.id} AND module_id = ${moduleId}
-    `
+    const { data: existing, error: fetchError } = await supabase
+      .from('masterclass_progress')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('module_id', moduleId)
+      .single()
 
     let progressData: Record<string, boolean> = {}
-    if (existing.length > 0 && existing[0].metadata) {
-      progressData = existing[0].metadata as any
+    if (!fetchError && existing?.metadata) {
+      progressData = existing.metadata as any
     }
 
     // Update section completion
@@ -40,20 +41,24 @@ export async function POST(req: NextRequest) {
     const progressPercent = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
 
     // Upsert progress
-    if (existing.length > 0) {
-      await sql`
-        UPDATE masterclass_progress
-        SET progress_percent = ${progressPercent},
-            metadata = ${JSON.stringify(progressData)}::jsonb,
-            updated_at = NOW(),
-            completed_at = CASE WHEN ${progressPercent} = 100 THEN NOW() ELSE completed_at END
-        WHERE user_id = ${session.user.id} AND module_id = ${moduleId}
-      `
-    } else {
-      await sql`
-        INSERT INTO masterclass_progress (user_id, module_id, progress_percent, metadata)
-        VALUES (${session.user.id}, ${moduleId}, ${progressPercent}, ${JSON.stringify(progressData)}::jsonb)
-      `
+    const upsertData = {
+      user_id: session.user.id,
+      module_id: moduleId,
+      progress_percent: progressPercent,
+      metadata: progressData,
+      updated_at: new Date().toISOString(),
+      ...(progressPercent === 100 && { completed_at: new Date().toISOString() })
+    }
+
+    const { error: upsertError } = await supabase
+      .from('masterclass_progress')
+      .upsert(upsertData, {
+        onConflict: 'user_id,module_id'
+      })
+
+    if (upsertError) {
+      console.error('Progress upsert error:', upsertError)
+      return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 })
     }
 
     return NextResponse.json({ 
@@ -83,25 +88,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Module ID is required' }, { status: 400 })
     }
 
-    const progress = await sql`
-      SELECT * FROM masterclass_progress
-      WHERE user_id = ${session.user.id} AND module_id = ${moduleId}
-    `
+    const supabase = await createClient()
+    const { data: progress, error } = await supabase
+      .from('masterclass_progress')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('module_id', moduleId)
+      .single()
 
-    if (progress.length === 0) {
-      return NextResponse.json({ 
+    if (error || !progress) {
+      return NextResponse.json({
         progress: 0,
         sections: {},
         completed: false
       })
     }
 
-    const p = progress[0] as any
     return NextResponse.json({
-      progress: p.progress_percent || 0,
-      sections: p.metadata || {},
-      completed: p.completed_at !== null,
-      completedAt: p.completed_at
+      progress: progress.progress_percent || 0,
+      sections: progress.metadata || {},
+      completed: progress.completed_at !== null,
+      completedAt: progress.completed_at
     })
   } catch (error: any) {
     console.error('Progress fetch error:', error)

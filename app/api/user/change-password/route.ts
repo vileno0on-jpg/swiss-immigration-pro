@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
@@ -22,21 +22,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'New password must be at least 8 characters long' }, { status: 400 })
     }
 
-    if (!sql) {
-      return NextResponse.json({ error: 'Database not available' }, { status: 500 })
-    }
+    const supabase = await createClient()
 
     // Get current user password
-    const users = await sql`
-      SELECT id, password_hash FROM users
-      WHERE id = ${session.user.id}
-    `
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, password_hash')
+      .eq('id', session.user.id)
+      .single()
 
-    if (!users || users.length === 0) {
+    if (userError || !user) {
+      console.error('User fetch error:', userError)
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
-
-    const user = users[0] as any
 
     // Verify current password
     const isValid = await bcrypt.compare(currentPassword, user.password_hash)
@@ -49,12 +47,18 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
     // Update password
-    await sql`
-      UPDATE users
-      SET password_hash = ${hashedPassword},
-          updated_at = NOW()
-      WHERE id = ${session.user.id}
-    `
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        password_hash: hashedPassword,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', session.user.id)
+
+    if (updateError) {
+      console.error('Password update error:', updateError)
+      return NextResponse.json({ error: 'Failed to update password' }, { status: 500 })
+    }
 
     return NextResponse.json({ message: 'Password changed successfully' })
   } catch (error: any) {

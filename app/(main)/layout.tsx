@@ -7,3 +7,6 @@ export default function MainLayout({
 }) {
   return <ClientLayout>{children}</ClientLayout>
 }
+
+
+

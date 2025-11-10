@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET() {
   try {
-    const stats = await sql`
-      SELECT * FROM live_stats
-      WHERE is_active = true
-      ORDER BY display_order ASC
-    `
+    const supabase = await createClient()
+    const { data: stats, error } = await supabase
+      .from('live_stats')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching stats:', error)
+      return NextResponse.json([], { status: 500 })
+    }
 
     return NextResponse.json(stats || [])
   } catch (error) {

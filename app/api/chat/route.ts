@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { streamText } from 'ai'
 import { groq } from '@ai-sdk/groq'
 import { CONFIG } from '@/lib/config'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 import { HfInference } from '@huggingface/inference'
 import { generateResponseFromKnowledge, findRelevantKnowledge } from '@/lib/knowledge-base'
 
@@ -311,17 +311,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Try to get layer from user's quiz results if not provided
-    if (!userLayer && sql) {
+    if (!userLayer) {
       try {
-        const quizResult = await sql`
-          SELECT answers FROM quiz_results
-          WHERE user_id = ${session.user.id}
-          AND quiz_type = 'initial_assessment'
-          ORDER BY created_at DESC
-          LIMIT 1
-        `
-        if (quizResult && quizResult[0]) {
-          const answers = quizResult[0].answers as any
+        const supabase = await createClient()
+        const { data: quizResult, error } = await supabase
+          .from('quiz_results')
+          .select('answers')
+          .eq('user_id', session.user.id)
+          .eq('quiz_type', 'initial_assessment')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (!error && quizResult) {
+          const answers = quizResult.answers as any
           userLayer = answers?.layer
         }
       } catch (error) {
@@ -333,17 +336,18 @@ export async function POST(req: NextRequest) {
     const systemPrompt = getSystemPrompt(userLayer)
 
     // Check if free tier has hit limit (handled by client, but double-check server-side)
-    if (packId === 'free' && sql) {
+    if (packId === 'free') {
       try {
-        const limitsResult = await sql`
-          SELECT messages_today, last_reset_date FROM user_limits
-          WHERE user_id = ${session.user.id}
-        `
+        const supabase = await createClient()
+        const { data: limitsResult, error } = await supabase
+          .from('user_limits')
+          .select('messages_today, last_reset_date')
+          .eq('user_id', session.user.id)
+          .single()
 
-        if (limitsResult && limitsResult[0]) {
-          const limits = limitsResult[0] as any
+        if (!error && limitsResult) {
           const today = new Date().toISOString().split('T')[0]
-          const currentMessages = limits.last_reset_date === today ? limits.messages_today : 0
+          const currentMessages = limitsResult.last_reset_date === today ? limitsResult.messages_today : 0
 
           if (currentMessages >= CONFIG.ai.freeDailyLimit) {
             return NextResponse.json(
@@ -468,47 +472,50 @@ export async function POST(req: NextRequest) {
       fullResponse = getSimpleFallbackResponse(message)
     }
 
-    // Save message to database (if database is available)
-    if (sql) {
-      try {
-        await sql`
-          INSERT INTO chat_messages (user_id, message, response, pack_id, tokens_used)
-          VALUES (${session.user.id}, ${message}, ${fullResponse}, ${packId || 'free'}, ${usage?.totalTokens || 0})
-        `
+    // Save message to database
+    try {
+      const supabase = await createClient()
 
-        // Update daily limit for free tier
-        if (packId === 'free') {
-          const today = new Date().toISOString().split('T')[0]
-          const limitsResult = await sql`
-            SELECT messages_today, last_reset_date FROM user_limits
-            WHERE user_id = ${session.user.id}
-          `
-          
-          if (limitsResult && limitsResult[0]) {
-            const limits = limitsResult[0] as any
-            const currentMessages = limits.last_reset_date === today ? limits.messages_today + 1 : 1
-            
-            await sql`
-              INSERT INTO user_limits (user_id, messages_today, last_reset_date)
-              VALUES (${session.user.id}, ${currentMessages}, ${today})
-              ON CONFLICT (user_id) DO UPDATE
-              SET messages_today = ${currentMessages},
-                  last_reset_date = ${today}
-            `
-          } else {
-            await sql`
-              INSERT INTO user_limits (user_id, messages_today, last_reset_date)
-              VALUES (${session.user.id}, 1, ${today})
-              ON CONFLICT (user_id) DO UPDATE
-              SET messages_today = 1,
-                  last_reset_date = ${today}
-            `
-          }
-        }
-      } catch (dbError) {
-        console.error('Error saving message to database:', dbError)
-        // Continue even if DB save fails
+      // Insert chat message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          user_id: session.user.id,
+          message,
+          response: fullResponse,
+          pack_id: packId || 'free',
+          tokens_used: usage?.totalTokens || 0
+        })
+
+      // Update daily limit for free tier
+      if (packId === 'free') {
+        const today = new Date().toISOString().split('T')[0]
+
+        // Check current limits
+        const { data: limitsResult } = await supabase
+          .from('user_limits')
+          .select('messages_today, last_reset_date')
+          .eq('user_id', session.user.id)
+          .single()
+
+        const currentMessages = limitsResult?.last_reset_date === today
+          ? (limitsResult.messages_today || 0) + 1
+          : 1
+
+        // Upsert user limits
+        await supabase
+          .from('user_limits')
+          .upsert({
+            user_id: session.user.id,
+            messages_today: currentMessages,
+            last_reset_date: today
+          }, {
+            onConflict: 'user_id'
+          })
       }
+    } catch (dbError) {
+      console.error('Error saving message to database:', dbError)
+      // Continue even if DB save fails
     }
 
     // Return response

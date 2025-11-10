@@ -1,9 +1,20 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Users table (extends Supabase auth.users)
+-- Users table (custom authentication)
+CREATE TABLE public.users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  email_verified BOOLEAN DEFAULT false,
+  email_verified_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Profiles table (extends users)
 CREATE TABLE public.profiles (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  id UUID REFERENCES public.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -138,86 +149,87 @@ CREATE TABLE public.admin_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- RLS Policies
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_limits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.masterclass_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.quiz_results ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_cvs ENABLE ROW LEVEL SECURITY;
+-- RLS Policies (disabled for custom auth)
+-- ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.user_limits ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.masterclass_progress ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.quiz_results ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.user_cvs ENABLE ROW LEVEL SECURITY;
 
+-- RLS Policies commented out for custom authentication
 -- Policies for profiles
-CREATE POLICY "Users can view own profile"
-  ON public.profiles FOR SELECT
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
-
--- Policies for chat messages
-CREATE POLICY "Users can insert own messages"
-  ON public.chat_messages FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view own messages"
-  ON public.chat_messages FOR SELECT
-  USING (auth.uid() = user_id);
-
--- Policies for subscriptions
-CREATE POLICY "Users can view own subscriptions"
-  ON public.subscriptions FOR SELECT
-  USING (auth.uid() = user_id);
-
--- Policies for payments
-CREATE POLICY "Users can view own payments"
-  ON public.payments FOR SELECT
-  USING (auth.uid() = user_id);
-
--- Policies for masterclass progress
-CREATE POLICY "Users can manage own progress"
-  ON public.masterclass_progress FOR ALL
-  USING (auth.uid() = user_id);
-
--- Policies for quiz results
-CREATE POLICY "Users can manage own quiz results"
-  ON public.quiz_results FOR ALL
-  USING (auth.uid() = user_id);
-
--- Policies for user CVs
-CREATE POLICY "Users can manage own CVs"
-  ON public.user_cvs FOR ALL
-  USING (auth.uid() = user_id);
-
--- Admin policies (is_admin check)
-CREATE POLICY "Admins can view all profiles"
-  ON public.profiles FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND is_admin = TRUE
-    )
-  );
-
-CREATE POLICY "Admins can view all chat messages"
-  ON public.chat_messages FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND is_admin = TRUE
-    )
-  );
-
-CREATE POLICY "Admins can view all subscriptions"
-  ON public.subscriptions FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND is_admin = TRUE
-    )
-  );
+-- CREATE POLICY "Users can view own profile"
+--   ON public.profiles FOR SELECT
+--   USING (auth.uid() = id);
+--
+-- CREATE POLICY "Users can update own profile"
+--   ON public.profiles FOR UPDATE
+--   USING (auth.uid() = id);
+--
+-- -- Policies for chat messages
+-- CREATE POLICY "Users can insert own messages"
+--   ON public.chat_messages FOR INSERT
+--   WITH CHECK (auth.uid() = user_id);
+--
+-- CREATE POLICY "Users can view own messages"
+--   ON public.chat_messages FOR SELECT
+--   USING (auth.uid() = user_id);
+--
+-- -- Policies for subscriptions
+-- CREATE POLICY "Users can view own subscriptions"
+--   ON public.subscriptions FOR SELECT
+--   USING (auth.uid() = user_id);
+--
+-- -- Policies for payments
+-- CREATE POLICY "Users can view own payments"
+--   ON public.payments FOR SELECT
+--   USING (auth.uid() = user_id);
+--
+-- -- Policies for masterclass progress
+-- CREATE POLICY "Users can manage own progress"
+--   ON public.masterclass_progress FOR ALL
+--   USING (auth.uid() = user_id);
+--
+-- -- Policies for quiz results
+-- CREATE POLICY "Users can manage own quiz results"
+--   ON public.quiz_results FOR ALL
+--   USING (auth.uid() = user_id);
+--
+-- -- Policies for user CVs
+-- CREATE POLICY "Users can manage own CVs"
+--   ON public.user_cvs FOR ALL
+--   USING (auth.uid() = user_id);
+--
+-- -- Admin policies (is_admin check)
+-- CREATE POLICY "Admins can view all profiles"
+--   ON public.profiles FOR SELECT
+--   USING (
+--     EXISTS (
+--       SELECT 1 FROM public.profiles
+--       WHERE id = auth.uid() AND is_admin = TRUE
+--     )
+--   );
+--
+-- CREATE POLICY "Admins can view all chat messages"
+--   ON public.chat_messages FOR SELECT
+--   USING (
+--     EXISTS (
+--       SELECT 1 FROM public.profiles
+--       WHERE id = auth.uid() AND is_admin = TRUE
+--     )
+--   );
+--
+-- CREATE POLICY "Admins can view all subscriptions"
+--   ON public.subscriptions FOR SELECT
+--   USING (
+--     EXISTS (
+--       SELECT 1 FROM public.profiles
+--       WHERE id = auth.uid() AND is_admin = TRUE
+--     )
+--   );
 
 -- Functions and triggers
 CREATE OR REPLACE FUNCTION update_updated_at_column()

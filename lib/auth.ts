@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -17,41 +17,37 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          if (!sql) {
-            console.error('Database connection not available')
+          const supabase = await createClient()
+
+          // For now, we'll use a custom users table in Supabase
+          // This maintains compatibility with existing auth flow
+          const { data: users, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', credentials.email)
+            .single()
+
+          if (error || !users) {
             return null
           }
-
-          // Find user by email
-          const users = await sql`
-            SELECT * FROM users 
-            WHERE email = ${credentials.email}
-          `
-
-          if (!users || users.length === 0) {
-            return null
-          }
-
-          const user = users[0] as any
 
           // Verify password
-          const isValid = await bcrypt.compare(credentials.password, user.password_hash)
+          const isValid = await bcrypt.compare(credentials.password, users.password_hash)
 
           if (!isValid) {
             return null
           }
 
           // Get user profile
-          const profiles = await sql`
-            SELECT * FROM profiles 
-            WHERE id = ${user.id}
-          `
-
-          const profile = (profiles && profiles[0]) ? (profiles[0] as any) : null
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', users.id)
+            .single()
 
           return {
-            id: user.id,
-            email: user.email,
+            id: users.id,
+            email: users.email,
             name: profile?.full_name || null,
             isAdmin: profile?.is_admin || false,
             packId: profile?.pack_id || 'free',

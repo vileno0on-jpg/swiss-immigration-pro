@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sql } from '@/lib/neon/db'
+import { createClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
@@ -20,12 +20,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Check if user already exists
-    const existingUsers = await sql`
-      SELECT id FROM users WHERE email = ${email}
-    `
+    const supabase = await createClient()
 
-    if (existingUsers.length > 0) {
+    // Check if user already exists
+    const { data: existingUsers, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single()
+
+    if (!checkError && existingUsers) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 400 }
@@ -36,15 +40,18 @@ export async function POST(req: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     // Create user
-    const newUsers = await sql`
-      INSERT INTO users (email, password_hash, email_verified)
-      VALUES (${email}, ${passwordHash}, true)
-      RETURNING id, email
-    `
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .insert({
+        email,
+        password_hash: passwordHash,
+        email_verified: true
+      })
+      .select('id, email')
+      .single()
 
-    const user = newUsers[0]
-
-    if (!user) {
+    if (userError || !user) {
+      console.error('User creation error:', userError)
       return NextResponse.json(
         { error: 'Failed to create user' },
         { status: 500 }
@@ -52,17 +59,31 @@ export async function POST(req: NextRequest) {
     }
 
     // Create profile
-    await sql`
-      INSERT INTO profiles (id, email, full_name, pack_id)
-      VALUES (${user.id}, ${email}, ${fullName || null}, 'free')
-    `
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email,
+        full_name: fullName || null,
+        pack_id: 'free'
+      })
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError)
+    }
 
     // Create user limits
-    await sql`
-      INSERT INTO user_limits (user_id, messages_today, last_reset_date)
-      VALUES (${user.id}, 0, CURRENT_DATE)
-      ON CONFLICT (user_id) DO NOTHING
-    `
+    const { error: limitsError } = await supabase
+      .from('user_limits')
+      .insert({
+        user_id: user.id,
+        messages_today: 0,
+        last_reset_date: new Date().toISOString().split('T')[0]
+      })
+
+    if (limitsError) {
+      console.error('Limits creation error:', limitsError)
+    }
 
     return NextResponse.json({ 
       success: true, 
