@@ -2,6 +2,34 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 
+// Performance API type declarations
+interface LayoutShift extends PerformanceEntry {
+  value: number
+  hadRecentInput: boolean
+  lastInputTime: number
+  sources: Array<{
+    node?: Node
+    previousRect: DOMRectReadOnly
+    currentRect: DOMRectReadOnly
+  }>
+}
+
+interface LargestContentfulPaint extends PerformanceEntry {
+  renderTime: number
+  loadTime: number
+  size: number
+  id: string
+  url: string
+  element?: Element
+}
+
+interface FirstInput extends PerformanceEntry {
+  processingStart: number
+  processingEnd: number
+  startTime: number
+  duration: number
+}
+
 /**
  * Performance optimization hooks for smooth, fluid interactions
  */
