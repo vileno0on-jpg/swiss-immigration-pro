@@ -8,9 +8,9 @@
 DO $$
 DECLARE
     v_user_id UUID;
-    v_user_email TEXT := 'admin@swissimmigrationpro.com'; -- CHANGE THIS
-    v_user_password TEXT := 'YourSecurePassword123!'; -- CHANGE THIS
-    v_user_name TEXT := 'Admin User';
+    v_user_email TEXT := 'andrea.vonflue@gmail.com'; -- Admin email
+    v_user_password TEXT := 'Andreavf0222'; -- Admin password
+    v_user_name TEXT := 'Andrea Von Flue';
 BEGIN
     -- Check if user already exists
     SELECT id INTO v_user_id FROM auth.users WHERE email = v_user_email;
