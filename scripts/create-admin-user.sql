@@ -1,6 +1,11 @@
 -- =====================================================
 -- Admin User Creation Script
 -- Run this in Supabase SQL Editor to create an admin user
+--
+-- ADMIN CREDENTIALS:
+-- Email: andrea.vonflue@gmail.com
+-- Password: Andreavf0222
+-- Name: Andrea Von Flue
 -- =====================================================
 
 -- Step 1: Create the auth user (if not exists)
