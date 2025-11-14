@@ -18,46 +18,20 @@ DECLARE
     v_user_name TEXT := 'Andrea Von Flue';
 BEGIN
     -- Check if user already exists
-    SELECT id INTO v_user_id FROM auth.users WHERE email = v_user_email;
-    
+    SELECT id INTO v_user_id FROM public.users WHERE email = v_user_email;
+
     IF v_user_id IS NULL THEN
-        -- Create new user
-        INSERT INTO auth.users (
-            instance_id,
-            id,
-            aud,
-            role,
+        -- Create new user in public.users table
+        INSERT INTO public.users (
             email,
-            encrypted_password,
-            email_confirmed_at,
-            recovery_sent_at,
-            last_sign_in_at,
-            raw_app_meta_data,
-            raw_user_meta_data,
-            created_at,
-            updated_at,
-            confirmation_token,
-            email_change,
-            email_change_token_new,
-            recovery_token
+            password_hash,
+            email_verified,
+            email_verified_at
         ) VALUES (
-            '00000000-0000-0000-0000-000000000000',
-            gen_random_uuid(),
-            'authenticated',
-            'authenticated',
             v_user_email,
             crypt(v_user_password, gen_salt('bf')),
-            NOW(),
-            NOW(),
-            NOW(),
-            '{"provider":"email","providers":["email"]}'::jsonb,
-            ('{"name":"' || v_user_name || '"}')::jsonb,
-            NOW(),
-            NOW(),
-            '',
-            '',
-            '',
-            ''
+            TRUE,
+            NOW()
         ) RETURNING id INTO v_user_id;
         
         RAISE NOTICE 'Created new user with ID: %', v_user_id;
