@@ -63,88 +63,67 @@ export default function LayerPage() {
 
   return (
     <div className="bg-white dark:bg-gray-900">
-      {/* Conversion Header - Sticky */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white shadow-lg">
+      {/* Professional Header */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            {/* Left: Urgency Message */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold">🔥 2025 Quotas Filling Fast</span>
+          <div className="flex items-center justify-between py-4">
+            {/* Professional Benefits */}
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>AI-Powered Guidance</span>
               </div>
-              <div className="hidden md:flex items-center space-x-2 text-sm">
-                <TrendingUp className="w-4 h-4" />
-                <span>Only 2,500 permits left</span>
+              <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span>Professional Templates</span>
               </div>
-            </div>
-
-            {/* Center: Premium Benefits */}
-            <div className="hidden lg:flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>Unlimited AI Chat</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>20+ CV Templates</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
+              <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-600">
+                <Award className="w-4 h-4 text-purple-600" />
                 <span>Expert Support</span>
               </div>
             </div>
 
-            {/* Right: CTA Buttons */}
-            <div className="flex items-center space-x-3">
+            {/* Professional CTA */}
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600 hidden sm:inline">Ready to accelerate your application?</span>
               <Link
                 href="/pricing"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-md"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition-colors shadow-sm"
               >
-                ⭐ Upgrade Now
-              </Link>
-              <Link
-                href="/auth/register"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm font-semibold px-4 py-2 rounded-lg text-sm transition-colors border border-white/30"
-              >
-                Start Free
+                View Premium Plans
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Premium Upgrade Banner */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-amber-200 dark:border-amber-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      {/* Professional Value Proposition */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="bg-amber-100 dark:bg-amber-800 p-2 rounded-lg">
-                <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Award className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-amber-900 dark:text-amber-100">
-                  Unlock Premium Features
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Professional Immigration Support
                 </h3>
-                <p className="text-sm text-amber-700 dark:text-amber-300">
-                  Get personalized AI guidance, CV templates, and priority support
+                <p className="text-sm text-gray-600">
+                  Access comprehensive tools and expert guidance designed for serious applicants
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               <div className="text-right">
-                <div className="text-lg font-bold text-amber-900 dark:text-amber-100">
-                  CHF 97/mo
-                </div>
-                <div className="text-xs text-amber-600 dark:text-amber-400">
-                  Cancel anytime
-                </div>
+                <div className="text-sm text-gray-600">Starting from</div>
+                <div className="text-xl font-bold text-gray-900">CHF 97/month</div>
               </div>
               <Link
                 href="/pricing"
-                className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-2 rounded-lg transition-colors shadow-md"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
               >
-                Get Premium →
+                Explore Plans
               </Link>
             </div>
           </div>
@@ -351,93 +330,85 @@ export default function LayerPage() {
         </div>
       </section>
 
-      {/* Premium Features Highlight */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+      {/* Professional Services Section */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-              <Award className="w-4 h-4" />
-              <span>⭐ Premium Features</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Unlock Your Complete Swiss Immigration Toolkit
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Comprehensive Immigration Services
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Join 10,000+ successful immigrants who used our premium tools to get their Swiss permits faster
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Professional tools and expert guidance trusted by thousands of successful applicants
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-blue-200 dark:border-blue-800">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">Unlimited AI Chat</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">24/7 expert answers</p>
+                  <h3 className="font-bold text-gray-900">AI-Powered Assistance</h3>
+                  <p className="text-sm text-gray-600">Intelligent guidance system</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Get instant answers to all your immigration questions from our AI powered by Swiss immigration experts.
+              <p className="text-gray-700 mb-4">
+                Advanced AI technology provides personalized answers to your immigration questions, available 24/7.
               </p>
+              <div className="text-sm text-blue-600 font-medium">Premium feature</div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-purple-200 dark:border-purple-800">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">20+ CV Templates</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">ATS-optimized designs</p>
+                  <h3 className="font-bold text-gray-900">Professional Templates</h3>
+                  <p className="text-sm text-gray-600">Swiss-standard documents</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Swiss-style CV templates designed specifically for immigration applications with 95% success rate.
+              <p className="text-gray-700 mb-4">
+                Industry-standard CV and document templates specifically designed for Swiss immigration requirements.
               </p>
+              <div className="text-sm text-blue-600 font-medium">Premium feature</div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-green-200 dark:border-green-800">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">Priority Support</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Expert guidance</p>
+                  <h3 className="font-bold text-gray-900">Expert Consultation</h3>
+                  <p className="text-sm text-gray-600">Professional immigration support</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Direct access to Swiss immigration experts and personalized document review.
+              <p className="text-gray-700 mb-4">
+                Direct access to certified immigration specialists for personalized guidance and document review.
               </p>
+              <div className="text-sm text-blue-600 font-medium">Premium feature</div>
             </div>
           </div>
 
           <div className="text-center">
-            <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl p-8 text-white mb-6">
-              <div className="flex items-center justify-center space-x-2 mb-4">
-                <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold">Limited Time: 30-Day Money-Back Guarantee</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Upgrade to Premium Today</h3>
-              <p className="text-lg opacity-90 mb-4">Get all features + save CHF 147 this month</p>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Ready for Professional Support?</h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Join thousands of successful applicants who have accelerated their Swiss immigration journey with our comprehensive premium services.
+              </p>
               <div className="flex items-center justify-center space-x-4 mb-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">CHF 97/mo</div>
-                  <div className="text-sm opacity-75">Instead of CHF 147</div>
-                </div>
-                <div className="text-6xl text-yellow-300">→</div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-300">33% OFF</div>
-                  <div className="text-sm opacity-75">First month</div>
+                  <div className="text-2xl font-bold text-gray-900">CHF 97/month</div>
+                  <div className="text-sm text-gray-600">Professional plan</div>
                 </div>
               </div>
               <Link
                 href="/pricing"
-                className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl transition-colors shadow-lg transform hover:scale-105"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-sm"
               >
-                🚀 Claim Discount - Start Premium
+                View Premium Plans
               </Link>
             </div>
           </div>
@@ -532,142 +503,118 @@ export default function LayerPage() {
         </div>
       </section>
 
-      {/* Final CTA Section - High Conversion */}
-      <section className="py-24 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent"></div>
-        </div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      {/* Professional CTA Section */}
+      <section className="py-20 bg-white border-t border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Social Proof */}
-          <div className="flex items-center justify-center space-x-6 mb-8">
-            <div className="flex -space-x-2">
-              <div className="w-10 h-10 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">🇺🇸</div>
-              <div className="w-10 h-10 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">🇩🇪</div>
-              <div className="w-10 h-10 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">🇮🇳</div>
-              <div className="w-10 h-10 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">🇨🇳</div>
-            </div>
-            <div className="text-left">
-              <div className="text-lg font-bold">10,000+ Success Stories</div>
-              <div className="text-sm opacity-75">From 120+ countries</div>
-            </div>
-          </div>
-
-          {/* Main Headline */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-8"
-          >
-            <div className="inline-flex items-center space-x-2 bg-red-500/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-              <span>⚡ Last Chance: 2025 Quotas Closing Soon</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-              Don't Miss Your Swiss Dream
-            </h2>
-            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
-              Join thousands who've successfully immigrated to Switzerland. Get expert guidance, proven strategies, and the tools you need to make it happen.
-            </p>
-          </motion.div>
-
-          {/* Value Proposition */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
-            >
-              <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">92% Success Rate</h3>
-              <p className="text-sm opacity-90">Our users get their permits approved</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
-            >
-              <Clock className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">9 Weeks Average</h3>
-              <p className="text-sm opacity-90">From application to approval</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
-            >
-              <Award className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">30-Day Guarantee</h3>
-              <p className="text-sm opacity-90">Money back if not satisfied</p>
-            </motion.div>
-          </div>
-
-          {/* Pricing Comparison */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl p-8 mb-8 text-black"
-          >
-            <h3 className="text-2xl font-bold mb-4">🎯 Limited Time Launch Discount</h3>
-            <div className="flex items-center justify-center space-x-8 mb-6">
-              <div className="text-center">
-                <div className="text-sm opacity-75">Regular Price</div>
-                <div className="text-2xl font-bold line-through">CHF 147/mo</div>
-              </div>
-              <div className="text-4xl text-red-600">→</div>
-              <div className="text-center">
-                <div className="text-sm opacity-75">Launch Price</div>
-                <div className="text-4xl font-extrabold">CHF 97/mo</div>
-                <div className="text-sm font-semibold">Save CHF 600/year</div>
-              </div>
+          {/* Trust Indicators */}
+          <div className="flex items-center justify-center space-x-8 mb-12">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">10,000+</div>
+              <div className="text-sm text-gray-600">Successful Applications</div>
             </div>
             <div className="text-center">
-              <span className="inline-block bg-red-600 text-white px-4 py-1 rounded-full text-sm font-bold">
-                🔥 34% OFF - First Month Only
-              </span>
+              <div className="text-2xl font-bold text-gray-900">92%</div>
+              <div className="text-sm text-gray-600">Approval Rate</div>
             </div>
-          </motion.div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/pricing"
-              className="group bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold px-10 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center space-x-2"
-            >
-              <Award className="w-5 h-5" />
-              <span>🚀 Start Premium - Claim Discount</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            <Link
-              href="/auth/register"
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 border border-white/30 hover:border-white/50"
-            >
-              Start Free Trial
-            </Link>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">120+</div>
+              <div className="text-sm text-gray-600">Countries Served</div>
+            </div>
           </div>
 
-          {/* Trust Signals */}
-          <div className="mt-8 text-center">
-            <p className="text-sm opacity-75 mb-4">
-              ✅ No setup fees • ✅ Cancel anytime • ✅ 30-day money-back guarantee
+          {/* Main Message */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Your Swiss Immigration Journey Starts Here
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+              Access professional tools and expert guidance designed to streamline your Swiss immigration process.
+              Join thousands of successful applicants who have achieved their immigration goals.
             </p>
-            <div className="flex items-center justify-center space-x-4 text-xs opacity-60">
-              <span>🔒 SSL Secured</span>
-              <span>•</span>
-              <span>📧 Email Support</span>
-              <span>•</span>
-              <span>🇨🇭 Swiss Based</span>
+          </div>
+
+          {/* Service Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Proven Success Rate</h3>
+              <p className="text-gray-600 text-sm">92% of our premium users successfully obtain their Swiss permits</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Faster Processing</h3>
+              <p className="text-gray-600 text-sm">Average 9 weeks from application to permit approval</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Expert Support</h3>
+              <p className="text-gray-600 text-sm">Professional immigration consultants and document review</p>
+            </div>
+          </div>
+
+          {/* Professional CTA */}
+          <div className="bg-gray-50 rounded-2xl p-8 text-center">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Ready to Take the Next Step?</h3>
+            <p className="text-gray-600 mb-6">
+              Choose the professional plan that best fits your immigration needs.
+            </p>
+            <div className="flex items-center justify-center space-x-6 mb-8">
+              <div className="text-center">
+                <div className="text-lg font-bold text-gray-900">CHF 97/month</div>
+                <div className="text-sm text-gray-600">Professional Plan</div>
+              </div>
+              <div className="text-gray-300">•</div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-gray-900">CHF 147/month</div>
+                <div className="text-sm text-gray-600">Citizenship Plan</div>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/pricing"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-sm"
+              >
+                Compare Plans
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-white hover:bg-gray-50 text-gray-900 font-semibold px-8 py-3 rounded-lg transition-colors border border-gray-300"
+              >
+                Start Free Account
+              </Link>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-12 text-center">
+            <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-3 h-3 text-green-600" />
+                </div>
+                <span>30-Day Guarantee</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                </div>
+                <span>SSL Secured</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Award className="w-3 h-3 text-purple-600" />
+                </div>
+                <span>Swiss Based</span>
+              </div>
             </div>
           </div>
         </div>
