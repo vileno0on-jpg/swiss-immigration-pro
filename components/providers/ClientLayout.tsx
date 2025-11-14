@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ChatWidget from '@/components/chat/ChatWidget'
@@ -8,10 +8,11 @@ import { InitialQuizGate } from '@/components/quiz/InitialQuizGate'
 import { SessionProvider } from './SessionProvider'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = React.useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const frameId = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(frameId)
   }, [])
 
   if (!mounted) {

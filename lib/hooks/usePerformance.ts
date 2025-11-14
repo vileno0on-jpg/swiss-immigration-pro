@@ -67,21 +67,26 @@ export function useDebounce<T>(value: T, delay: number): T {
 /**
  * Throttle function for scroll events and other frequent updates
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (...args: unknown[]) => void>(
   callback: T,
   delay: number
-): T {
-  const lastRun = useRef<number>(Date.now())
+): ((...args: Parameters<T>) => void) {
+  const lastRun = useRef<number>(0)
+  const storedCallback = useRef(callback)
+
+  useEffect(() => {
+    storedCallback.current = callback
+  }, [callback])
 
   return useCallback(
-    ((...args: Parameters<T>) => {
+    (...args: Parameters<T>) => {
       const now = Date.now()
       if (now - lastRun.current >= delay) {
-        callback(...args)
+        storedCallback.current(...args)
         lastRun.current = now
       }
-    }) as T,
-    [callback, delay]
+    },
+    [delay]
   )
 }
 
@@ -97,7 +102,6 @@ export function useAnimationFrame(callback: () => void, isActive: boolean) {
 
     const animate = (time: number) => {
       if (previousTimeRef.current !== null) {
-        const deltaTime = time - previousTimeRef.current
         callback()
       }
       previousTimeRef.current = time
@@ -142,17 +146,22 @@ export function usePerformanceMonitor() {
       try {
         // Largest Contentful Paint (LCP)
         const lcpObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries()
-          const lastEntry = entries[entries.length - 1] as any
-          console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime)
+          const entries = list.getEntries() as PerformanceEntry[]
+          const lastEntry = entries[entries.length - 1] as LargestContentfulPaint | undefined
+          if (lastEntry) {
+            console.log('LCP:', lastEntry.renderTime ?? lastEntry.loadTime ?? 0)
+          }
         })
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] })
 
         // First Input Delay (FID)
         const fidObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries()
-          entries.forEach((entry: any) => {
-            console.log('FID:', entry.processingStart - entry.startTime)
+          const entries = list.getEntries() as PerformanceEntry[]
+          entries.forEach((entry) => {
+            if (entry.entryType === 'first-input') {
+              const timing = entry as PerformanceEventTiming
+              console.log('FID:', timing.processingStart - timing.startTime)
+            }
           })
         })
         fidObserver.observe({ entryTypes: ['first-input'] })
@@ -160,8 +169,8 @@ export function usePerformanceMonitor() {
         // Cumulative Layout Shift (CLS)
         let clsValue = 0
         const clsObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries()
-          entries.forEach((entry: any) => {
+          const entries = list.getEntries() as LayoutShift[]
+          entries.forEach((entry) => {
             if (!entry.hadRecentInput) {
               clsValue += entry.value
               console.log('CLS:', clsValue)
@@ -175,7 +184,7 @@ export function usePerformanceMonitor() {
           fidObserver.disconnect()
           clsObserver.disconnect()
         }
-      } catch (e) {
+      } catch {
         // Performance Observer not supported
       }
     }

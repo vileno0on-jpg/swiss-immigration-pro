@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Globe, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { initTranslationObserver, markContentAsTranslatable } from '@/lib/translation-helper'
 
 interface Language {
   code: string
@@ -35,29 +34,13 @@ export default function LanguageSwitcher() {
   const [currentLang, setCurrentLang] = useState<Language>(LANGUAGES[0])
   const [isTranslating, setIsTranslating] = useState(false)
   const [isScriptLoaded, setIsScriptLoaded] = useState(false)
+  const [pendingLanguageCode, setPendingLanguageCode] = useState<string | null>(null)
 
-  useEffect(() => {
-    // Load saved language preference
-    const savedLang = localStorage.getItem('preferredLanguage')
-    if (savedLang) {
-      const lang = LANGUAGES.find(l => l.code === savedLang)
-      if (lang) {
-        setCurrentLang(lang)
-      }
+  const loadGoogleTranslate = useCallback(() => {
+    if (typeof document === 'undefined') {
+      return
     }
 
-    // Load Google Translate script
-    loadGoogleTranslate()
-
-    // Don't initialize observer or mark content until script is loaded
-    // This prevents lag on initial load
-
-    return () => {
-      // Cleanup
-    }
-  }, [])
-
-  const loadGoogleTranslate = () => {
     // Add Google Translate script only once
     if (!document.getElementById('google-translate-script')) {
       const script = document.createElement('script')
@@ -92,55 +75,32 @@ export default function LanguageSwitcher() {
     } else {
       setIsScriptLoaded(true)
     }
-  }
+  }, [])
 
-  const applyGoogleTranslate = (langCode: string) => {
-    // Prevent multiple simultaneous translations
-    if (isTranslating) return
-    
-    setIsTranslating(true)
-    
-    // For English, just clear cookies and reload
-    if (langCode === 'en') {
-      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
-      document.cookie = `googtrans=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT`
-      setTimeout(() => {
-        window.location.reload()
-      }, 100)
+  useEffect(() => {
+    if (typeof window === 'undefined') {
       return
     }
-    
-    // Try to use the widget first
-    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement
-    if (selectElement && isScriptLoaded) {
-      try {
-        selectElement.value = langCode
-        selectElement.dispatchEvent(new Event('change'))
-        
-        // Short timeout for feedback
-        setTimeout(() => {
-          setIsTranslating(false)
-        }, 1500)
-      } catch (error) {
-        console.error('Translation error:', error)
-        useCookieFallback(langCode)
-      }
-    } else {
-      // Fallback: use cookies and reload
-      useCookieFallback(langCode)
-    }
-  }
 
-  const useCookieFallback = (langCode: string) => {
-    // Set cookie and reload
-    document.cookie = `googtrans=/en/${langCode}; path=/`
-    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`
-    
-    // Show brief loading message
-    setTimeout(() => {
-      window.location.reload()
-    }, 500)
-  }
+    // Load saved language preference
+    const savedLang = localStorage.getItem('preferredLanguage')
+    if (savedLang) {
+      const lang = LANGUAGES.find(l => l.code === savedLang)
+      if (lang) {
+        setCurrentLang(lang)
+      }
+    }
+
+    // Load Google Translate script
+    loadGoogleTranslate()
+
+    // Don't initialize observer or mark content until script is loaded
+    // This prevents lag on initial load
+
+    return () => {
+      // Cleanup
+    }
+  }, [loadGoogleTranslate])
 
   const handleLanguageChange = (language: Language) => {
     // Prevent rapid clicking
@@ -151,7 +111,8 @@ export default function LanguageSwitcher() {
     setIsOpen(false)
     
     // Apply translation
-    applyGoogleTranslate(language.code)
+    setIsTranslating(true)
+    setPendingLanguageCode(language.code)
   }
 
   return (

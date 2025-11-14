@@ -65,6 +65,7 @@ export function InitialQuizGate() {
 
   return useMemo(() => (
     <InitialQuizModal
+      key={isOpen ? 'open' : 'closed'}
       isOpen={isOpen}
       onClose={closeQuiz}
       onComplete={handleComplete}

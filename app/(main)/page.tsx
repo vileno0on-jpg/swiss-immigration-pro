@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, TrendingUp, Users, Clock, CheckCircle, Sparkles, BarChart3, Award, BookOpen } from 'lucide-react'
@@ -15,22 +15,48 @@ export default function Home() {
   const [stats, setStats] = useState<LiveStat[]>([])
   const [isClient, setIsClient] = useState(false)
 
-  useEffect(() => {
-    setIsClient(true)
-    loadStats()
-  }, [])
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async (): Promise<LiveStat[]> => {
     try {
       const res = await fetch('/api/stats')
-      if (res.ok) {
-        const data = await res.json()
-        setStats(data)
+      if (!res.ok) {
+        return []
       }
+      const data: LiveStat[] = await res.json()
+      return Array.isArray(data) ? data : []
     } catch (error) {
       console.error('Error loading stats:', error)
+      return []
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const frameId =
+      typeof window !== 'undefined'
+        ? window.requestAnimationFrame(() => {
+            if (isMounted) {
+              setIsClient(true)
+            }
+          })
+        : null
+
+    const fetchStats = async () => {
+      const data = await loadStats()
+      if (isMounted) {
+        setStats(data)
+      }
+    }
+
+    fetchStats()
+
+    return () => {
+      isMounted = false
+      if (frameId !== null && typeof window !== 'undefined') {
+        window.cancelAnimationFrame(frameId)
+      }
+    }
+  }, [loadStats])
 
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },

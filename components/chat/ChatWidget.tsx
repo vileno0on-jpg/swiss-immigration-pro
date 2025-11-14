@@ -1,304 +1,370 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Sparkles, Crown } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { MessageCircle, X, Send, Sparkles, Paperclip, FileText, XCircle } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
 import { CONFIG } from '@/lib/config'
+
+type UserPack = 'free' | 'immigration' | 'masterclass' | 'citizenship'
 
 interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  file?: {
+    name: string
+    type: string
+    size: number
+  }
 }
 
+interface UploadedFile {
+  file: File
+  preview: string
+}
+
+interface SessionUserMetadata {
+  pack?: UserPack
+  dailyMessages?: number
+  layer?: string
+}
+
+const DAILY_FREE_LIMIT = CONFIG.ai.freeDailyLimit
+
 export default function ChatWidget() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   const { data: session } = useSession()
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
 
-  // Don't render during SSR
-  if (!mounted) {
-    return null
-  }
+  const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [userPack, setUserPack] = useState<'free' | 'immigration' | 'masterclass' | 'citizenship'>('free')
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [dailyMessages, setDailyMessages] = useState(0)
+  const [userPack, setUserPack] = useState<UserPack>('free')
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Hide chat widget on module pages
-  const isModulePage = pathname?.startsWith('/modules/') ?? false
-
-  // Mutual exclusivity: Listen for events from EmbeddedChat
-  useEffect(() => {
-    const handleCloseChatWidget = () => {
-      setIsOpen(false)
-    }
-    window.addEventListener('closeChatWidget', handleCloseChatWidget)
-    return () => window.removeEventListener('closeChatWidget', handleCloseChatWidget)
-  }, [])
-
-  // When ChatWidget opens, notify EmbeddedChat
-  useEffect(() => {
-    if (isOpen) {
-      // Dispatch event to close EmbeddedChat
-      window.dispatchEvent(new CustomEvent('chatWidgetOpened'))
-      // Remove embedded chat flag
-      localStorage.removeItem('embeddedChatOpen')
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const init = async () => {
-      if (!session?.user) {
-        setUserPack('free')
-        return
-      }
-
-      // Load user pack and limits
-      try {
-        const res = await fetch('/api/user/limits')
-        if (res.ok) {
-          const data = await res.json()
-          setUserPack(data.packId || 'free')
-          setDailyMessages(data.messagesToday || 0)
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error)
-      }
-
-      // Load recent messages
-      try {
-        const msgRes = await fetch('/api/user/messages')
-        if (msgRes.ok) {
-          const msgData = await msgRes.json()
-          const formattedMessages = msgData
-            .flatMap((msg: any) => [
-              { id: `u-${msg.created_at}`, role: 'user' as const, content: msg.message, timestamp: new Date(msg.created_at) },
-              { id: `a-${msg.created_at}`, role: 'assistant' as const, content: msg.response || '', timestamp: new Date(msg.created_at) }
-            ])
-          setMessages(formattedMessages)
-        }
-      } catch (error) {
-        console.error('Error loading messages:', error)
-      }
-    }
-    init()
+  const sessionMetadata = useMemo(() => {
+    if (!session?.user) return undefined
+    return session.user as SessionUserMetadata
   }, [session])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  const canSendMessage = userPack === 'free' ? dailyMessages < CONFIG.ai.freeDailyLimit : true
-
-  const handleSend = async () => {
-    if (!input.trim() || !canSendMessage || isLoading) return
-
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
+    if (!sessionMetadata) {
+      setUserPack('free')
+      setDailyMessages(0)
+      return
     }
 
-    setMessages(prev => [...prev, userMessage])
+    setUserPack(sessionMetadata.pack ?? 'free')
+    setDailyMessages(sessionMetadata.dailyMessages ?? 0)
+  }, [sessionMetadata])
+
+  useEffect(() => {
+    if (!isOpen) return
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isOpen])
+
+  useEffect(() => {
+    return () => {
+      if (uploadedFile?.preview) {
+        URL.revokeObjectURL(uploadedFile.preview)
+      }
+    }
+  }, [uploadedFile])
+
+  const appendMessage = useCallback((message: ChatMessage) => {
+    setMessages((prev) => [...prev, message])
+  }, [])
+
+  const resetFileSelection = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }, [])
+
+  const handleRemoveFile = useCallback(() => {
+    if (uploadedFile?.preview) {
+      URL.revokeObjectURL(uploadedFile.preview)
+    }
+    setUploadedFile(null)
+    resetFileSelection()
+  }, [resetFileSelection, uploadedFile])
+
+  const handleFileSelect = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (!file) {
+        handleRemoveFile()
+        return
+      }
+
+      if (uploadedFile?.preview) {
+        URL.revokeObjectURL(uploadedFile.preview)
+      }
+
+      const preview = URL.createObjectURL(file)
+      setUploadedFile({ file, preview })
+    },
+    [handleRemoveFile, uploadedFile]
+  )
+
+  const handleToggle = useCallback(() => {
+    setIsOpen((prev) => !prev)
+    setErrorMessage(null)
+  }, [])
+
+  const canSendMessage = useMemo(() => {
+    if (!session?.user) return false
+    if (userPack !== 'free') return true
+    return dailyMessages < DAILY_FREE_LIMIT
+  }, [dailyMessages, session, userPack])
+
+  const createMessageId = useCallback(() => {
+    try {
+      return crypto.randomUUID()
+    } catch {
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`
+    }
+  }, [])
+
+  const handleSend = useCallback(async () => {
+    if (!canSendMessage) {
+      setErrorMessage('Upgrade your plan to continue chatting.')
+      return
+    }
+
+    const trimmedInput = input.trim()
+    if (!trimmedInput && !uploadedFile) {
+      return
+    }
+
+    const currentTimestamp = new Date()
+    const outboundMessage: ChatMessage = {
+      id: createMessageId(),
+      role: 'user',
+      content: trimmedInput || (uploadedFile ? 'Uploaded a document.' : ''),
+      timestamp: currentTimestamp,
+      file: uploadedFile
+        ? {
+            name: uploadedFile.file.name,
+            type: uploadedFile.file.type,
+            size: uploadedFile.file.size,
+          }
+        : undefined,
+    }
+
+    appendMessage(outboundMessage)
     setInput('')
+    setErrorMessage(null)
     setIsLoading(true)
 
+    const payload = {
+      message: trimmedInput || uploadedFile?.file.name || '',
+      packId: userPack,
+      layer: sessionMetadata?.layer,
+    }
+
     try {
-      // Get user layer from localStorage for personalized responses
-      const userLayer = typeof window !== 'undefined' ? localStorage.getItem('userLayer') : null
-      
-      // Call AI API
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: input, 
-          packId: userPack,
-          layer: userLayer || undefined, // Pass layer for personalized responses
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `HTTP ${response.status}`)
+        throw new Error('We could not reach the chat assistant. Please try again shortly.')
       }
 
-      const data = await response.json()
+      const data: { response?: string } = await response.json()
+      const assistantText = data.response?.trim()
 
-      if (data.error) {
-        throw new Error(data.error)
-      }
-
-      const assistantMessage: ChatMessage = {
-        id: `assistant-${Date.now()}`,
+      appendMessage({
+        id: createMessageId(),
         role: 'assistant',
-        content: data.response || data.message || 'Sorry, I could not process your request.',
+        content:
+          assistantText && assistantText.length > 0
+            ? assistantText
+            : 'I could not generate a helpful response right now. Please try again.',
         timestamp: new Date(),
-      }
+      })
 
-      setMessages(prev => [...prev, assistantMessage])
-
-      // Update daily limit if free tier
       if (userPack === 'free') {
-        setDailyMessages(prev => prev + 1)
+        setDailyMessages((count) => count + 1)
       }
-    } catch (error: any) {
-      console.error('Chat error:', error)
-      const errorMessage: ChatMessage = {
-        id: `error-${Date.now()}`,
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong while sending your message.'
+      setErrorMessage(message)
+
+      appendMessage({
+        id: createMessageId(),
         role: 'assistant',
-        content: error?.message?.includes('limit') 
-          ? 'Daily message limit reached. Please upgrade to unlock unlimited AI chat. [View Pricing](/pricing)'
-          : `Sorry, an error occurred: ${error?.message || 'Unknown error'}. 
-
-The AI chat uses a knowledge base system that works without API keys. For more powerful responses, add a free Groq API key (takes 2 minutes):
-1. Sign up at https://console.groq.com
-2. Get your API key
-3. Add to .env.local: GROQ_API_KEY=your_key
-
-Or try asking again - the knowledge base may still help!`,
+        content:
+          'I’m sorry—I ran into an issue processing that request. Please try again in a moment.',
         timestamp: new Date(),
-      }
-      setMessages(prev => [...prev, errorMessage])
+      })
     } finally {
       setIsLoading(false)
+      if (uploadedFile) {
+        handleRemoveFile()
+      }
     }
-  }
-
-  const handleUpgrade = () => {
-    setIsOpen(false)
-    window.location.href = '/pricing'
-  }
+  }, [
+    appendMessage,
+    canSendMessage,
+    createMessageId,
+    handleRemoveFile,
+    input,
+    sessionMetadata?.layer,
+    uploadedFile,
+    userPack,
+  ])
 
   return (
     <>
-      {/* Chat Button */}
       <button
-        onClick={() => {
-          // Check if EmbeddedChat is open - if so, don't open ChatWidget
-          if (localStorage.getItem('embeddedChatOpen') === 'true') {
-            return // Don't open if EmbeddedChat is open
-          }
-          setIsOpen(!isOpen)
-        }}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-50"
-        aria-label="Open chat"
+        onClick={handleToggle}
+        className="fixed bottom-4 right-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        title="Open Chat"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-        {!isOpen && <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />}
+        <MessageCircle className="w-6 h-6" />
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white dark:bg-gray-900 rounded-lg shadow-2xl flex flex-col border border-gray-200 dark:border-gray-800 z-50">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-t-lg flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5" />
-              <span className="font-semibold">AI Immigration Assistant</span>
-            </div>
-            {userPack === 'free' && (
-              <div className="flex items-center space-x-1 text-sm">
-                <Crown className="w-4 h-4" />
-                <span>{CONFIG.ai.freeDailyLimit - dailyMessages} left</span>
-              </div>
-            )}
+        <div className="fixed bottom-4 right-4 z-50 w-full max-w-md h-[90vh] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col">
+          <div className="flex justify-between items-center p-3 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">AI Chat</h2>
+            <button
+              onClick={handleToggle}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 && (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm font-semibold mb-2">AI Immigration Assistant</p>
-                <p className="text-xs">Ask me anything about Swiss immigration!</p>
-              </div>
-            )}
-            {messages.map((msg) => (
+          <div className="flex-1 overflow-y-auto p-3 space-y-4">
+            {messages.map((message) => (
               <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    msg.role === 'user'
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.role === 'user'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  {message.content}
+                  {message.file && (
+                    <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      File: {message.file.name}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
+
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 animate-pulse">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
+                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                  <Sparkles className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Limit Warning */}
-          {!canSendMessage && (
-            <div className="bg-orange-50 dark:bg-orange-900 border-t border-orange-200 dark:border-orange-800 p-3">
-              <p className="text-xs text-orange-900 dark:text-orange-100 mb-2">
-                Daily limit reached! Upgrade for unlimited access.
-              </p>
-              <button
-                onClick={handleUpgrade}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg transition-colors"
-              >
-                Upgrade Now →
-              </button>
-            </div>
-          )}
-
-          {/* Disclaimer */}
-          {messages.length > 0 && (
-            <div className="bg-blue-50 dark:bg-blue-900 border-t border-blue-200 dark:border-blue-800 p-2">
-              <p className="text-xs text-blue-900 dark:text-blue-100">
-                ⚠️ {CONFIG.discord.disclaimer}
-              </p>
-            </div>
-          )}
-
-          {/* Input */}
           <div className="border-t border-gray-200 dark:border-gray-800 p-3">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={canSendMessage ? "Type your question..." : "Upgrade to continue"}
-                disabled={!canSendMessage || isLoading}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-              />
-              <button
-                onClick={handleSend}
-                disabled={!canSendMessage || isLoading || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
-              >
-                <Send className="w-5 h-5" />
-              </button>
+            {uploadedFile && (
+              <div className="mb-2 p-2 bg-blue-50 dark:bg-blue-900 rounded-lg flex items-center justify-between">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <span className="text-sm text-blue-900 dark:text-blue-100 truncate">
+                    {uploadedFile.file.name}
+                  </span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400 flex-shrink-0">
+                    {(uploadedFile.file.size / 1024).toFixed(1)} KB
+                  </span>
+                </div>
+                <button
+                  onClick={handleRemoveFile}
+                  className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 flex-shrink-0"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-col space-y-2">
+              <div className="flex space-x-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="chat-file-input"
+                  disabled={!canSendMessage || isLoading}
+                />
+                <label
+                  htmlFor="chat-file-input"
+                  className={`flex items-center justify-center p-2 rounded-lg transition-colors cursor-pointer ${
+                    !canSendMessage || isLoading
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <Paperclip className="w-5 h-5" />
+                </label>
+
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault()
+                      handleSend()
+                    }
+                  }}
+                  placeholder={
+                    canSendMessage
+                      ? uploadedFile
+                        ? 'Add a message (optional)...'
+                        : 'Type your question or upload a CV/document...'
+                      : 'Upgrade to continue'
+                  }
+                  disabled={!canSendMessage || isLoading}
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!canSendMessage || isLoading || (!input.trim() && !uploadedFile)}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+
+              {errorMessage && (
+                <p className="text-xs text-red-600 dark:text-red-400">{errorMessage}</p>
+              )}
+
+              {uploadedFile && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  💡 Upload CVs, documents, or images for personalized feedback on Swiss immigration
+                  applications.
+                </p>
+              )}
             </div>
           </div>
         </div>

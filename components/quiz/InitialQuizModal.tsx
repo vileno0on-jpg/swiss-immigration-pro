@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, ArrowLeft, CheckCircle, Globe, Mail, Briefcase, User, Calendar, Languages, FileText } from 'lucide-react'
+import { X, ArrowRight, ArrowLeft, CheckCircle, Globe, Mail, Briefcase, User, Calendar, Languages } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { classifyLayer, getLayerRoute, type QuizAnswers, getAllCountries } from '@/lib/layerLogic'
 
@@ -27,14 +27,25 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
 
   // Reset on open
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
+      return
+    }
+
+    let frameId: number | null = null
+
+    frameId = requestAnimationFrame(() => {
       setCurrentStep(1)
       setAnswers({})
-      requestAnimationFrame(() => {
-        if (scrollRef.current) {
-          scrollRef.current.scrollTop = 0
-        }
-      })
+
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = 0
+      }
+    })
+
+    return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
     }
   }, [isOpen])
 
@@ -137,7 +148,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
       default:
         return false
     }
-  }, [currentStep, answers])
+  }, [currentStep, answers.countryOfOrigin, answers.immigrationReason?.length, answers.hasJobOffer])
 
   if (!isOpen) return null
 
@@ -230,7 +241,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     {answers.countryOfOrigin && (
                       <div className="mt-4 p-5 bg-blue-50 dark:bg-blue-900 rounded-xl">
                         <p className="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">
-                          💡 Based on your selection, you'll be categorized into one of three personalized pathways:
+                          💡 Based on your selection, you&apos;ll be categorized into one of three personalized pathways:
                           <br />
                           <strong>EU/EFTA:</strong> Freedom of movement benefits
                           <br />
@@ -491,7 +502,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     />
                     <div className="p-5 bg-green-50 dark:bg-green-900 rounded-xl">
                       <p className="text-sm text-green-900 dark:text-green-100 leading-relaxed">
-                        ✓ You'll receive a personalized PDF with:
+                        ✓ You&apos;ll receive a personalized PDF with:
                         <br />• Your customized immigration pathway
                         <br />• Timeline and requirements checklist
                         <br />• Next steps and resources
