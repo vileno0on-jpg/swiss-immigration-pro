@@ -28,6 +28,7 @@ const defaultNavigation: NavItem[] = [
   { href: '/', label: 'Home' },
   { href: '/visas', label: 'Visas' },
   { href: '/citizenship', label: 'Citizenship' },
+  { href: '/resources', label: 'Resources' },
   { href: '/tools', label: 'Tools' },
 ]
 
@@ -247,7 +248,7 @@ export default function Header() {
                   </>
                 )}
 
-                {appUser.isAdmin && (
+                {appUser?.isAdmin && (
                   <>
                     <Link
                       href="/admin"
@@ -429,5 +430,6 @@ export default function Header() {
     </header>
   )
 }
+
 
 

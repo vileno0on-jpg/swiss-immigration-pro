@@ -243,7 +243,7 @@ export default function PermitCalculator() {
                       Quota System Applies
                     </div>
                     <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                      As of November 2025, approximately 2,500 permits remain out of 8,500 total. Apply strategically and early.
+                      Permits are subject to annual quotas. Apply strategically and early.
                     </p>
                   </div>
                 </div>

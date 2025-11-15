@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, FileText, BookOpen, CheckCircle } from 'lucide-react'
+import { Download, FileText, BookOpen, CheckCircle, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 export default function ResourcesPage() {
@@ -24,7 +24,7 @@ export default function ResourcesPage() {
         {/* Free Resources */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-            🆓 Free Resources
+            Free Resources
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -48,7 +48,7 @@ export default function ResourcesPage() {
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    📥 {resource.downloads} downloads
+                    {resource.downloads} downloads
                   </span>
                   <button className="btn-secondary text-sm">
                     <Download className="w-4 h-4 inline-block mr-1" />
@@ -64,7 +64,7 @@ export default function ResourcesPage() {
         <div className="mb-16">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-              ⭐ Premium Resources
+              Premium Resources
             </h2>
             <Link href="/pricing" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
               Unlock All →
@@ -120,6 +120,30 @@ export default function ResourcesPage() {
         </div>
 
         {/* Quick Links */}
+        {/* Personalized Resources CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-12 text-white"
+        >
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              Get Personalized Resources
+            </h2>
+            <p className="text-xl mb-6 opacity-90">
+              Take our quick assessment to unlock detailed, country-specific guides and resources tailored to your situation.
+            </p>
+            <Link
+              href="/quiz"
+              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+            >
+              Start Assessment
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

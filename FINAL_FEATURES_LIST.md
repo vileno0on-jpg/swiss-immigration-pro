@@ -293,7 +293,7 @@
 - 30-day guarantee
 
 ### Urgency Signals:
-- 2,500 permits remaining
+- Annual quota system active
 - Quota countdown
 - Health insurance deadline
 

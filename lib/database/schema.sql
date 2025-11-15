@@ -91,6 +91,7 @@ CREATE TABLE public.masterclass_progress (
   completed_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  metadata JSONB DEFAULT '{}'::jsonb,
   UNIQUE(user_id, module_id)
 );
 

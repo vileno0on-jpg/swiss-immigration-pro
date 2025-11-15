@@ -8,7 +8,7 @@
 
 ## 🔧 IMMEDIATE FIX
 
-**You MUST manually create this file** (AI cannot create .gitignore files):
+**You MUST have this file in place** (the repo now auto-creates it when you run `npm run dev`, but you should still review the values):
 
 1. **Open File Explorer**
 2. **Navigate to:** `C:\Users\vilen\Downloads\New folder\swiss-immigration-pro\`
@@ -17,9 +17,9 @@
 
 ```env
 # Supabase (placeholder - won't work yet)
-NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key
-SUPABASE_SERVICE_ROLE_KEY=placeholder_service_key
+NEXT_PUBLIC_SUPABASE_URL=https://mvetijyhqdizxygbahkt.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXRpanlocWRpenh5Z2JhaGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1NDM4MDIsImV4cCI6MjA3ODExOTgwMn0.Hh5Sn7KloFSZ_6mr7KJ61eApsNoSAIWXBLn1jTMsXes
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12ZXRpanlocWRpenh5Z2JhaGt0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjU0MzgwMiwiZXhwIjoyMDc4MTE5ODAyfQ.Ap-usdTiIMjFVeM-IqDLkaUIl8LFGLvfTUM16hUqhJg
 
 # Stripe (placeholder - won't work yet)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
@@ -31,11 +31,11 @@ GROQ_API_KEY=gsk_placeholder
 OPENAI_API_KEY=sk-placeholder
 
 # App Configuration
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:9000
 NEXT_PUBLIC_ADMIN_EMAIL=admin@swissimmigrationpro.com
 ```
 
-5. **Save the file**
+5. **Save the file** (or simply run `npm run dev` once and the project will copy `env.local.txt` into `.env.local` for you).
 6. **Restart the dev server** (Ctrl+C then `npm run dev`)
 
 ---

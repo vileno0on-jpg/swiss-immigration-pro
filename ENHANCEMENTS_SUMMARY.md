@@ -257,7 +257,7 @@ This document summarizes all the marketing, SEO, and feature enhancements made t
 
 ### FOMO (Fear of Missing Out)
 - 2025 quota warnings
-- "Only 2,500 permits remaining"
+- "Annual quota system active"
 - Processing time urgency
 
 ### Value Demonstration

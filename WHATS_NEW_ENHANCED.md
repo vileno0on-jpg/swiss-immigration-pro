@@ -115,7 +115,7 @@
 - ✅ Cancel anytime
 
 #### Urgency Signals:
-- 🔥 "Only 2,500 permits left in 2025"
+- 🔥 "Annual permit quotas apply"
 - ⏰ "Act now before quotas exhausted"
 - 📊 Real-time quota tracking
 

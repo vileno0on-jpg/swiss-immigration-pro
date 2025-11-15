@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { update } = useSession()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,17 +19,29 @@ export default function LoginPage() {
     setError('')
 
     try {
+      console.log('Attempting login with:', { email, password: '***' })
+
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       })
 
+      console.log('Login result:', result)
+
       if (result?.error) {
         throw new Error(result.error)
       }
 
-      router.push('/dashboard')
+      if (result?.ok) {
+        console.log('Login successful, updating session...')
+        // Update the session to ensure JWT token has isAdmin property
+        await update()
+        console.log('Session updated, redirecting to dashboard')
+        router.push('/dashboard')
+      } else {
+        throw new Error('Login failed without specific error')
+      }
     } catch (err: any) {
       setError(err.message || 'Invalid email or password')
     } finally {

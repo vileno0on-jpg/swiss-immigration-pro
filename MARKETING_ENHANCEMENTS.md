@@ -160,7 +160,7 @@ Transformed Swiss Immigration Pro into a high-converting, trust-building platfor
 ## 💡 Marketing Psychology Applied
 
 ### Scarcity:
-- "Only 2,500 permits remaining"
+- "Annual quota system active"
 - "2025 quotas nearly exhausted"
 - Time-sensitive language
 

@@ -1,8 +1,9 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { ArrowLeft, BookOpen, Clock, Tag } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, BookOpen, Clock, Tag, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
@@ -10,11 +11,24 @@ import type { LayerType } from '@/lib/layerLogic'
 export default function ResourcesPage() {
   const params = useParams()
   const layerParam = params?.layer as string
-  const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
-    ? layerParam 
+  const layer = (['europeans', 'americans', 'others'].includes(layerParam)
+    ? layerParam
     : 'others') as LayerType
-  
+
   const content = LAYER_CONTENT[layer]
+
+
+  const [expandedPosts, setExpandedPosts] = useState<Set<number>>(new Set())
+
+  const toggleExpanded = (index: number) => {
+    const newExpanded = new Set(expandedPosts)
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index)
+    } else {
+      newExpanded.add(index)
+    }
+    setExpandedPosts(newExpanded)
+  }
 
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
@@ -35,14 +49,24 @@ export default function ResourcesPage() {
 
         {/* Resources Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {content.resources.posts.map((post, idx) => (
-            <motion.article
+          {content.resources.posts.map((post, idx) => {
+            if (process.env.NODE_ENV !== 'production') {
+              console.debug(
+                `Post ${idx}: expanded=${expandedPosts.has(idx)} | hasContent=${!!post.content}`
+              )
+            }
+            return (
+              <motion.article
               key={idx}
               id={post.title.toLowerCase().replace(/\s+/g, '-')}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="card p-6 hover:shadow-xl transition-all duration-300"
+              className={`card p-6 hover:shadow-xl transition-all duration-300 ${expandedPosts.has(idx) ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
+              onClick={(e) => {
+                // Prevent event bubbling from article to interfere with button clicks
+                e.stopPropagation()
+              }}
             >
               <div className="flex items-center space-x-2 mb-4">
                 <Tag className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -59,17 +83,47 @@ export default function ResourcesPage() {
                 {post.excerpt}
               </p>
               
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Clock className="w-4 h-4" />
-                  <span>5 min read</span>
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                    <Clock className="w-4 h-4" />
+                    <span>5 min read</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      alert(`Read more clicked for post ${idx}!`)
+                      console.log('Button clicked for post', idx, 'Current expanded:', Array.from(expandedPosts))
+                      toggleExpanded(idx)
+                      console.log('After toggle, expanded:', Array.from(expandedPosts))
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm flex items-center space-x-1 cursor-pointer border-none rounded-md px-3 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                  >
+                    <span>{expandedPosts.has(idx) ? 'Read less' : 'Read more'}</span>
+                    {expandedPosts.has(idx) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
                 </div>
-                <button className="text-blue-600 dark:text-blue-400 hover:underline font-semibold text-sm">
-                  Read more →
-                </button>
               </div>
-            </motion.article>
-          ))}
+
+              <AnimatePresence>
+                {expandedPosts.has(idx) && post.content && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                      {post.content}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              </motion.article>
+            )
+          })}
         </div>
 
         {/* Additional Resources */}

@@ -264,16 +264,16 @@ Track your progress as you work through this strategic guide - **we'll help you 
 
 ## Strategy 7: Nationality-Specific Strategies
 
-### 🇪🇺 EU/EFTA Citizens: Leverage Your Advantages
+### EU/EFTA Citizens: Leverage Your Advantages
 
 **You DON'T need quota strategies!** But here's how to optimize:
 
 **For EU/EFTA Nationals:**
-- ✅ **Apply any time** - No quota restrictions
-- ✅ **Fast processing** - 2-4 weeks typical
-- ✅ **Simpler documentation** - No educational certificates required
-- ✅ **Family can join easily** - Spouse and children under 21
-- ✅ **5 years to C permit** - vs. 10 for non-EU
+- ✓ Apply any time - No quota restrictions
+- ✓ Fast processing - 2-4 weeks typical
+- ✓ Simpler documentation - No educational certificates required
+- ✓ Family can join easily - Spouse and children under 21
+- ✓ 5 years to C permit - vs. 10 for non-EU
 
 **Best Strategy for EU Citizens:**
 1. **G Permit for Border Residents** (Italians, French, Germans, Austrians):
@@ -302,7 +302,7 @@ Track your progress as you work through this strategic guide - **we'll help you 
 - **Industries**: Hospitality, construction, healthcare
 - **Community**: 270,000+ Portuguese, strong support networks
 
-**🇺🇦 Ukrainians:**
+**Ukrainians:**
 - **S Permit**: Available for refugees (separate system)
 - **Regular Work Permits**: Also possible with employer sponsorship
 - **Expedited Processing**: May be available for humanitarian cases
@@ -342,7 +342,7 @@ Track your progress as you work through this strategic guide - **we'll help you 
 
 **Success Rate**: Moderate (quota competition), but strong candidates with good salaries succeed
 
-### 🇨🇳 Chinese Citizens: Maximizing Your Chances
+### Chinese Citizens: Maximizing Your Chances
 
 **Status**: Non-EU, quota applies - **Highly competitive**
 
@@ -510,23 +510,23 @@ Track your progress as you work through this strategic guide - **we'll help you 
 
 ### Red Flags That Kill Applications
 
-❌ Salary below cantonal minimum
-❌ Generic job descriptions
-❌ Weak CV formatting
-❌ Missing language certificates
-❌ Criminal background issues
-❌ Doubtful employer financials
-❌ Overstated qualifications
-❌ Missing Apostille/notarization
+✗ Salary below cantonal minimum
+✗ Generic job descriptions
+✗ Weak CV formatting
+✗ Missing language certificates
+✗ Criminal background issues
+✗ Doubtful employer financials
+✗ Overstated qualifications
+✗ Missing Apostille/notarization
 
-✅ High salary + unique skills
-✅ Detailed job specifications
-✅ Professional Swiss CV
-✅ Language B2+ certified
-✅ Clean criminal record
-✅ Established employer
-✅ Honest qualifications
-✅ All documents legalized
+✓ High salary + unique skills
+✓ Detailed job specifications
+✓ Professional Swiss CV
+✓ Language B2+ certified
+✓ Clean criminal record
+✓ Established employer
+✓ Honest qualifications
+✓ All documents legalized
 
 ## Strategy 10: The Winning Application Formula
 
@@ -630,15 +630,15 @@ Track your progress as you work through this strategic guide - **we'll help you 
 
 ---
 
-**Bottom Line:** With only 2,500 permits left, strategy matters more than ever. Target the right canton, maximize your salary, apply early, and position yourself as irreplaceable.
+**Bottom Line:** Strategy matters more than ever. Target the right canton, maximize your salary, apply early, and position yourself as irreplaceable.
 
 **Your odds increase from 15% to 45%+ when you follow these strategies systematically.**
 
-⚠️ General information only (updated Nov 2025). Not legal advice. Consult Dr. Alpine Esq. for your specific case.
+**Note:** General information only (updated Nov 2025). Not legal advice. Consult Dr. Alpine Esq. for your specific case.
 
 ---
 
-## 🎯 Interactive Quiz: Test Your Quota Strategy Knowledge
+## Interactive Quiz: Test Your Quota Strategy Knowledge
 
 **Test yourself on the key strategies from this module:**
 `,
@@ -726,27 +726,27 @@ City, Switzerland | LinkedIn: linkedin.com/in/name
 \`\`\`
 
 **Swiss-Specific Requirements:**
-✅ **No photo** (legally prohibited, prevents bias)
-✅ **Address**: City only (not full address)
-✅ **Phone**: Swiss format preferred
-✅ **LinkedIn**: Almost mandatory
-✅ **Professional email**: Name-based, not funny
+✓ **No photo** (legally prohibited, prevents bias)
+✓ **Address**: City only (not full address)
+✓ **Phone**: Swiss format preferred
+✓ **LinkedIn**: Almost mandatory
+✓ **Professional email**: Name-based, not funny
 
 **Common Mistakes:**
-❌ Adding photo (illegal in most cantons)
-❌ Including age/marital status (protected info)
-❌ Using Gmail domains (unprofessional)
-❌ Missing LinkedIn profile
-❌ Long URLs
+✗ Adding photo (illegal in most cantons)
+✗ Including age/marital status (protected info)
+✗ Using Gmail domains (unprofessional)
+✗ Missing LinkedIn profile
+✗ Long URLs
 
 ### 2. Professional Summary
 
 **Swiss Style:** Fact-based, not fluffy
 
-**❌ Avoid:**
+**Avoid:**
 > "Dynamic, results-driven professional with passion for innovation..."
 
-**✅ Do:**
+**Recommended:**
 > "Senior Software Engineer with 7 years developing enterprise applications. Expert in Python, Kubernetes, and microservices architecture. Led teams of 5+ delivering FinTech solutions handling 1M+ transactions daily."
 
 **Key Elements:**
@@ -820,10 +820,10 @@ Grade: 5.2/6.0 | Relevant coursework: Machine Learning, Algorithms, Distributed 
 - Study abroad experiences
 
 **Common Pitfalls:**
-❌ Including high school (unless very recent)
-❌ Listing every single course
-❌ GPA without scale explanation
-❌ Unrelated education
+✗ Including high school (unless very recent)
+✗ Listing every single course
+✗ GPA without scale explanation
+✗ Unrelated education
 
 ### 5. Skills Section
 
@@ -852,15 +852,15 @@ Leadership, Team Collaboration, Problem-Solving, Mentoring
 \`\`\`
 
 **Swiss Skill Expectations:**
-✅ Specific technologies with proficiency levels
-✅ Swiss national languages (German/French/Italian)
-✅ Industry-standard certifications
-✅ Modern, in-demand tools
+✓ Specific technologies with proficiency levels
+✓ Swiss national languages (German/French/Italian)
+✓ Industry-standard certifications
+✓ Modern, in-demand tools
 
-❌ Self-assessed skill levels (% or bars)
-❌ Obvious skills everyone has
-❌ Outdated technologies
-❌ Vague "communication skills"
+✗ Self-assessed skill levels (% or bars)
+✗ Obvious skills everyone has
+✗ Outdated technologies
+✗ Vague "communication skills"
 
 ### 6. Certifications & Licenses
 
@@ -919,7 +919,7 @@ ISO 27001 Lead Auditor | ISO | 2021
 
 ### Formatting for ATS Success
 
-**✅ ATS-Friendly:**
+**ATS-Friendly:**
 - Standard fonts (Arial, Calibri, Times)
 - Simple layouts, no graphics
 - Clean bullet points
@@ -927,7 +927,7 @@ ISO 27001 Lead Auditor | ISO | 2021
 - Plain text headers
 - No tables or columns
 
-**❌ ATS-Killer Formatting:**
+**ATS-Killer Formatting:**
 - Unusual fonts (decorative, fancy)
 - Complex layouts with images
 - Non-standard symbols
@@ -956,16 +956,16 @@ ISO 27001 Lead Auditor | ISO | 2021
 ### Swiss Value Quantification
 
 **Instead of:**
-❌ "Improved system performance"
+✗ "Improved system performance"
 
 **Write:**
-✅ "Increased API response time by 65% through Redis caching, reducing latency from 450ms to 165ms"
+✓ "Increased API response time by 65% through Redis caching, reducing latency from 450ms to 165ms"
 
 **Instead of:**
-❌ "Managed projects successfully"
+✗ "Managed projects successfully"
 
 **Write:**
-✅ "Delivered 12 projects on time and under budget, totaling CHF 2.3M revenue"
+✓ "Delivered 12 projects on time and under budget, totaling CHF 2.3M revenue"
 
 **The SWAR Formula (Swiss Achievements):**
 
@@ -1013,12 +1013,12 @@ ISO 27001 Lead Auditor | ISO | 2021
 
 **Swiss HR Preferences:**
 
-**✅ Good:**
+**Good:**
 "Senior Software Engineer Application - [Your Name]"
 "Software Engineer Position at [Company] - [Your Name]"
 "Application: Data Scientist - 7 years Python/Big Data"
 
-**❌ Avoid:**
+**Avoid:**
 "Your Dream Candidate is Here"
 "Check Out My Amazing CV"
 "RE: Your Job Posting"
@@ -1113,11 +1113,11 @@ Notice Period: 2 months
 
 **Master the Swiss CV format and watch your interview rate soar from 8% to 40%+.**
 
-⚠️ General information only (updated Nov 2025). Not legal advice. For personalized CV review, book consultation with Dr. Alpine Esq.
+**Note:** General information only (updated Nov 2025). Not legal advice. For personalized CV review, book consultation with Dr. Alpine Esq.
 
 ---
 
-## 🎯 Interactive Quiz: Test Your Swiss CV Knowledge
+## Interactive Quiz: Test Your Swiss CV Knowledge
 
 **Test your understanding of Swiss CV requirements:**
 `,

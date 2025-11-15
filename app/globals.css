@@ -136,6 +136,7 @@
     @apply absolute inset-0 bg-gradient-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0;
     @apply transition-all duration-500;
     @apply opacity-0;
+    pointer-events: none;
   }
   
   .card:hover::before {

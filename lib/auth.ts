@@ -45,13 +45,20 @@ export const authOptions: NextAuthOptions = {
             .eq('id', users.id)
             .single()
 
-          return {
+          console.log('Auth successful for user:', users.email)
+          console.log('Profile data:', profile)
+          console.log('isAdmin value:', profile?.is_admin)
+
+          const userData = {
             id: users.id,
             email: users.email,
             name: profile?.full_name || null,
             isAdmin: profile?.is_admin || false,
             packId: profile?.pack_id || 'free',
           }
+
+          console.log('Returning user data:', userData)
+          return userData
         } catch (error) {
           console.error('Auth error:', error)
           return null
@@ -66,19 +73,27 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
+      console.log('JWT callback - user:', user)
+      console.log('JWT callback - token before:', token)
       if (user) {
         token.id = user.id
         token.isAdmin = user.isAdmin
         token.packId = user.packId
+        console.log('JWT callback - setting isAdmin:', user.isAdmin)
       }
+      console.log('JWT callback - token after:', token)
       return token
     },
     async session({ session, token }) {
+      console.log('Session callback - token:', token)
+      console.log('Session callback - session before:', session)
       if (session.user) {
         session.user.id = token.id as string
         session.user.isAdmin = token.isAdmin as boolean
         session.user.packId = token.packId as string
+        console.log('Session callback - setting isAdmin:', token.isAdmin)
       }
+      console.log('Session callback - session after:', session)
       return session
     }
   },

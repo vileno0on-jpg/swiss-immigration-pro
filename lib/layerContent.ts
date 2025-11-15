@@ -52,6 +52,7 @@ export interface LayerContent {
       title: string
       excerpt: string
       category: string
+      content?: string
     }>
   }
 }
@@ -205,26 +206,254 @@ export const LAYER_CONTENT: Record<LayerType, LayerContent> = {
             title: 'G Permit: Best Option for Border Residents',
             excerpt: 'Why living in your home country and working in Switzerland might be the smartest choice. Legal basis: FMPA and AuG Art. 25.',
             category: 'Permits',
+            content: `# G Permit: The Smart Choice for Border Residents
+
+## Why Choose a G Permit?
+
+The G permit (Grenzgänger permit) allows you to live in your EU/EFTA home country while working in Switzerland. This arrangement offers several advantages:
+
+### Key Benefits:
+- **Tax Advantages**: Pay taxes only in your home country (usually lower rates)
+- **Housing Costs**: Live in more affordable EU housing
+- **Family Life**: Maintain your current lifestyle and social connections
+- **No Integration Requirements**: Less stringent language requirements
+
+## Eligibility Requirements
+
+To qualify for a G permit, you must:
+- Live in an EU/EFTA country within reasonable commuting distance (typically 30-60km)
+- Work in Switzerland
+- Return to your residence at least once per week
+- Have a valid employment contract
+
+## Application Process
+
+1. **Find Employment**: Secure a job offer from a Swiss employer
+2. **Register**: Apply through the cantonal migration office in your work canton
+3. **Documentation**: Submit passport, employment contract, and proof of residence
+4. **Processing**: Usually 1-2 weeks under FMPA provisions
+
+## Legal References
+- **FMPA Agreement**: Regulates cross-border worker rights
+- **AuG Art. 25**: Permits for cross-border workers
+- **VZAE Art. 20**: Specific requirements for G permits
+
+**Official Source**: [SEM - Cross-border Workers](https://www.sem.admin.ch/sem/en/home/themen/arbeit/grenzgaenger.html)`,
           },
           {
             title: 'EU Blue Card vs. B Permit: Which is Better?',
             excerpt: 'Compare the two options for highly qualified EU professionals. Most EU citizens choose B permit as it\'s simpler.',
             category: 'Comparison',
+            content: `# EU Blue Card vs. B Permit: Making the Right Choice
+
+## The EU Blue Card in Switzerland
+
+The EU Blue Card is an optional permit for highly qualified non-EU workers, but EU/EFTA citizens rarely use it since standard permits are simpler.
+
+### When EU Blue Card Might Make Sense:
+- **International Mobility**: If you plan to work in multiple EU countries
+- **Very High Salary**: CHF 120,000+ annual salary
+- **Specific Qualifications**: University degree + 5+ years experience
+
+## Why Most EU Citizens Choose B Permit
+
+### B Permit Advantages:
+- **Simpler Process**: No additional requirements beyond standard B permit
+- **Faster Processing**: Same 2-4 week timeline as other EU permits
+- **No Salary Minimum**: More flexible salary requirements
+- **Family Benefits**: Easier family reunification
+
+## Comparison Table
+
+| Aspect | EU Blue Card | Standard B Permit |
+|--------|-------------|------------------|
+| Processing Time | 3-5 weeks | 2-4 weeks |
+| Salary Threshold | CHF 97,000+ | No minimum (market rate) |
+| Documentation | More complex | Standard EU process |
+| Mobility | EU-wide | Switzerland-focused |
+| Family Rights | EU-wide | Swiss residence rights |
+
+## Recommendation
+
+**For most EU/EFTA citizens**: Choose the standard B permit. It's simpler, faster, and provides the same long-term benefits.
+
+**Official Sources**:
+- [SEM - Highly Qualified Workers](https://www.sem.admin.ch/sem/en/home/themen/arbeit.html)
+- EU Blue Card Directive (implemented in Swiss law via VZAE Art. 21)`,
           },
           {
             title: '5-Year Citizenship: What You Need to Know',
             excerpt: 'Complete guide to fast-track naturalization for EU/EFTA citizens. Legal basis: Citizenship Act (StAG, SR 141.0).',
             category: 'Citizenship',
+            content: `# Fast-Track Citizenship: 5 Years for EU/EFTA Citizens
+
+## Your Citizenship Timeline
+
+As an EU/EFTA citizen, you qualify for naturalization after **5 years** of continuous residence in Switzerland, compared to 10 years for non-EU citizens.
+
+## Key Requirements
+
+### Residence Requirements:
+- **5 years continuous residence** in Switzerland (StAG Art. 9)
+- **1 year** in the canton where you apply (StAG Art. 10)
+- **3 months** in the commune where you apply (StAG Art. 11)
+
+### Integration Requirements:
+- **Language Proficiency**: A2 level in local language (German/French/Italian/Romansh)
+- **Knowledge of Switzerland**: Pass citizenship test on Swiss history, geography, and institutions
+- **Social Integration**: Demonstrate good integration (employment, no criminal record)
+
+### Additional Requirements:
+- **Clean Criminal Record**: No serious criminal convictions
+- **Financial Independence**: No reliance on social assistance
+- **Employment**: Stable employment or self-employment
+
+## Application Process
+
+1. **Prepare Documents**: Gather residence permits, language certificates, employment proof
+2. **Take Integration Course**: Complete required integration course
+3. **Apply at Commune**: Submit application to your local commune
+4. **Canton Review**: Cantonal authorities review your application
+5. **Federal Approval**: Swiss Citizenship Office makes final decision
+6. **Ceremony**: Attend citizenship ceremony
+
+## Timeline and Costs
+
+- **Processing Time**: 12-18 months
+- **Application Fee**: CHF 200-500 (varies by canton)
+- **Language Test**: CHF 100-200
+- **Integration Course**: CHF 200-400
+
+## Benefits of Swiss Citizenship
+
+- **Full Political Rights**: Vote in federal, cantonal, and communal elections
+- **EU Citizenship**: Automatic EU citizenship with full rights
+- **No Permit Renewals**: Permanent residence rights
+- **Family Benefits**: Easier to bring extended family
+
+**Official Source**: [SEM - Naturalization](https://www.sem.admin.ch/sem/en/home/themen/buergerrecht.html)
+**Legal Basis**: Citizenship Act (StAG, SR 141.0)`,
           },
           {
             title: 'Family Reunification Made Easy',
             excerpt: 'How to bring your spouse and children to Switzerland as an EU citizen under FMPA family reunification provisions.',
             category: 'Family',
+            content: `# Family Reunification for EU/EFTA Citizens
+
+## Your FMPA Family Rights
+
+As an EU/EFTA citizen with a Swiss residence permit, your spouse and children have the **right to join you** in Switzerland under the Free Movement Agreement.
+
+## Who Qualifies for Family Reunification?
+
+### Immediate Family:
+- **Spouse/Registered Partner**: Automatic right to join you
+- **Minor Children**: Under 18 years old
+- **Dependent Children**: Over 18 but financially dependent
+
+### Extended Family:
+- **Parents**: Can join if you provide care (case-by-case)
+- **Adult Children**: Generally must be self-sufficient
+
+## Application Process
+
+### For Spouse:
+1. **Secure Housing**: Proof of adequate accommodation
+2. **Health Insurance**: Coverage for the whole family
+3. **Employment**: Spouse can work immediately (no permit needed)
+4. **Register**: Apply through cantonal migration office
+
+### For Children:
+1. **Birth Certificate**: Official documents
+2. **School Enrollment**: For school-age children
+3. **Medical Check**: Health certificate if required
+4. **Custody Documents**: If applicable
+
+## Timeline and Rights
+
+- **Processing Time**: 2-4 weeks for EU/EFTA families
+- **Work Rights**: Spouse can work immediately
+- **Residence Rights**: Full residence rights from day one
+- **Social Benefits**: Access to Swiss social services
+
+## Key Advantages for EU Families
+
+- **No Quotas**: Family reunification not subject to quotas
+- **Fast Processing**: Simplified procedure under FMPA
+- **Full Rights**: Same rights as you from arrival
+- **Path to Citizenship**: Family members follow your citizenship timeline
+
+## Legal References
+
+- **FMPA Art. 3**: Family reunification rights
+- **AuG Art. 42-44**: Family permits for foreigners
+- **VZAE Art. 39-42**: Implementation of family reunification
+
+**Official Source**: [SEM - Family Reunification](https://www.sem.admin.ch/sem/en/home/themen/familie.html)`,
           },
           {
             title: 'Official Legal References',
             excerpt: 'Key laws: Foreign Nationals Act (AuG, SR 142.20), FMPA Agreement, VZAE Ordinance (SR 142.201). Access via Fedlex.admin.ch',
             category: 'Legal',
+            content: `# Essential Legal Framework for EU/EFTA Citizens
+
+## Primary Legislation
+
+### 1. Agreement on the Free Movement of Persons (FMPA)
+- **SR Number**: 0.142.112.681
+- **Purpose**: Regulates movement and employment of EU/EFTA citizens
+- **Key Articles**:
+  - Art. 1-2: Personal scope and definitions
+  - Art. 7: Employment rights
+  - Art. 3: Family reunification
+  - Art. 9: Social security coordination
+
+### 2. Foreign Nationals Act (AuG)
+- **SR Number**: 142.20
+- **Purpose**: Main law governing foreign nationals in Switzerland
+- **Key Articles for EU Citizens**:
+  - Art. 2: Scope (excludes EU/EFTA from certain restrictions)
+  - Art. 24-25: L and B permits for EU citizens
+  - Art. 27: Registration requirements
+  - Art. 42-44: Family reunification
+
+### 3. Foreign Nationals and Integration Ordinance (VZAE)
+- **SR Number**: 142.201
+- **Purpose**: Implementation of AuG provisions
+- **Key Articles**:
+  - Art. 10: L permits for EU citizens
+  - Art. 15: B permits for EU citizens
+  - Art. 20: G permits for cross-border workers
+  - Art. 39-42: Family reunification procedures
+
+## Citizenship Law
+
+### Citizenship Act (StAG)
+- **SR Number**: 141.0
+- **Key Provisions for EU Citizens**:
+  - Art. 9: 5-year residence requirement (vs. 10 for non-EU)
+  - Art. 10-11: Canton and commune requirements
+
+## Where to Find Official Texts
+
+### Primary Sources:
+- **Fedlex**: [fedlex.admin.ch](https://www.fedlex.admin.ch) - Complete legal database
+- **SEM Website**: [sem.admin.ch](https://www.sem.admin.ch) - Migration authority guidance
+- **CH.ch Portal**: [ch.ch](https://www.ch.ch) - Official government portal
+
+### Search Tips:
+- Use SR numbers for exact laws (e.g., "142.20" for AuG)
+- Search in German/French/Italian (official languages)
+- Check "Stand am" dates for current versions
+
+## Important Notes
+
+- **Language**: Official texts are in German/French/Italian
+- **Updates**: Laws are updated regularly - always check current versions
+- **Interpretation**: SEM guidelines provide official interpretation
+- **Changes**: Monitor SEM announcements for policy changes
+
+**Disclaimer**: This is general information. Consult official sources and professional legal advice for your specific situation.`,
           },
         ],
       },
