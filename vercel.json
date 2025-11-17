@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd swiss-immigration-pro && npm install && npm run build",
+  "outputDirectory": "swiss-immigration-pro/.next",
+  "installCommand": "cd swiss-immigration-pro && npm install",
+  "framework": "nextjs",
+  "nodeVersion": "20"
+}
+
