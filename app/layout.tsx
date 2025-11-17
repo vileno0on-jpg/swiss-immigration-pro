@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SessionProvider } from "@/components/providers/SessionProvider";
+import RegionDetector from "@/components/RegionDetector";
+import { suppressExtensionErrors } from "@/lib/error-suppression";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,10 +35,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" data-extension-ignore="true">
-      <body className={`${inter.variable} antialiased bg-white dark:bg-gray-900`} data-extension-ignore="true">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className={`${inter.variable} antialiased bg-white dark:bg-gray-900`}>
         <ErrorBoundary>
-          {children}
+          <SessionProvider>
+            <RegionDetector>
+              {children}
+            </RegionDetector>
+          </SessionProvider>
         </ErrorBoundary>
       </body>
     </html>

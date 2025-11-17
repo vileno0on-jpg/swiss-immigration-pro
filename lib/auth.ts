@@ -13,11 +13,18 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.error('Missing credentials in authorize function')
           return null
         }
 
         try {
+          console.log('Attempting to authenticate user:', credentials.email)
           const supabase = await createClient()
+
+          if (!supabase) {
+            console.error('Failed to create Supabase client')
+            return null
+          }
 
           // For now, we'll use a custom users table in Supabase
           // This maintains compatibility with existing auth flow
@@ -27,7 +34,13 @@ export const authOptions: NextAuthOptions = {
             .eq('email', credentials.email)
             .single()
 
-          if (error || !users) {
+          if (error) {
+            console.error('Database error fetching user:', error)
+            return null
+          }
+
+          if (!users) {
+            console.log('User not found:', credentials.email)
             return null
           }
 
@@ -101,6 +114,6 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-change-in-production',
 }
 

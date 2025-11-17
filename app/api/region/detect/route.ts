@@ -5,7 +5,8 @@ import { RegionType } from '@/lib/geolocation'
 export {}
 
 export async function GET() {
-  // Simplified: Always return 'other' region without IP detection
+  // For now, return 'other' region
+  // The quiz will redirect users to the appropriate layer page directly
   return NextResponse.json({
     region: 'other' as RegionType,
     autoDetected: false

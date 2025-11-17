@@ -26,7 +26,9 @@ export default withAuth(
             pathname.startsWith('/tools') ||
             pathname.startsWith('/us-citizens') ||
             pathname.startsWith('/cantons') ||
-            pathname.startsWith('/quiz')) {
+            pathname.startsWith('/us') ||
+            pathname.startsWith('/eu') ||
+            pathname.startsWith('/other')) {
           return true
         }
 
@@ -35,7 +37,6 @@ export default withAuth(
             pathname.startsWith('/profile') ||
             pathname.startsWith('/api/user') ||
             pathname.startsWith('/api/chat') ||
-            pathname.startsWith('/api/quiz') ||
             pathname.startsWith('/api/modules')) {
           return !!token
         }
@@ -64,7 +65,6 @@ export const config = {
     '/api/user/:path*',
     '/api/admin/:path*',
     '/api/chat/:path*',
-    '/api/quiz/:path*',
     '/api/modules/:path*'
   ]
 }
