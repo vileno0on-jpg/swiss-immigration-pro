@@ -56,7 +56,7 @@ export default function ResourcesPage() {
               )
             }
             return (
-              <motion.article
+            <motion.article
               key={idx}
               id={post.title.toLowerCase().replace(/\s+/g, '-')}
               initial={{ opacity: 0, y: 20 }}
@@ -121,7 +121,7 @@ export default function ResourcesPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              </motion.article>
+            </motion.article>
             )
           })}
         </div>

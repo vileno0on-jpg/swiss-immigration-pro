@@ -79,7 +79,7 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 ## The Three Fastest Legal Pathways (Updated 2025)
 
 ### 1. EU/EFTA Freedom of Movement (FMPA) - "The Golden Ticket"
-- **Legal basis**: Agreement on the Free Movement of Persons (FMPA), AuG (SR 142.20) Art. 2, VZAE (SR 142.201) Art. 7-23
+- **Legal basis**: Agreement on the Free Movement of Persons (FMPA), AuG (SR 142.20) Art. 2, VZAE (SR 142.201) Art. 7-23  
 - **Turnaround**: 2-4 weeks once documents are ready (vs. 8-12 weeks for non-EU)
 - **Success Rate**: 94% approval rate (based on SEM 2024 data)
 - **What you need**: Employment contract, health insurance (KVG-compliant), commune registration within 14 days
@@ -89,7 +89,7 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 **Pro Tip**: Even as EU citizens, 23% get rejected for incomplete health insurance. Our templates ensure KVG compliance.
 
 ### 2. Highly Skilled Non-EU Specialists (Permits L & B) - "The Competitive Path"
-- **Legal basis**: AuG Art. 21-24, VZAE Art. 23 (L permits), Art. 18-25 (B permits)
+- **Legal basis**: AuG Art. 21-24, VZAE Art. 23 (L permits), Art. 18-25 (B permits)  
 - **Quota availability (2025)**: 4,000 L + 4,500 B permits for third-country nationals
 - **Competition Level**: Extremely competitive - average applicant-to-permit ratio: 8:1
 - **What we optimise**: Salary benchmarks by canton, employer motivation letters, strategic canton selection, perfect timing
@@ -98,7 +98,7 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 **Reality Check**: 67% of L permit applications fail due to insufficient salary justification. We show you exactly how to calculate and prove market value.
 
 ### 3. Corporate Transfers & Innovation Visas - "The Elite Lane"
-- **Legal basis**: AuG Art. 19, VZAE Art. 28-30 for intra-company transfers; Start-up facilitation per SEM practice notes
+- **Legal basis**: AuG Art. 19, VZAE Art. 28-30 for intra-company transfers; Start-up facilitation per SEM practice notes  
 - **Why it works**: Cantons desperately need innovation - Tech, Pharma, MedTech, FinTech get priority
 - **Processing**: 4-6 weeks vs. 8-12 weeks standard
 - **Requirements**: Company transfer agreement OR innovative business plan with growth potential

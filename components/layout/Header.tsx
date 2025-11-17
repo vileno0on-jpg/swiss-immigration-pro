@@ -58,8 +58,23 @@ const layerNavigation: Record<LayerKey, NavItem[]> = {
 
 const setThemeClasses = (dark: boolean) => {
   if (typeof document === 'undefined') return
-  document.documentElement.classList.toggle('dark', dark)
-  document.body.classList.toggle('dark-mode', dark)
+
+  const html = document.documentElement
+  const body = document.body
+
+  if (dark) {
+    html.classList.add('dark')
+    body.classList.add('dark-mode')
+    // Apply direct styles as fallback for immediate visual feedback
+    body.style.backgroundColor = '#111827'
+    body.style.color = '#f9fafb'
+  } else {
+    html.classList.remove('dark')
+    body.classList.remove('dark-mode')
+    // Apply light mode styles as fallback
+    body.style.backgroundColor = '#ffffff'
+    body.style.color = '#111827'
+  }
 }
 
 export default function Header() {
@@ -217,8 +232,12 @@ export default function Header() {
             </div>
 
             <button
-              onClick={toggleDarkMode}
-              className="group relative rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 hover:bg-gray-100 dark:hover:border-gray-700 dark:hover:bg-gray-800"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                toggleDarkMode()
+              }}
+              className="group relative rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 hover:bg-gray-100 dark:hover:border-gray-700 dark:hover:bg-gray-800 cursor-pointer"
               aria-label="Toggle dark mode"
               title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >

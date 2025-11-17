@@ -38,7 +38,7 @@ export default function LoginPage() {
         // Update the session to ensure JWT token has isAdmin property
         await update()
         console.log('Session updated, redirecting to dashboard')
-        router.push('/dashboard')
+      router.push('/dashboard')
       } else {
         throw new Error('Login failed without specific error')
       }
