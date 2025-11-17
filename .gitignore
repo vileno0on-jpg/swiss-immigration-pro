@@ -1,0 +1,102 @@
+# Personal files and directories
+.VirtualBox/
+.android/
+.cargo/
+.chocolatey/
+.claude.json
+.claude.json.backup
+.claude/
+.cursor/
+.dbus-keyrings/
+.docker/
+.dotnet/
+.env.local
+.gitconfig
+.ipython/
+.lesshst
+.nuget/
+.ollama/
+.pkg-cache/
+.qtemu/
+.rustup/
+.ssh/
+.vscode/
+.yarnrc
+AppData/
+BrawlhallaReplays/
+Contacts/
+Desktop/
+Documents/
+Downloads/
+Favorites/
+Library/
+Links/
+Logs/
+Music/
+My project*/
+NTUSER.DAT*
+ntuser.dat.*
+ntuser.ini
+OneDrive/
+Packages/
+Pictures/
+Saved Games/
+Searches/
+UserSettings/
+Videos/
+VirtualBox VMs/
+__pycache__/
+node_modules/
+myenv/
+w64devkit/
+
+# Log files
+*.log
+AMDRM_Install.log
+AMD_RyzenMaster.log
+debug.log
+
+# Temporary files
+*.tmp
+*.temp
+*.save
+s.save
+uu.txt
+uu.txt#
+injection.txt
+where
+
+# Project specific
+swiss-immigration-pro/node_modules/
+swiss-immigration-pro/.next/
+swiss-immigration-pro/out/
+swiss-immigration-pro/build/
+swiss-immigration-pro/.env*
+swiss-immigration-pro/.vercel
+swiss-immigration-pro/*.tsbuildinfo
+swiss-immigration-pro/next-env.d.ts
+
+# Other projects
+discord-example-app/
+discord-id_to_ip-address/
+mu_code/
+privacy-shield-hub/
+Raven-Storm/
+source/
+temp-app/
+trai/
+v/
+PayloadsAllTheThings/
+
+# System files
+Local Settings/
+My Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start Menu/
+Templates/
+Application Data/
+Cookies/
+
