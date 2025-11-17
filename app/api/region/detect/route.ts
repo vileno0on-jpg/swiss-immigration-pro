@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
                      request.headers.get('x-netlify-proxied-for') ||
                      forwardedFor?.split(',')[0]?.trim() ||
                      realIP ||
-                     request.ip
+                     null
 
     if (!clientIP) {
       console.warn('No client IP found in headers, defaulting to other region')
