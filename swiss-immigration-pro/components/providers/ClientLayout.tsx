@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ChatWidget from '@/components/chat/ChatWidget'
+import { InitialQuizGate } from '@/components/quiz/InitialQuizGate'
 import { SessionProvider } from './SessionProvider'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +31,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900">
+        <InitialQuizGate />
         <Header />
         <main className="flex-1 bg-white dark:bg-gray-900">
           {children}

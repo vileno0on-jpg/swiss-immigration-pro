@@ -1,5 +1,5 @@
-// Simplified geolocation types and utilities
-// Removed IP detection functionality
+// IP-based geolocation for automatic region detection
+// Replaces the quiz system with automatic region detection
 
 export type RegionType = 'us' | 'eu' | 'other'
 
@@ -11,19 +11,100 @@ export interface GeolocationData {
   detected_at: number
 }
 
-// Simplified functions - always return 'other' region
+/**
+ * EU country codes for region detection
+ */
+const EU_COUNTRIES = new Set([
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+  'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+  'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO'
+])
+
+/**
+ * US country codes (mainly US)
+ */
+const US_COUNTRIES = new Set(['US'])
+
+/**
+ * Detects region based on IP address using ipapi.co
+ * Free tier allows 1000 requests per month
+ */
 export async function detectRegionFromIP(ip?: string): Promise<RegionType> {
-  return 'other'
+  try {
+    if (!ip) {
+      console.warn('No IP provided, defaulting to other region')
+      return 'other'
+    }
+
+    // Use ipapi.co for free geolocation (1000 requests/month)
+    const response = await fetch(`https://ipapi.co/${ip}/json/`, {
+      headers: {
+        'User-Agent': 'Swiss-Immigration-App/1.0'
+      }
+    })
+
+    if (!response.ok) {
+      console.warn('Geolocation API failed, defaulting to other')
+      return 'other'
+    }
+
+    const data = await response.json()
+
+    if (data.error) {
+      console.warn('Geolocation API error:', data.error)
+      return 'other'
+    }
+
+    const countryCode = data.country_code?.toUpperCase()
+
+    if (!countryCode) {
+      console.warn('No country code in geolocation response')
+      return 'other'
+    }
+
+    // Determine region
+    if (US_COUNTRIES.has(countryCode)) {
+      return 'us'
+    }
+
+    if (EU_COUNTRIES.has(countryCode)) {
+      return 'eu'
+    }
+
+    return 'other'
+  } catch (error) {
+    console.error('Error detecting region from IP:', error)
+    return 'other'
+  }
 }
 
+/**
+ * Determines region from country code
+ */
 export function getRegionFromCountryCode(countryCode: string): RegionType {
+  const code = countryCode.toUpperCase().trim()
+
+  if (US_COUNTRIES.has(code)) {
+    return 'us'
+  }
+
+  if (EU_COUNTRIES.has(code)) {
+    return 'eu'
+  }
+
   return 'other'
 }
 
+/**
+ * Gets region-specific route path
+ */
 export function getRegionRoute(region: RegionType): string {
   return `/${region}`
 }
 
+/**
+ * Gets region-specific display name
+ */
 export function getRegionDisplayName(region: RegionType): string {
   switch (region) {
     case 'us':
@@ -37,6 +118,9 @@ export function getRegionDisplayName(region: RegionType): string {
   }
 }
 
+/**
+ * Gets region-specific tagline
+ */
 export function getRegionTagline(region: RegionType): string {
   switch (region) {
     case 'us':
@@ -50,6 +134,9 @@ export function getRegionTagline(region: RegionType): string {
   }
 }
 
+/**
+ * Gets region-specific description
+ */
 export function getRegionDescription(region: RegionType): string {
   switch (region) {
     case 'us':
@@ -63,6 +150,9 @@ export function getRegionDescription(region: RegionType): string {
   }
 }
 
+/**
+ * Creates a geolocation data object
+ */
 export function createGeolocationData(ip: string, countryCode: string, countryName: string): GeolocationData {
   const region = getRegionFromCountryCode(countryCode)
 
@@ -75,6 +165,9 @@ export function createGeolocationData(ip: string, countryCode: string, countryNa
   }
 }
 
+/**
+ * Stores region detection in localStorage and cookies
+ */
 export function storeRegionDetection(region: RegionType, geolocationData?: GeolocationData): void {
   if (typeof window === 'undefined') return
 
@@ -99,6 +192,9 @@ export function storeRegionDetection(region: RegionType, geolocationData?: Geolo
   }
 }
 
+/**
+ * Retrieves stored region detection
+ */
 export function getStoredRegion(): RegionType | null {
   if (typeof window === 'undefined') return null
 
