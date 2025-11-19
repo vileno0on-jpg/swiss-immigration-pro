@@ -169,7 +169,7 @@ export default function RequirementsPage() {
           <ol className="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
             <li>Complete all required documents</li>
             <li>Review the <Link href={`/${layer}/process`} className="text-blue-600 dark:text-blue-400 hover:underline">application process</Link></li>
-            <li>Review the <Link href={`/${layer}/process`} className="text-blue-600 dark:text-blue-400 hover:underline">step-by-step process</Link> for detailed guidance</li>
+            <li>Review our detailed <Link href={`/${layer}/visas`} className="text-blue-600 dark:text-blue-400 hover:underline">visa options</Link> for your situation</li>
             <li>Consult with a Swiss immigration lawyer for your specific case</li>
           </ol>
         </div>

@@ -101,10 +101,10 @@ export default function VisasPage() {
             Need Help Choosing?
           </h3>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
-            Not sure which permit is right for you? Check our requirements page to understand the different pathways available to you.
+            Not sure which permit is right for you? Check our requirements page for detailed guidance on each permit type.
           </p>
           <Link href={`/${layer}/requirements`} className="btn-primary inline-block">
-            Check Requirements
+            View Requirements
           </Link>
         </motion.div>
       </div>

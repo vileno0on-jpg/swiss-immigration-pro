@@ -49,13 +49,7 @@ export default function ResourcesPage() {
 
         {/* Resources Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {content.resources.posts.map((post, idx) => {
-            if (process.env.NODE_ENV !== 'production') {
-              console.debug(
-                `Post ${idx}: expanded=${expandedPosts.has(idx)} | hasContent=${!!post.content}`
-              )
-            }
-            return (
+          {content.resources.posts.map((post, idx) => (
             <motion.article
               key={idx}
               id={post.title.toLowerCase().replace(/\s+/g, '-')}
@@ -93,10 +87,7 @@ export default function ResourcesPage() {
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      alert(`Read more clicked for post ${idx}!`)
-                      console.log('Button clicked for post', idx, 'Current expanded:', Array.from(expandedPosts))
                       toggleExpanded(idx)
-                      console.log('After toggle, expanded:', Array.from(expandedPosts))
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm flex items-center space-x-1 cursor-pointer border-none rounded-md px-3 py-2 transition-all duration-200 shadow-sm hover:shadow-md"
                   >
@@ -122,8 +113,7 @@ export default function ResourcesPage() {
                 )}
               </AnimatePresence>
             </motion.article>
-            )
-          })}
+          ))}
         </div>
 
         {/* Additional Resources */}

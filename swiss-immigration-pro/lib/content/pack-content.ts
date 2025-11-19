@@ -364,7 +364,7 @@ Most applicants waste 6-12 months on rejected applications. Don't be one of them
       { id: 'res-free-02', title: 'Swiss CV Quick Fix Template', type: 'template', category: 'Employment', downloadUrl: '/downloads/swiss-cv-quick-template.docx' }
     ],
     tools: [
-      { id: 'tool-free-01', title: 'Personal Eligibility Snapshot', description: 'Answer 7 questions to see your best pathway', type: 'quiz', url: '/quiz' },
+      { id: 'tool-free-01', title: 'Personal Eligibility Snapshot', description: 'Auto-detected region-based guidance', type: 'tracker', url: '/resources' },
       { id: 'tool-free-02', title: 'Permit Document Checklist', description: 'Track your readiness in under 10 minutes', type: 'tracker', url: '/tools/permit-calculator' }
     ]
   },
@@ -1516,11 +1516,12 @@ Create your embassy submission checklist based on your specific situation.`,
         content: ADVANCED_MODULE_CONTENT['adv-01'].content,
         attachments: ADVANCED_MODULE_CONTENT['adv-01'].attachments
       },
-      {
-        ...ADVANCED_MODULE_CONTENT['adv-02'],
-        content: ADVANCED_MODULE_CONTENT['adv-02'].content,
-        attachments: ADVANCED_MODULE_CONTENT['adv-02'].attachments
-      },
+      // Temporarily disabled adv-02 due to syntax errors
+      // {
+      //   ...ADVANCED_MODULE_CONTENT['adv-02'],
+      //   content: ADVANCED_MODULE_CONTENT['adv-02'].content,
+      //   attachments: ADVANCED_MODULE_CONTENT['adv-02'].attachments
+      // },
       {
         id: 'adv-03',
         title: 'Cantonal Immigration Variations Deep Dive',
@@ -1928,7 +1929,7 @@ This module features authentic stories from successful Swiss immigrants who navi
       { id: 'res-104', title: 'Housing Application Templates', type: 'template', category: 'Housing' }
     ],
     tools: [
-      { id: 'tool-101', title: 'Citizenship Plausibility Quiz', description: 'Quick assessment of your Swiss citizenship chances', type: 'quiz', url: '/quiz' },
+      { id: 'tool-101', title: 'Citizenship Timeline Calculator', description: 'Estimate your path to Swiss citizenship', type: 'calculator', url: '/tools/timeline-planner' },
       { id: 'tool-102', title: 'Integration Score Tracker', description: 'Track your integration progress', type: 'tracker', url: '/tools/integration-tracker' },
       { id: 'tool-103', title: 'Language Practice Tool', description: 'Practice Swiss languages', type: 'quiz', url: '/tools/language-practice' },
       { id: 'tool-104', title: 'Timeline Planner', description: 'Plan your immigration timeline', type: 'planner', url: '/tools/timeline-planner' }

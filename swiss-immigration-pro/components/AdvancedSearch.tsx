@@ -31,7 +31,7 @@ const SEARCH_INDEX: SearchResult[] = [
   { id: '10', title: 'Cost Calculator', description: 'Calculate living costs by canton', url: '/tools#cost', category: 'tool', icon: Calculator, keywords: ['calculator', 'cost', 'living', 'salary', 'expenses', 'budget'] },
   { id: '11', title: 'Timeline Planner', description: 'Estimate your immigration timeline', url: '/tools#timeline', category: 'tool', icon: Calculator, keywords: ['timeline', 'planner', 'schedule', 'duration', 'how long', 'time'] },
   { id: '12', title: 'Canton Comparison', description: 'Compare cantons side-by-side', url: '/tools#canton', category: 'tool', icon: Calculator, keywords: ['compare', 'comparison', 'canton', 'which canton', 'best canton'] },
-  { id: '13', title: 'Permit Calculator', description: 'Check your permit eligibility', url: '/tools/permit-calculator', category: 'tool', icon: Calculator, keywords: ['calculator', 'eligibility', 'qualify', 'eligible', 'assessment', 'check'] },
+  { id: '13', title: 'Region Settings', description: 'Update your region and language preferences', url: '/profile', category: 'tool', icon: Calculator, keywords: ['region', 'language', 'preferences', 'settings', 'location'] },
   
   // Guides
   { id: '14', title: 'L Permit Guide', description: 'Short-term residence permit', url: '/visas#l-permit', category: 'guide', icon: FileText, keywords: ['l permit', 'short term', '1 year', 'temporary'] },

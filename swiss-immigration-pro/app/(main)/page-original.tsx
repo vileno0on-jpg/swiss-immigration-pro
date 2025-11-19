@@ -476,8 +476,8 @@ export default function Home() {
               <Link href="/pricing" className="inline-block bg-white text-blue-600 hover:bg-blue-50 font-bold px-8 py-4 rounded-lg transition-all duration-200 transform hover:scale-105">
                 Get Started Today →
               </Link>
-              <Link href="/quiz" className="inline-block bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200">
-                Take Free Assessment
+              <Link href="/pricing" className="inline-block bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200">
+                Start Your Journey
               </Link>
             </div>
             <p className="text-sm mt-6 opacity-75">

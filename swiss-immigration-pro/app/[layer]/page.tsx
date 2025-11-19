@@ -155,8 +155,8 @@ export default function LayerPage() {
                 {content.hero.cta}
                 <ArrowRight className="inline-block ml-2 w-5 h-5" />
               </Link>
-              <Link href={`/${layer}/requirements`} className="btn-secondary bg-white/20 hover:bg-white/30 text-white border-white/30">
-                Check Requirements
+              <Link href={`/${layer}`} className="btn-secondary bg-white/20 hover:bg-white/30 text-white border-white/30">
+                Explore Resources
               </Link>
             </div>
 

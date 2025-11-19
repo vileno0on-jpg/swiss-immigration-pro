@@ -31,16 +31,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-dialog'],
   },
 
-  // Skip TypeScript check during build for deployment
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-
-  // Disable ESLint during build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Headers for security and performance
   async headers() {
     return [

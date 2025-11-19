@@ -16,21 +16,6 @@
     /* Enable GPU acceleration */
     transform: translateZ(0);
     will-change: scroll-position;
-    /* Default light mode background */
-    background-color: #ffffff;
-    color: #111827;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  /* Dark mode styles */
-  .dark body {
-    background-color: #111827;
-    color: #f9fafb;
-  }
-
-  .dark-mode body {
-    background-color: #111827;
-    color: #f9fafb;
   }
 
   /* Performance optimizations */

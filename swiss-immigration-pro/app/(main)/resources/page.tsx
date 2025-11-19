@@ -129,18 +129,15 @@ export default function ResourcesPage() {
         >
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">
-              Get Personalized Resources
+              Personalized Resources
             </h2>
             <p className="text-xl mb-6 opacity-90">
-              Take our quick assessment to unlock detailed, country-specific guides and resources tailored to your situation.
+              We've automatically detected your region and preferences to show you the most relevant immigration information and resources for your situation.
             </p>
-            <Link
-              href="/visas"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
-            >
-              Start Assessment
+            <div className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold">
+              Region-Specific Content Available
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </div>
           </div>
         </motion.div>
 

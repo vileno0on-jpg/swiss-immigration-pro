@@ -200,6 +200,7 @@ To switch from Groq to OpenAI:
 
 ### OpenAI:
 - **gpt-4o-mini:** ~$0.15 per 1M input tokens
+- **gpt-4o:** ~$2.50 per 1M input tokens
 - **Average cost:** $0.01-0.10 per conversation
 
 ---

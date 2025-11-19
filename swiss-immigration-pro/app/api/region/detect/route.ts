@@ -15,3 +15,5 @@ export async function GET() {
 
 // Runtime configuration for Next.js
 export const runtime = 'nodejs'
+
+
