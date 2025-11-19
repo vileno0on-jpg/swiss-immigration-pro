@@ -79,7 +79,7 @@ CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
   return basePrompt + `
    - No specific layer detected - provide general Swiss immigration information
    - Always mention the three pathways: EU/EFTA (no quotas), Americans (quota), Others (quota)
-   - Encourage users to take the quiz for personalized guidance
+   - Users can set their preferences in the welcome popup for personalized guidance
 `
 }
 
@@ -310,25 +310,24 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Try to get layer from user's quiz results if not provided
+    // Try to get layer from user's stored preferences if not provided
     if (!userLayer) {
       try {
         const supabase = await createClient()
-        const { data: quizResult, error } = await supabase
-          .from('quiz_results')
-          .select('answers')
+        const { data: userPrefs, error } = await supabase
+          .from('user_preferences')
+          .select('region')
           .eq('user_id', session.user.id)
-          .eq('quiz_type', 'initial_assessment')
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
 
-        if (!error && quizResult) {
-          const answers = quizResult.answers as any
-          userLayer = answers?.layer
+        if (!error && userPrefs) {
+          userLayer = userPrefs.region === 'eu' ? 'europeans' :
+                     userPrefs.region === 'us' ? 'americans' : 'others'
         }
       } catch (error) {
-        console.error('Error fetching user layer:', error)
+        console.error('Error fetching user preferences:', error)
       }
     }
 

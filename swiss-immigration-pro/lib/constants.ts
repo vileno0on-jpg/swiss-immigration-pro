@@ -36,30 +36,6 @@ export const EMBASSY_LOCATIONS = [
   { country: 'Australia', city: 'Canberra', link: 'https://www.swissinfo.ch' },
 ] as const
 
-// Sample test questions for quiz
-export const QUIZ_QUESTIONS = [
-  {
-    id: 1,
-    question: 'How long does it take to get Swiss citizenship through ordinary naturalization?',
-    options: ['5 years', '10 years', '15 years', '20 years'],
-    correct: 1,
-    explanation: 'Ordinary naturalization requires 10 years of residency with a C permit.',
-  },
-  {
-    id: 2,
-    question: 'What language proficiency is required for Swiss citizenship?',
-    options: ['A1', 'A2', 'B1', 'C1'],
-    correct: 2,
-    explanation: 'B1 level is required for ordinary naturalization in German, French, or Italian.',
-  },
-  {
-    id: 3,
-    question: 'How many non-EU work permits are available in 2025?',
-    options: ['6,500', '8,500', '10,500', '12,500'],
-    correct: 1,
-    explanation: 'SEM allocated 8,500 permits (4,000 L + 4,500 B) for 2025.',
-  },
-] as const
 
 // Monetization trigger points
 export const MONETIZATION_TRIGGERS = {
