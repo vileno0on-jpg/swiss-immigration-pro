@@ -95,6 +95,16 @@ CREATE TABLE public.masterclass_progress (
   UNIQUE(user_id, module_id)
 );
 
+-- Quiz results table
+CREATE TABLE public.quiz_results (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  quiz_type TEXT NOT NULL,
+  score INTEGER NOT NULL,
+  total_questions INTEGER NOT NULL,
+  answers JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- CV templates table
 CREATE TABLE public.cv_templates (
@@ -147,6 +157,7 @@ CREATE TABLE public.admin_logs (
 -- ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE public.user_limits ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE public.masterclass_progress ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.quiz_results ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE public.user_cvs ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies commented out for custom authentication
@@ -183,6 +194,10 @@ CREATE TABLE public.admin_logs (
 --   ON public.masterclass_progress FOR ALL
 --   USING (auth.uid() = user_id);
 --
+-- -- Policies for quiz results
+-- CREATE POLICY "Users can manage own quiz results"
+--   ON public.quiz_results FOR ALL
+--   USING (auth.uid() = user_id);
 --
 -- -- Policies for user CVs
 -- CREATE POLICY "Users can manage own CVs"

@@ -1,0 +1,4 @@
+{
+  "/(main)/page": "app/(main)/page.js",
+  "/[layer]/page": "app/[layer]/page.js"
+}

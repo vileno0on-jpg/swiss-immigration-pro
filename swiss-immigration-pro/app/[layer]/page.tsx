@@ -117,7 +117,7 @@ export default function LayerPage() {
             <div className="flex items-center space-x-4">
               <div className="text-right">
                 <div className="text-sm text-gray-600">Starting from</div>
-                <div className="text-xl font-bold text-gray-900">CHF 97/month</div>
+                <div className="text-xl font-bold text-gray-900">CHF 19.90/month</div>
               </div>
               <Link
                 href="/pricing"
@@ -155,8 +155,8 @@ export default function LayerPage() {
                 {content.hero.cta}
                 <ArrowRight className="inline-block ml-2 w-5 h-5" />
               </Link>
-              <Link href={`/${layer}`} className="btn-secondary bg-white/20 hover:bg-white/30 text-white border-white/30">
-                Explore Resources
+              <Link href={`/${layer}/quiz`} className="btn-secondary bg-white/20 hover:bg-white/30 text-white border-white/30">
+                Take Follow-Up Quiz
               </Link>
             </div>
 
@@ -400,7 +400,7 @@ export default function LayerPage() {
               </p>
               <div className="flex items-center justify-center space-x-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">CHF 97/month</div>
+                  <div className="text-2xl font-bold text-gray-900">CHF 19.90/month</div>
                   <div className="text-sm text-gray-600">Professional plan</div>
                 </div>
               </div>
@@ -527,11 +527,11 @@ export default function LayerPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Your Swiss Immigration Journey Starts Here
-            </h2>
+          </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
               Access professional tools and expert guidance designed to streamline your Swiss immigration process.
               Join thousands of successful applicants who have achieved their immigration goals.
-            </p>
+          </p>
           </div>
 
           {/* Service Benefits */}
@@ -569,7 +569,7 @@ export default function LayerPage() {
             </p>
             <div className="flex items-center justify-center space-x-6 mb-8">
               <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">CHF 97/month</div>
+                <div className="text-lg font-bold text-gray-900">CHF 19.90/month</div>
                 <div className="text-sm text-gray-600">Professional Plan</div>
               </div>
               <div className="text-gray-300">•</div>
@@ -584,13 +584,13 @@ export default function LayerPage() {
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-sm"
               >
                 Compare Plans
-              </Link>
+            </Link>
               <Link
                 href="/auth/register"
                 className="bg-white hover:bg-gray-50 text-gray-900 font-semibold px-8 py-3 rounded-lg transition-colors border border-gray-300"
               >
                 Start Free Account
-              </Link>
+            </Link>
             </div>
           </div>
 

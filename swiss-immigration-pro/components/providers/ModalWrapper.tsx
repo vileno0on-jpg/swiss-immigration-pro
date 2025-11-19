@@ -1,8 +1,7 @@
 'use client'
 
-import { InitialQuizGate } from '@/components/quiz/PreferencesModal'
-
-export default function ModalWrapper({ children }: { children: React.ReactNode }) {
-  return <InitialQuizGate>{children}</InitialQuizGate>
+// ModalWrapper is currently not used - region detection is handled on the home page
+export default function ModalWrapper() {
+  return null
 }
 

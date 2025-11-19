@@ -436,8 +436,8 @@ export default function USCitizensPage() {
             <Link href="/pricing" className="inline-block bg-white text-blue-600 hover:bg-blue-50 font-bold px-8 py-4 rounded-lg transition-all duration-200 transform hover:scale-105">
               View Pricing Plans →
             </Link>
-            <Link href="/pricing" className="inline-block bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200">
-              Start Your Application
+            <Link href="/quiz" className="inline-block bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-lg transition-all duration-200">
+              Take Eligibility Quiz
             </Link>
           </div>
           <p className="text-sm mt-6 opacity-75">

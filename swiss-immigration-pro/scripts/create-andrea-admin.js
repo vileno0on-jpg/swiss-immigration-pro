@@ -9,7 +9,7 @@ const https = require('https');
 const http = require('http');
 
 // Configuration
-const API_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 const ADMIN_DATA = {
   email: 'andrea.vonflue@gmail.com',
   password: 'Andreavf0222',
@@ -96,5 +96,3 @@ async function createAdminUser() {
 
 // Run the script
 createAdminUser();
-
-

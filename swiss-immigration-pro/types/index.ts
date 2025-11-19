@@ -46,6 +46,13 @@ export interface MasterclassProgress {
   completed_at?: string
 }
 
+export interface QuizResult {
+  id: string
+  quiz_type: string
+  score: number
+  total_questions: number
+  answers: Record<string, any>
+}
 
 export interface CantonalData {
   id: string

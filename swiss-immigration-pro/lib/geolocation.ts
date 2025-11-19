@@ -1,5 +1,4 @@
-// IP-based geolocation for automatic region detection
-// Replaces the quiz system with automatic region detection
+// Simplified geolocation utilities for region detection
 
 export type RegionType = 'us' | 'eu' | 'other'
 
@@ -12,70 +11,11 @@ export interface GeolocationData {
 }
 
 /**
- * EU country codes for region detection
- */
-const EU_COUNTRIES = new Set([
-  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
-  'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
-  'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO'
-])
-
-/**
- * US country codes (mainly US)
- */
-const US_COUNTRIES = new Set(['US'])
-
-/**
- * Detects region based on IP address using ipapi.co
- * Free tier allows 1000 requests per month
+ * Simplified region detection - no longer uses IP geolocation
  */
 export async function detectRegionFromIP(ip?: string): Promise<RegionType> {
-  try {
-    if (!ip) {
-      console.warn('No IP provided, defaulting to other region')
-      return 'other'
-    }
-
-    // Use ipapi.co for free geolocation (1000 requests/month)
-    const response = await fetch(`https://ipapi.co/${ip}/json/`, {
-      headers: {
-        'User-Agent': 'Swiss-Immigration-App/1.0'
-      }
-    })
-
-    if (!response.ok) {
-      console.warn('Geolocation API failed, defaulting to other')
-      return 'other'
-    }
-
-    const data = await response.json()
-
-    if (data.error) {
-      console.warn('Geolocation API error:', data.error)
-      return 'other'
-    }
-
-    const countryCode = data.country_code?.toUpperCase()
-
-    if (!countryCode) {
-      console.warn('No country code in geolocation response')
-      return 'other'
-    }
-
-    // Determine region
-    if (US_COUNTRIES.has(countryCode)) {
-      return 'us'
-    }
-
-    if (EU_COUNTRIES.has(countryCode)) {
-      return 'eu'
-    }
-
-    return 'other'
-  } catch (error) {
-    console.error('Error detecting region from IP:', error)
-    return 'other'
-  }
+  // Always return 'other' since we removed IP detection
+  return 'other'
 }
 
 /**
@@ -84,22 +24,22 @@ export async function detectRegionFromIP(ip?: string): Promise<RegionType> {
 export function getRegionFromCountryCode(countryCode: string): RegionType {
   const code = countryCode.toUpperCase().trim()
 
-  if (US_COUNTRIES.has(code)) {
+  if (code === 'US') {
     return 'us'
   }
+
+  // EU country codes
+  const EU_COUNTRIES = new Set([
+    'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+    'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+    'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO'
+  ])
 
   if (EU_COUNTRIES.has(code)) {
     return 'eu'
   }
 
   return 'other'
-}
-
-/**
- * Gets region-specific route path
- */
-export function getRegionRoute(region: RegionType): string {
-  return `/${region}`
 }
 
 /**
@@ -225,5 +165,3 @@ export function getStoredRegion(): RegionType | null {
     return null
   }
 }
-
-

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { SessionProvider } from './SessionProvider'
-import ModalWrapper from './ModalWrapper'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -27,9 +26,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <ModalWrapper>
-        {children}
-      </ModalWrapper>
+      {children}
     </SessionProvider>
   )
 }

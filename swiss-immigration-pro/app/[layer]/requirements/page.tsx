@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, Circle, Download, FileText } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Circle, Download, FileText, Sparkles, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
@@ -71,6 +71,57 @@ export default function RequirementsPage() {
 
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
+      {/* Conversion Header - Sticky */}
+      <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-3">
+            {/* Left: Urgency Message */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold">🔥 2025 Quotas Filling Fast</span>
+              </div>
+              <div className="hidden md:flex items-center space-x-2 text-sm">
+                <Sparkles className="w-4 h-4" />
+                <span>Only 2,500 permits left</span>
+              </div>
+            </div>
+
+            {/* Center: Premium Benefits */}
+            <div className="hidden lg:flex items-center space-x-6 text-sm">
+              <div className="flex items-center space-x-1">
+                <CheckCircle className="w-4 h-4 text-green-300" />
+                <span>Unlimited AI Chat</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <CheckCircle className="w-4 h-4 text-green-300" />
+                <span>20+ CV Templates</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <CheckCircle className="w-4 h-4 text-green-300" />
+                <span>Expert Support</span>
+              </div>
+            </div>
+
+            {/* Right: CTA Buttons */}
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/pricing"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-md"
+              >
+                ⭐ Upgrade Now
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm font-semibold px-4 py-2 rounded-lg text-sm transition-colors border border-white/30"
+              >
+                Start Free
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
@@ -169,7 +220,7 @@ export default function RequirementsPage() {
           <ol className="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
             <li>Complete all required documents</li>
             <li>Review the <Link href={`/${layer}/process`} className="text-blue-600 dark:text-blue-400 hover:underline">application process</Link></li>
-            <li>Review our detailed <Link href={`/${layer}/visas`} className="text-blue-600 dark:text-blue-400 hover:underline">visa options</Link> for your situation</li>
+            <li>Take the <Link href={`/${layer}/quiz`} className="text-blue-600 dark:text-blue-400 hover:underline">follow-up quiz</Link> for personalized recommendations</li>
             <li>Consult with a Swiss immigration lawyer for your specific case</li>
           </ol>
         </div>

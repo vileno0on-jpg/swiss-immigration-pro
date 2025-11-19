@@ -47,7 +47,7 @@ export interface Tool {
   id: string
   title: string
   description: string
-  type: 'calculator' | 'generator' | 'tracker' | 'tool' | 'planner'
+  type: 'calculator' | 'generator' | 'tracker' | 'quiz' | 'planner'
   url: string
 }
 
@@ -1161,6 +1161,25 @@ Use this checklist to track your progress:
 ✅ Follow up regularly with employer
 ✅ Be prepared for interviews
 ✅ Have backup documents ready`,
+        quiz: {
+          questions: [
+            {
+              question: 'How many passport photos are typically required?',
+              options: ['1', '2-4', '5-6', 'Not required'],
+              correct: 1
+            },
+            {
+              question: 'What is the minimum passport validity required?',
+              options: ['3 months', '6 months', '1 year', 'Does not matter'],
+              correct: 1
+            },
+            {
+              question: 'Who submits the application to the cantonal authority?',
+              options: ['You directly', 'Your employer', 'A lawyer', 'Embassy'],
+              correct: 1
+            }
+          ]
+        },
         exercises: [
           {
             title: 'Document Preparation Exercise',
@@ -1273,6 +1292,25 @@ We provide 20+ templates for different industries:
 - Consulting (2 templates)
 - Legal (1 template)
 - Marketing & Sales (2 templates)`,
+        quiz: {
+          questions: [
+            {
+              question: 'Is a photo required on a Swiss CV?',
+              options: ['No', 'Yes, professional headshot', 'Optional', 'Only for certain jobs'],
+              correct: 1
+            },
+            {
+              question: 'What is the maximum recommended length for a Swiss CV?',
+              options: ['1 page', '1-2 pages', '3 pages', 'No limit'],
+              correct: 1
+            },
+            {
+              question: 'Should you include marital status?',
+              options: ['Always', 'Never', 'Optional', 'Only if married'],
+              correct: 2
+            }
+          ]
+        },
         exercises: [
           {
             title: 'CV Builder Tool',
@@ -1893,7 +1931,7 @@ This module features authentic stories from successful Swiss immigrants who navi
     tools: [
       { id: 'tool-101', title: 'Citizenship Timeline Calculator', description: 'Estimate your path to Swiss citizenship', type: 'calculator', url: '/tools/timeline-planner' },
       { id: 'tool-102', title: 'Integration Score Tracker', description: 'Track your integration progress', type: 'tracker', url: '/tools/integration-tracker' },
-      { id: 'tool-103', title: 'Language Practice Tool', description: 'Practice Swiss languages', type: 'tool', url: '/tools/language-practice' },
+      { id: 'tool-103', title: 'Language Practice Tool', description: 'Practice Swiss languages', type: 'quiz', url: '/tools/language-practice' },
       { id: 'tool-104', title: 'Timeline Planner', description: 'Plan your immigration timeline', type: 'planner', url: '/tools/timeline-planner' }
     ]
   },
