@@ -47,7 +47,7 @@ export interface Tool {
   id: string
   title: string
   description: string
-  type: 'calculator' | 'generator' | 'tracker' | 'quiz' | 'planner'
+  type: 'calculator' | 'generator' | 'tracker' | 'tool' | 'planner'
   url: string
 }
 
