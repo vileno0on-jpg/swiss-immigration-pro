@@ -223,7 +223,7 @@ export default function CountryLanguageDetectionModal({
   const applyTranslation = async (languageCode: string) => {
     if (typeof window === 'undefined') return
 
-    // Load Google Translate script if not already loaded
+      // Load Google Translate script if not already loaded
     const loadGoogleTranslate = (): Promise<void> => {
       return new Promise((resolve, reject) => {
         if (window.google?.translate?.TranslateElement) {
@@ -267,16 +267,16 @@ export default function CountryLanguageDetectionModal({
         // Initialize Google Translate when script loads
         ;(window as any).googleTranslateElementInit = () => {
           try {
-            if (window.google?.translate?.TranslateElement) {
-              new window.google.translate.TranslateElement(
-                {
-                  pageLanguage: 'en',
-                  includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
-                  autoDisplay: false,
+          if (window.google?.translate?.TranslateElement) {
+            new window.google.translate.TranslateElement(
+              {
+                pageLanguage: 'en',
+                includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
+                autoDisplay: false,
                   layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-                },
-                'google_translate_element'
-              )
+              },
+              'google_translate_element'
+            )
               resolve()
             } else {
               reject(new Error('Google Translate API not available'))
@@ -302,14 +302,14 @@ export default function CountryLanguageDetectionModal({
       const targetLang = languageCode === 'en' ? 'en' : languageCode
       const cookieValue = `/en/${targetLang}`
       document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
-
+      
       // Wait a bit for Google Translate to initialize
       await new Promise(resolve => setTimeout(resolve, 500))
 
       // Trigger translation
-      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
-      if (select) {
-        select.value = targetLang
+        const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
+        if (select) {
+          select.value = targetLang
         select.dispatchEvent(new Event('change', { bubbles: true }))
       } else {
         // If select not found, reload page to apply translation

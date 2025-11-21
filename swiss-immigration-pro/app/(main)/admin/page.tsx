@@ -893,7 +893,7 @@ export default function AdminDashboard() {
                     <div className="text-xs text-purple-600 dark:text-purple-400 font-medium flex items-center justify-between group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
                       <span>Open admin view</span>
                       <span>→</span>
-                    </div>
+                  </div>
                   </div>
                 </button>
               ))}

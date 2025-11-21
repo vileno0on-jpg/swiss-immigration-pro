@@ -51,10 +51,10 @@ export function InitialQuizGate() {
 
         // Only auto-open if not completed and not skipped
         if (!detectionCompleted && !detectionSkipped) {
-          const timer = setTimeout(() => {
-            setIsOpen(true)
+        const timer = setTimeout(() => {
+          setIsOpen(true)
           }, 1000)
-          return () => clearTimeout(timer)
+        return () => clearTimeout(timer)
         }
       }
     } catch {

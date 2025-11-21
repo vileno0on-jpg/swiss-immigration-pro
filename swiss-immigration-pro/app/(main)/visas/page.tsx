@@ -121,30 +121,30 @@ export default function VisasPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-            {
-              title: 'C Permit',
-              subtitle: 'Settlement Permit',
-              description: 'Permanent residence after 5-10 years',
+              {
+                title: 'C Permit',
+                subtitle: 'Settlement Permit',
+                description: 'Permanent residence after 5-10 years',
               icon: Award
-            },
-            {
-              title: 'EU Blue Card',
-              subtitle: 'High-Quality Workers',
-              description: 'Simplified process for highly qualified',
+              },
+              {
+                title: 'EU Blue Card',
+                subtitle: 'High-Quality Workers',
+                description: 'Simplified process for highly qualified',
               icon: Badge
-            },
-            {
-              title: 'N Permit',
-              subtitle: 'Asylum Seekers',
-              description: 'For refugees and asylum cases',
+              },
+              {
+                title: 'N Permit',
+                subtitle: 'Asylum Seekers',
+                description: 'For refugees and asylum cases',
               icon: Shield
-            },
-            {
-              title: 'CI Permit',
-              subtitle: 'Diplomatic',
-              description: 'For diplomats and international orgs',
+              },
+              {
+                title: 'CI Permit',
+                subtitle: 'Diplomatic',
+                description: 'For diplomats and international orgs',
               icon: FileCheck
-            }
+              }
             ].map((perm, idx) => {
               const PermIcon = perm.icon
               return (

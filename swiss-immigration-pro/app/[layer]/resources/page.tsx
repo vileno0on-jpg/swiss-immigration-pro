@@ -127,7 +127,7 @@ export default function ResourcesPage() {
                     const IconComponent = getCategoryIcon(post.category)
                     return (
                       <div className="flex items-center justify-center h-full">
-                        <IconComponent className="w-12 h-12 text-blue-600" />
+                      <IconComponent className="w-12 h-12 text-blue-600" />
                       </div>
                     )
                   })()}
