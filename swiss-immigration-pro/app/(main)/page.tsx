@@ -125,9 +125,9 @@ export default function Home() {
               </motion.div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Become a Swiss Citizen in
+                Become a Swiss Resident in
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                  2025
+                  2026
                 </span>
               </h1>
 
