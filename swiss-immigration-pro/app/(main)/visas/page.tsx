@@ -4,8 +4,9 @@ import { motion } from 'framer-motion'
 import { FileText, Clock, MapPin, CheckCircle, Euro, Users, Building, TrendingUp, Shield, Badge, Award, FileCheck } from 'lucide-react'
 import Link from 'next/link'
 
+// Disable static generation for this client component
 export const dynamic = 'force-dynamic'
-export const revalidate = false
+export const fetchCache = 'force-no-store'
 
 export default function VisasPage() {
   return (
@@ -65,7 +66,9 @@ export default function VisasPage() {
                 extendable: 'Yes'
               }
             },
-          ].map((visa, idx) => (
+          ].map((visa, idx) => {
+            const IconComponent = visa.icon
+            return (
             <motion.div
               key={visa.title}
               initial={{ opacity: 0, y: 20 }}
@@ -74,7 +77,7 @@ export default function VisasPage() {
               className="bg-white border-2 border-blue-100 rounded-xl p-8 hover:border-blue-500 hover:shadow-lg transition-all"
             >
               <div className="flex items-center justify-between mb-4">
-                <visa.icon className="w-12 h-12 text-blue-600" />
+                <IconComponent className="w-12 h-12 text-blue-600" />
                 <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                   {visa.duration}
                 </span>
@@ -114,7 +117,8 @@ export default function VisasPage() {
                 </div>
               </div>
             </motion.div>
-          ))}
+            )
+          })}
         </div>
 
 
@@ -149,7 +153,9 @@ export default function VisasPage() {
               description: 'For diplomats and international orgs',
               icon: FileCheck
             }
-            ].map((perm, idx) => (
+            ].map((perm, idx) => {
+              const PermIcon = perm.icon
+              return (
               <motion.div
                 key={perm.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -157,12 +163,13 @@ export default function VisasPage() {
                 transition={{ delay: 0.4 + idx * 0.1 }}
                 className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 hover:shadow-md transition-all"
               >
-                <perm.icon className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                <PermIcon className="w-10 h-10 text-blue-600 mx-auto mb-3" />
                 <div className="font-bold text-gray-900 mb-1">{perm.title}</div>
                 <div className="text-sm text-blue-600 mb-2">{perm.subtitle}</div>
                 <div className="text-xs text-gray-600">{perm.description}</div>
               </motion.div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -348,7 +355,11 @@ export default function VisasPage() {
           <p className="text-xl text-gray-600 mb-8">
             Upgrade to Immigration Pack for complete checklists, embassy contacts, and step-by-step guides
           </p>
-          <Link href="/pricing" className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors">
+          <Link 
+            href="/pricing" 
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors"
+            prefetch={false}
+          >
             View Pricing →
           </Link>
         </motion.div>

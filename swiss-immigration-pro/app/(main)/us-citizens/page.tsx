@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { DollarSign, FileText, Heart, Clock, MapPin, CheckCircle, AlertCircle, Plane, Home, Briefcase, Users, Shield } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function USCitizensPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 py-24">

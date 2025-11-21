@@ -100,3 +100,6 @@ Templates/
 Application Data/
 Cookies/
 
+
+# Local Netlify folder
+.netlify
