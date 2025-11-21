@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Become a Swiss Citizen in 2025 | Swiss Immigration Pro - 96% Success Rate",
+  title: "Become a Swiss Resident in 2026 | Swiss Immigration Pro - 96% Success Rate",
   description: "AI-Powered Swiss immigration platform with 96% success rate. Expert guidance for work permits, citizenship, visas. Join 18,500+ successful applicants. 30 free AI questions. Fast 6-8 week processing.",
   keywords: "Swiss immigration, Switzerland visa, Swiss citizenship, work permit Switzerland, L permit, B permit, Swiss work visa, Swiss employment, permanent residence Switzerland, naturalization Swiss, 2025 quota, Swiss immigration lawyer, EU work permit, Swiss visa application, citizenship Switzerland, Swiss residency permit",
   authors: [{ name: "Swiss Immigration Pro" }],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "Become a Swiss Citizen in 2025 | 96% Success Rate | Swiss Immigration Pro",
+    title: "Become a Swiss Resident in 2026 | 96% Success Rate | Swiss Immigration Pro",
     description: "AI-Powered Swiss immigration platform. 18,500+ successful applications. 96% approval rate. Expert guidance, 30 free AI questions, fast processing.",
     url: 'https://swissimmigrationpro.com',
     siteName: 'Swiss Immigration Pro',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Become a Swiss Citizen in 2025 | 96% Success Rate",
+    title: "Become a Swiss Resident in 2026 | 96% Success Rate",
     description: "AI-Powered Swiss immigration platform. Join 18,500+ successful applicants. Expert guidance, fast processing.",
     images: ['/og-image.jpg'],
   },
