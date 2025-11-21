@@ -1,6 +1,5 @@
 [build]
   command = "npm run build"
-  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -8,9 +7,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Redirect all requests to Next.js
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/next"
-  status = 200
