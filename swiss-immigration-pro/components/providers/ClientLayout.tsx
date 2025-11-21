@@ -65,7 +65,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <ToastProvider>
         <TranslationLoader />
-        {typeof window !== 'undefined' && <InitialQuizGate />}
+        <InitialQuizGate />
         {!isHomePage && pathname ? (
           <>
             <Header />
@@ -75,7 +75,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
           {children}
         </main>
-        {typeof window !== 'undefined' && <ScrollToTop />}
+        <ScrollToTop />
         <FloatingChatWidget />
       </ToastProvider>
     </SessionProvider>
