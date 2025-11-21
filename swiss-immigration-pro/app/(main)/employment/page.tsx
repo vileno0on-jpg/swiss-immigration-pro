@@ -5,37 +5,37 @@ import { Briefcase, DollarSign, TrendingUp, Users } from 'lucide-react'
 
 export default function EmploymentPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-24">
+    <div className="min-h-screen bg-white py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Swiss Employment Hub
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Navigate Swiss job market, quotas, and employment requirements
           </p>
         </motion.div>
 
-        {/* Live Quota Alert */}
+        {/* Quota Information Box - Blue Theme */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-red-50 dark:bg-red-900 border-l-4 border-red-600 dark:border-red-400 p-6 rounded-lg mb-12"
+          className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg mb-12"
         >
           <div className="flex items-center mb-3">
-            <TrendingUp className="w-6 h-6 text-red-600 dark:text-red-400 mr-3" />
-            <h3 className="text-xl font-bold text-red-900 dark:text-red-100">
+            <TrendingUp className="w-6 h-6 text-blue-600 mr-3" />
+            <h3 className="text-xl font-bold text-blue-900">
               2025 Non-EU Work Quotas
             </h3>
           </div>
-          <p className="text-red-800 dark:text-red-200 text-lg">
+          <p className="text-blue-800 text-lg">
             <strong>Permits are subject to annual federal quotas</strong> (4,000 L + 4,500 B permits in recent years)
           </p>
-          <p className="text-red-700 dark:text-red-300 mt-2">
+          <p className="text-blue-700 mt-2">
             Updated: November 2025 • Source: SEM
           </p>
         </motion.div>
@@ -71,11 +71,11 @@ export default function EmploymentPage() {
               transition={{ delay: idx * 0.1 }}
               className="card p-8"
             >
-              <section.icon className="w-12 h-12 text-blue-600 dark:text-blue-400 mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <section.icon className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 {section.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600">
                 {section.content}
               </p>
             </motion.div>

@@ -62,7 +62,7 @@ export default function Testimonials() {
   ]
 
   return (
-    <section className="py-24 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <section className="py-24 bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,10 +71,10 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Real Success Stories
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-gray-600">
             Join 10,000+ immigrants who've successfully navigated Swiss immigration
           </p>
         </motion.div>
@@ -87,10 +87,10 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow relative"
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow relative"
             >
               <div className="absolute top-4 right-4 opacity-20">
-                <Quote className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+                <Quote className="w-12 h-12 text-blue-600" />
               </div>
               
               {/* Rating */}
@@ -101,29 +101,38 @@ export default function Testimonials() {
               </div>
 
               {/* Text */}
-              <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed relative z-10">
+              <p className="text-gray-700 mb-6 leading-relaxed relative z-10">
                 "{testimonial.text}"
               </p>
 
-              {/* Author */}
+              {/* Author with real family photo */}
               <div className="flex items-start space-x-3 mb-4">
-                <div className="text-3xl">{testimonial.avatar}</div>
+                <div className="relative">
+                  <img 
+                    src={idx % 2 === 0 ? "/images/family/c41e6c67-7e1b-4bce-922b-1e21f696a6f2.png" : "/images/family/download (4).jpeg"} 
+                    alt={`${testimonial.name} - Success story`}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-blue-200"
+                  />
+                  <div className="absolute -bottom-1 -right-1 text-xl bg-white rounded-full p-1">
+                    {testimonial.avatar}
+                  </div>
+                </div>
                 <div>
-                  <div className="font-bold text-gray-900 dark:text-white">
+                  <div className="font-bold text-gray-900">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600">
                     {testimonial.location}
                   </div>
                 </div>
               </div>
 
               {/* Result */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-bold px-3 py-1 rounded-full mb-2">
+              <div className="pt-4 border-t border-gray-200">
+                <div className="inline-block bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
                   ✓ {testimonial.result}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-gray-500">
                   {testimonial.timeframe}
                 </div>
               </div>
@@ -146,10 +155,10 @@ export default function Testimonials() {
             { number: '9 weeks', label: 'Avg. Processing' }
           ].map((metric, idx) => (
             <div key={idx}>
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+              <div className="text-4xl font-bold text-blue-600 mb-2">
                 {metric.number}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-600">
                 {metric.label}
               </div>
             </div>

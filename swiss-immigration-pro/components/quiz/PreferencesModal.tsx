@@ -16,8 +16,8 @@ interface UserPreferences {
 }
 
 export function InitialQuizGate({ children }: { children: React.ReactNode }) {
-  const [showModal, setShowModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false) // Always false - modal disabled
+  const [isLoading, setIsLoading] = useState(false) // Set to false immediately
   const [preferences, setPreferences] = useState<UserPreferences>({
     region: 'other',
     language: 'en',
@@ -32,6 +32,13 @@ export function InitialQuizGate({ children }: { children: React.ReactNode }) {
   } | null>(null)
 
   useEffect(() => {
+    // DISABLED: Hide language selection modal for now
+    // The new CountryLanguageDetectionModal handles this functionality
+    setIsLoading(false)
+    return
+    
+    // Original code commented out:
+    /*
     const initializeModal = async () => {
       try {
         // Check if user has already confirmed preferences
@@ -91,6 +98,7 @@ export function InitialQuizGate({ children }: { children: React.ReactNode }) {
     }
 
     initializeModal()
+    */
   }, [])
 
   const handleConfirm = () => {

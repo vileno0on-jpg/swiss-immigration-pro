@@ -441,7 +441,7 @@ export default function USCitizensPage() {
             </Link>
           </div>
           <p className="text-sm mt-6 opacity-75">
-            ✓ Save CHF 5,000+ vs immigration consultants  •  ✓ 30-Day Money-Back Guarantee
+            ✓ Save CHF 5,000+ vs immigration consultants  •  ✓ Cancel Anytime
           </p>
         </motion.div>
       </div>

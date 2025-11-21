@@ -157,43 +157,50 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
   return (
     <AnimatePresence>
       <motion.div
-        ref={scrollRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-white dark:bg-gray-900 overflow-y-auto"
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        onClick={onClose}
       >
-        <div className="min-h-screen flex flex-col">
-          <div className="px-6 py-6 border-b border-gray-200 dark:border-gray-800 flex items-start justify-between gap-6 sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur">
+        <motion.div
+          ref={scrollRef}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-6 py-6 border-b border-gray-200 flex items-start justify-between gap-6 sticky top-0 bg-white z-10">
             <div className="space-y-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
                 Personalized Swiss Assessment
               </span>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-3xl font-bold text-gray-900">
                   Build Your Swiss Immigration Pathway
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   {progressPercent}% complete • Step {currentStep} of {TOTAL_STEPS}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
-          <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="space-y-8">
+          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-10">
+            <div className="w-full space-y-8">
               <div>
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
+                <div className="flex justify-between text-sm text-gray-600 mb-3">
                   <span>Step {currentStep} of {TOTAL_STEPS}</span>
                   <span>{progressPercent}% complete</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                   <motion.div
                     key={currentStep}
                     initial={{ width: 0 }}
@@ -204,7 +211,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8">
                 <AnimatePresence mode="wait">
                 {/* Step 1: Country of Origin */}
                 {currentStep === 1 && (
@@ -218,10 +225,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Globe className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Where are you from?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           This helps us personalize your immigration pathway
                         </p>
                       </div>
@@ -239,8 +246,8 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                       ))}
                     </select>
                     {answers.countryOfOrigin && (
-                      <div className="mt-4 p-5 bg-blue-50 dark:bg-blue-900 rounded-xl">
-                        <p className="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">
+                      <div className="mt-4 p-5 bg-blue-50 rounded-xl">
+                        <p className="text-sm text-blue-900 leading-relaxed">
                           💡 Based on your selection, you&apos;ll be categorized into one of three personalized pathways:
                           <br />
                           <strong>EU/EFTA:</strong> Freedom of movement benefits
@@ -266,10 +273,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Briefcase className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Why do you want to immigrate to Switzerland?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           Select all that apply (you can choose multiple)
                         </p>
                       </div>
@@ -292,7 +299,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                           }}
                           className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                         />
-                        <span className="text-lg text-gray-900 dark:text-white">{reason}</span>
+                        <span className="text-lg text-gray-900">{reason}</span>
                       </label>
                     ))}
                   </motion.div>
@@ -310,10 +317,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <User className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Your nationality?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           (Optional - if different from country of origin)
                         </p>
                       </div>
@@ -345,10 +352,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Calendar className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Age range?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           (Optional - helps us tailor opportunities)
                         </p>
                       </div>
@@ -366,7 +373,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                           onChange={() => setAnswers({ ...answers, ageRange: age })}
                           className="w-5 h-5 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-lg text-gray-900 dark:text-white">{age} years</span>
+                        <span className="text-lg text-gray-900">{age} years</span>
                       </label>
                     ))}
                   </motion.div>
@@ -384,10 +391,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Briefcase className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Do you have a job offer or sponsor?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           This significantly impacts your pathway options
                         </p>
                       </div>
@@ -398,8 +405,8 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                           key={String(value)}
                           className={`flex items-center justify-center space-x-3 p-6 border-2 rounded-xl cursor-pointer transition-all ${
                             answers.hasJobOffer === value
-                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-900 shadow-md'
-                              : 'border-gray-300 dark:border-gray-700 hover:border-blue-500'
+                              ? 'border-blue-600 bg-blue-50 shadow-md'
+                              : 'border-gray-300 hover:border-blue-500'
                           }`}
                         >
                           <input
@@ -409,7 +416,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                             onChange={() => setAnswers({ ...answers, hasJobOffer: value })}
                             className="sr-only"
                           />
-                          <span className="text-2xl font-semibold text-gray-900 dark:text-white">
+                          <span className="text-2xl font-semibold text-gray-900">
                             {value ? 'Yes' : 'No'}
                           </span>
                         </label>
@@ -430,10 +437,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Languages className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Language skills?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           (Optional - select your proficiency levels)
                         </p>
                       </div>
@@ -443,7 +450,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                       const levels: Array<'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'> = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
                       return (
                         <div key={lang} className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <label className="text-sm font-medium text-gray-700">
                             {langNames[lang as keyof typeof langNames]}
                           </label>
                           <select
@@ -458,7 +465,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                                 },
                               })
                             }}
-                            className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                           >
                             <option value="">No proficiency</option>
                             {levels.map((level) => (
@@ -485,10 +492,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                     <div className="flex items-center space-x-3 mb-6">
                       <Mail className="w-8 h-8 text-blue-600" />
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-semibold text-gray-900">
                           Get your personalized PDF summary?
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600">
                           (Optional - enter your email to receive a customized immigration pathway document)
                         </p>
                       </div>
@@ -498,10 +505,10 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                       value={answers.email || ''}
                       onChange={(e) => setAnswers({ ...answers, email: e.target.value })}
                       placeholder="your.email@example.com"
-                      className="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white text-lg"
+                      className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 text-lg"
                     />
-                    <div className="p-5 bg-green-50 dark:bg-green-900 rounded-xl">
-                      <p className="text-sm text-green-900 dark:text-green-100 leading-relaxed">
+                    <div className="p-5 bg-green-50 rounded-xl">
+                      <p className="text-sm text-green-900 leading-relaxed">
                         ✓ You&apos;ll receive a personalized PDF with:
                         <br />• Your customized immigration pathway
                         <br />• Timeline and requirements checklist
@@ -517,12 +524,12 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
                 <button
                   onClick={handleBack}
                   disabled={currentStep === 1}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
                 </button>
-                <div className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+                <div className="text-sm text-gray-600 text-center sm:text-left">
                   {currentStep === TOTAL_STEPS
                     ? 'Final review before we build your pathway.'
                     : 'Complete each step to personalize your Swiss roadmap.'}
@@ -558,7 +565,7 @@ export default function InitialQuizModal({ isOpen, onClose, onComplete }: Initia
               </div>
             </div>
           </main>
-        </div>
+        </motion.div>
       </motion.div>
     </AnimatePresence>
   )

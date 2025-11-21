@@ -23,7 +23,7 @@ export const PRICING_PACKS = {
   immigration: {
     id: 'immigration',
     name: 'Immigration Pack',
-    price: 9.99,
+    price: 19,
     priceId: null, // Will be set with actual Stripe Price ID
     features: [
       'Unlimited AI chatbot access',
@@ -33,12 +33,13 @@ export const PRICING_PACKS = {
       'Dashboard access',
       'ATS-optimized CV editor',
       'Interactive quizzes & assessments',
+      'Email support',
     ],
   },
   advanced: {
     id: 'advanced',
     name: 'Advanced Pack',
-    price: 29.99,
+    price: 49,
     priceId: null,
     features: [
       'Everything in Immigration Pack',
@@ -50,23 +51,25 @@ export const PRICING_PACKS = {
       'Interactive learning tools',
       'Video tutorials & walkthroughs',
       'Practice exercises & quizzes',
+      'Priority email support',
     ],
   },
   citizenship: {
     id: 'citizenship',
     name: 'Citizenship Pro Pack',
-    price: 89.99,
+    price: 149,
     priceId: null,
     features: [
       'Everything in Advanced Pack',
       'Citizenship roadmap (10yr path)',
       'Spouse & 3rd-gen shortcuts',
       'Language test preparation',
-      'Lifetime access',
-      'Priority support',
+      'Lifetime access to all content',
+      'Priority support (24h response)',
       'Personalized application coaching',
       'Advanced interactive modules',
       'Expert video content',
+      'Annual strategy review',
     ],
   },
 } as const

@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, Circle, Download, FileText, Sparkles, TrendingUp } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Circle, Download, FileText, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
@@ -70,81 +70,47 @@ export default function RequirementsPage() {
   const progress = (completedCount / requirements.length) * 100
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
-      {/* Conversion Header - Sticky */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            {/* Left: Urgency Message */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold">🔥 2025 Quotas Filling Fast</span>
-              </div>
-              <div className="hidden md:flex items-center space-x-2 text-sm">
-                <Sparkles className="w-4 h-4" />
-                <span>Only 2,500 permits left</span>
-              </div>
-            </div>
-
-            {/* Center: Premium Benefits */}
-            <div className="hidden lg:flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>Unlimited AI Chat</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>20+ CV Templates</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>Expert Support</span>
-              </div>
-            </div>
-
-            {/* Right: CTA Buttons */}
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/pricing"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-md"
-              >
-                ⭐ Upgrade Now
-              </Link>
-              <Link
-                href="/auth/register"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm font-semibold px-4 py-2 rounded-lg text-sm transition-colors border border-white/30"
-              >
-                Start Free
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-white min-h-screen">
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
-          <Link href={`/${layer}`} className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-4">
+          <Link href={`/${layer}`} className="inline-flex items-center text-blue-600 hover:underline mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to {layer.charAt(0).toUpperCase() + layer.slice(1)} Home
+            Back
           </Link>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          {/* Requirements Header Image */}
+          <div className="relative mb-6 h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+            <img 
+              src={`/images/${layer}/${layer === 'europeans' ? 'process-registration' : layer === 'americans' ? 'documents-apostille' : 'documents-apostille'}.${layer === 'europeans' ? 'png' : 'png'}`}
+              alt={`Swiss Immigration Requirements for ${layer === 'europeans' ? 'EU/EFTA Citizens' : layer === 'americans' ? 'US Citizens' : 'International Citizens'} - Document Checklist`}
+              title={`Swiss Immigration Requirements - ${layer === 'europeans' ? 'EU/EFTA' : layer === 'americans' ? 'US' : 'International'} Document Preparation`}
+              className="w-full h-full object-cover"
+              loading="eager"
+              width={1200}
+              height={400}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.src = '/images/environment/mountains-2982087_1280.jpg'
+              }}
+            />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             Requirements Checklist
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-lg text-gray-600 mb-6">
             Track your progress preparing for your Swiss immigration application
           </p>
           
           {/* Progress Bar */}
-          <div className="bg-gray-200 dark:bg-gray-800 rounded-full h-4 mb-2">
+          <div className="bg-gray-200 rounded-full h-4 mb-2">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               className="bg-blue-600 h-4 rounded-full"
             />
           </div>
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex justify-between text-sm text-gray-600">
             <span>{completedCount} of {requirements.length} completed</span>
             <span>{Math.round(progress)}%</span>
           </div>
@@ -158,34 +124,34 @@ export default function RequirementsPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="card p-6 flex items-start space-x-4 hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-white border border-gray-200 rounded-xl p-6 flex items-start space-x-4 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer"
               onClick={() => handleToggle(req.id)}
             >
               <div className="flex-shrink-0 mt-1">
                 {checked[req.id] ? (
-                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="w-6 h-6 text-blue-600" />
                 ) : (
-                  <Circle className="w-6 h-6 text-gray-400 dark:text-gray-600" />
+                  <Circle className="w-6 h-6 text-gray-400" />
                 )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
-                  <label className="text-lg font-semibold text-gray-900 dark:text-white cursor-pointer">
+                  <label className="text-lg font-semibold text-gray-900 cursor-pointer">
                     {req.label}
                   </label>
                   {req.required && (
-                    <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded">
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
                       Required
                     </span>
                   )}
                 </div>
                 {layer === 'americans' && req.id === 'education' && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  <p className="text-sm text-gray-600 mt-2">
                     💡 US documents need apostille from the Secretary of State. Allow 4-6 weeks for processing.
                   </p>
                 )}
                 {layer === 'others' && req.id === 'education' && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  <p className="text-sm text-gray-600 mt-2">
                     💡 Documents must be apostilled in your home country, then translated if needed. Check embassy requirements.
                   </p>
                 )}
@@ -195,32 +161,59 @@ export default function RequirementsPage() {
         </div>
 
         {/* Export */}
-        <div className="card p-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Export Your Checklist
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 Save your progress and share with your immigration lawyer
               </p>
             </div>
-            <button className="btn-primary flex items-center space-x-2">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors flex items-center space-x-2">
               <Download className="w-4 h-4" />
               <span>Export PDF</span>
             </button>
           </div>
         </div>
 
+        {/* Integration/Language Section for Others Layer */}
+        {layer === 'others' && (
+          <div className="mt-8 bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="relative h-64 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <img 
+                src="/images/others/integration-language.png"
+                alt="Language Integration Requirements for International Citizens - Swiss Immigration"
+                title="Language Integration Requirements - International Citizens Swiss Immigration"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                width={1200}
+                height={500}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-2xl font-bold mb-2">Language Integration</h3>
+                  <p className="text-lg opacity-90">B1+ German/French proficiency recommended for better integration and permit approval chances</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Next Steps */}
-        <div className="mt-8 card p-6">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">
             Next Steps
           </h3>
-          <ol className="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
+          <ol className="space-y-3 list-decimal list-inside text-gray-700">
             <li>Complete all required documents</li>
-            <li>Review the <Link href={`/${layer}/process`} className="text-blue-600 dark:text-blue-400 hover:underline">application process</Link></li>
-            <li>Take the <Link href={`/${layer}/quiz`} className="text-blue-600 dark:text-blue-400 hover:underline">follow-up quiz</Link> for personalized recommendations</li>
+            <li>Review the <Link href={`/${layer}/process`} className="text-blue-600 hover:underline">application process</Link></li>
+            <li>Take the <Link href={`/${layer}/quiz`} className="text-blue-600 hover:underline">follow-up quiz</Link> for personalized recommendations</li>
             <li>Consult with a Swiss immigration lawyer for your specific case</li>
           </ol>
         </div>

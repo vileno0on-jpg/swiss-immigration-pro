@@ -144,15 +144,29 @@ export default function CountryLanguageDetectionModal({
     detectUserPreferences()
   }, [isOpen])
 
-  // Lock body scroll while modal is open
+  // Lock body scroll while modal is open and reset scroll position
   useEffect(() => {
     if (!isOpen) return
 
     const originalOverflow = document.body.style.overflow
+    const originalPosition = document.body.style.position
+    const originalTop = document.body.style.top
+    const scrollY = window.scrollY
+
+    // Lock body scroll and prevent background scrolling
     document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
+    document.documentElement.style.overflow = 'hidden'
 
     return () => {
       document.body.style.overflow = originalOverflow
+      document.body.style.position = originalPosition
+      document.body.style.top = originalTop
+      document.body.style.width = ''
+      document.documentElement.style.overflow = ''
+      window.scrollTo(0, scrollY)
     }
   }, [isOpen])
 
@@ -207,43 +221,108 @@ export default function CountryLanguageDetectionModal({
   }, [selectedData, router, onComplete, onClose])
 
   const applyTranslation = async (languageCode: string) => {
-    // Use Google Translate widget if available
-    if (typeof window !== 'undefined') {
-      // Load Google Translate script if not already loaded
-      if (!window.google?.translate) {
-        const script = document.createElement('script')
-        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
-        script.async = true
-        document.body.appendChild(script)
+    if (typeof window === 'undefined') return
 
-        // Initialize Google Translate
+    // Load Google Translate script if not already loaded
+    const loadGoogleTranslate = (): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        if (window.google?.translate?.TranslateElement) {
+          resolve()
+          return
+        }
+
+        // Check if script is already being loaded
+        if (document.getElementById('google-translate-script')) {
+          // Wait for it to load
+          const checkInterval = setInterval(() => {
+            if (window.google?.translate?.TranslateElement) {
+              clearInterval(checkInterval)
+              resolve()
+            }
+          }, 100)
+          setTimeout(() => {
+            clearInterval(checkInterval)
+            if (!window.google?.translate?.TranslateElement) {
+              reject(new Error('Google Translate failed to load'))
+            }
+          }, 10000)
+          return
+        }
+
+        // Create container for Google Translate widget
+        let container = document.getElementById('google_translate_element')
+        if (!container) {
+          container = document.createElement('div')
+          container.id = 'google_translate_element'
+          container.style.cssText = 'position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; visibility: hidden;'
+          document.body.appendChild(container)
+        }
+
+        // Load Google Translate script
+        const script = document.createElement('script')
+        script.id = 'google-translate-script'
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+        script.async = true
+
+        // Initialize Google Translate when script loads
         ;(window as any).googleTranslateElementInit = () => {
-          if (window.google?.translate?.TranslateElement) {
-            new window.google.translate.TranslateElement(
-              {
-                pageLanguage: 'en',
-                includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
-                autoDisplay: false,
-              },
-              'google_translate_element'
-            )
+          try {
+            if (window.google?.translate?.TranslateElement) {
+              new window.google.translate.TranslateElement(
+                {
+                  pageLanguage: 'en',
+                  includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
+                  autoDisplay: false,
+                  layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                },
+                'google_translate_element'
+              )
+              resolve()
+            } else {
+              reject(new Error('Google Translate API not available'))
+            }
+          } catch (error) {
+            reject(error)
           }
         }
-      }
+
+        script.onerror = () => {
+          reject(new Error('Failed to load Google Translate script'))
+        }
+
+        document.head.appendChild(script)
+      })
+    }
+
+    try {
+      // Load Google Translate
+      await loadGoogleTranslate()
 
       // Set translation cookie
       const targetLang = languageCode === 'en' ? 'en' : languageCode
-      document.cookie = `googtrans=/en/${targetLang}; path=/; max-age=31536000`
-      
-      // Trigger translation by reloading the page or using Google Translate API
-      if (window.google?.translate?.TranslateElement) {
-        // Force translation
-        const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
-        if (select) {
-          select.value = targetLang
-          select.dispatchEvent(new Event('change'))
-        }
+      const cookieValue = `/en/${targetLang}`
+      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
+
+      // Wait a bit for Google Translate to initialize
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Trigger translation
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
+      if (select) {
+        select.value = targetLang
+        select.dispatchEvent(new Event('change', { bubbles: true }))
+      } else {
+        // If select not found, reload page to apply translation
+        window.location.reload()
       }
+    } catch (error) {
+      console.error('Error applying translation:', error)
+      // Fallback: set cookie and reload
+      const targetLang = languageCode === 'en' ? 'en' : languageCode
+      document.cookie = `googtrans=/en/${targetLang}; path=/; max-age=31536000; SameSite=Lax`
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     }
   }
 
@@ -260,29 +339,66 @@ export default function CountryLanguageDetectionModal({
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-8 sm:pt-16"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem',
+            paddingTop: '2rem'
+          }}
+          onClick={handleSkip}
         >
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0
+            }}
+          />
+          {/* Modal Content */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -100 }}
+            className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto mt-8 sm:mt-16 border-2 border-blue-100"
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              margin: 'auto',
+              maxWidth: '32rem',
+              width: '100%',
+              maxHeight: '85vh',
+              marginTop: '2rem'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-900 z-10">
+          <div className="px-6 py-4 border-b border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center space-x-3">
               <Globe className="w-6 h-6 text-blue-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-xl font-semibold text-gray-900">
                 Personalize Your Experience
               </h2>
             </div>
             <button
               onClick={handleSkip}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -301,10 +417,10 @@ export default function CountryLanguageDetectionModal({
                 >
                   <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Detecting Your Location
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <p className="text-gray-600 text-sm">
                       We're detecting your country, language, and currency preferences...
                     </p>
                   </div>
@@ -318,13 +434,13 @@ export default function CountryLanguageDetectionModal({
                 >
                   <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
                       All Set!
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-gray-600 mb-4">
                       Your preferences have been saved and the site is being translated.
                     </p>
-                    <div className="inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                    <div className="inline-flex items-center space-x-2 text-blue-600">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Redirecting to your personalized experience...</span>
                     </div>
@@ -338,14 +454,14 @@ export default function CountryLanguageDetectionModal({
                   className="space-y-6"
                 >
                   <div className="text-center mb-6">
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <p className="text-gray-600 text-sm">
                       We've detected your preferences. Please confirm or adjust them below.
                     </p>
                   </div>
 
                   {/* Country Selection */}
                   <div className="space-y-2">
-                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                       <MapPin className="w-4 h-4" />
                       <span>Country</span>
                     </label>
@@ -361,7 +477,7 @@ export default function CountryLanguageDetectionModal({
                           currency,
                         })
                       }}
-                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                     >
                       {countries.map((country) => (
                         <option key={country.code} value={country.code}>
@@ -371,30 +487,30 @@ export default function CountryLanguageDetectionModal({
                     </select>
                   </div>
 
-                  {/* Language Selection */}
+                  {/* Language Selection with Google Translate */}
                   <div className="space-y-2">
-                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                       <Globe className="w-4 h-4" />
-                      <span>Language</span>
+                      <span>Language (Google Translate)</span>
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
                       {SUPPORTED_LANGUAGES.map((lang) => (
                         <button
                           key={lang.code}
                           onClick={() => setSelectedData({ ...selectedData!, language: lang.code })}
                           className={`p-3 rounded-lg border-2 transition-all text-left ${
                             selectedData?.language === lang.code
-                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-900'
-                              : 'border-gray-300 dark:border-gray-700 hover:border-blue-500'
+                              ? 'border-blue-600 bg-blue-50 shadow-md'
+                              : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/50'
                           }`}
                         >
                           <div className="flex items-center space-x-2">
                             <span className="text-2xl">{lang.flag}</span>
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-white text-sm">
+                              <div className="font-medium text-gray-900 text-sm">
                                 {lang.nativeName}
                               </div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                              <div className="text-xs text-gray-600">
                                 {lang.name}
                               </div>
                             </div>
@@ -402,18 +518,21 @@ export default function CountryLanguageDetectionModal({
                         </button>
                       ))}
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      ✨ Powered by Google Translate - The entire site will be translated automatically
+                    </p>
                   </div>
 
                   {/* Currency Selection */}
                   <div className="space-y-2">
-                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                       <DollarSign className="w-4 h-4" />
                       <span>Currency</span>
                     </label>
                     <select
                       value={selectedData?.currency || ''}
                       onChange={(e) => setSelectedData({ ...selectedData!, currency: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 hover:border-blue-400 transition-colors"
                     >
                       {CURRENCIES.map((currency) => (
                         <option key={currency.code} value={currency.code}>
@@ -425,11 +544,11 @@ export default function CountryLanguageDetectionModal({
 
                   {/* Layer Preview */}
                   {layer && (
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                      <p className="text-sm text-blue-900 dark:text-blue-100">
+                    <div className="p-4 bg-blue-50 rounded-xl">
+                      <p className="text-sm text-blue-900">
                         <strong>Your Pathway:</strong> {layer === 'europeans' ? 'EU/EFTA Citizen' : layer === 'americans' ? 'US/Canadian Citizen' : 'International'}
                       </p>
-                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                      <p className="text-xs text-blue-700 mt-1">
                         You'll be directed to personalized content based on your country.
                       </p>
                     </div>
@@ -457,7 +576,7 @@ export default function CountryLanguageDetectionModal({
 
                     <button
                       onClick={handleSkip}
-                      className="w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-xl transition-colors"
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors border border-gray-200"
                     >
                       Skip for now
                     </button>
@@ -467,7 +586,8 @@ export default function CountryLanguageDetectionModal({
             </AnimatePresence>
           </div>
         </motion.div>
-      </motion.div>
+      </div>
+      )}
     </AnimatePresence>
   )
 }

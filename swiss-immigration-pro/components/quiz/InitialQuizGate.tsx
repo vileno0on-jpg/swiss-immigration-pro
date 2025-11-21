@@ -4,10 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type { LayerType } from '@/lib/layerLogic'
 
-const CountryLanguageDetectionModal = dynamic(() => import('../CountryLanguageDetectionModal'), {
-  ssr: false,
-  loading: () => null,
-})
+const CountryLanguageDetectionModal = dynamic(
+  () => import('../CountryLanguageDetectionModal'),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+)
 
 declare global {
   interface Window {
@@ -37,15 +40,16 @@ export function InitialQuizGate() {
     try {
       if (typeof window !== 'undefined') {
         const pathname = window.location.pathname
-        // Don't show on admin pages or if already completed
-        if (pathname.startsWith('/admin')) {
+        // Don't auto-show on admin pages, layer pages, or if already completed
+        if (pathname.startsWith('/admin') || pathname.startsWith('/europeans') || pathname.startsWith('/americans') || pathname.startsWith('/others')) {
           return
         }
 
         // Check if detection was already completed or skipped
         const detectionCompleted = localStorage.getItem('detectionCompleted')
         const detectionSkipped = localStorage.getItem('detectionSkipped')
-        
+
+        // Only auto-open if not completed and not skipped
         if (!detectionCompleted && !detectionSkipped) {
           const timer = setTimeout(() => {
             setIsOpen(true)
@@ -69,13 +73,15 @@ export function InitialQuizGate() {
     // Preferences are saved in the modal component
   }, [])
 
-  return useMemo(() => (
+  if (!isOpen) return null
+
+  return (
     <CountryLanguageDetectionModal
       key={isOpen ? 'open' : 'closed'}
       isOpen={isOpen}
       onClose={closeQuiz}
       onComplete={handleComplete}
     />
-  ), [isOpen, closeQuiz, handleComplete])
+  )
 }
 

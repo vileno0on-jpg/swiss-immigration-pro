@@ -131,13 +131,35 @@ export default function LanguageDetectionModal({ isOpen, onClose }: LanguageDete
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        onClick={handleSkipTranslation}
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          paddingTop: '1rem',
+          paddingBottom: '1rem'
+        }}
       >
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-xl lg:max-w-2xl max-h-[60vh] overflow-y-auto modal-hide-scrollbar"
+          onClick={(e) => e.stopPropagation()}
+          style={{ 
+            width: '100%',
+            maxWidth: '42rem',
+            position: 'relative'
+          }}
         >
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
@@ -262,3 +284,5 @@ export default function LanguageDetectionModal({ isOpen, onClose }: LanguageDete
     </AnimatePresence>
   )
 }
+
+

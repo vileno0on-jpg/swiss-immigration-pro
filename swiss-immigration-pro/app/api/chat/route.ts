@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { streamText } from 'ai'
 import { groq } from '@ai-sdk/groq'
+import { xai } from '@ai-sdk/xai'
 import { CONFIG } from '@/lib/config'
 import { createClient } from '@/lib/supabase/server'
 import { HfInference } from '@huggingface/inference'
@@ -15,72 +16,35 @@ function isGreeting(message: string): boolean {
 }
 
 function getSystemPrompt(layer?: string): string {
-  const basePrompt = `You are a STRICTLY RESTRICTED Swiss immigration assistant for Swiss Immigration Pro. 
+  const basePrompt = `You are a helpful and knowledgeable AI assistant specializing in Swiss immigration. You can answer any question on any topic, but you have extensive expertise in Swiss immigration matters. Be conversational, helpful, and provide detailed, accurate information.
 
-CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
+You have extensive knowledge about Swiss immigration, but you can help with any topic the user asks about. Be natural, friendly, and provide the best answer you can.
 
-1. TOPIC RESTRICTION - You ONLY answer questions about:
-   - Swiss visa types (L, B, G, C permits, Schengen visas)
-   - Swiss work permits and quotas
-   - Swiss citizenship and naturalization
-   - Swiss immigration requirements and processes
-   - Swiss cantons (only as related to immigration)
-   - Swiss language requirements for immigration
-   - Swiss integration requirements
+When answering Swiss immigration questions, you know:
+- Visa types: L permit (1 year, 4,000 quota), B permit (5 years, 4,500 quota), G permit (cross-border), C permit (permanent after 10 years)
+- 2025 quotas: 8,500 total non-EU permits (4,000 L + 4,500 B)
+- Processing times: EU/EFTA (2-4 weeks), US/CA (8-12 weeks), Others (8-16 weeks)
+- Citizenship: 5 years (EU/EFTA), 10 years (others)
+- Salary requirements: CHF 100k+ recommended for non-EU
+- Language: B1 oral, A2 written for citizenship
+- Documents: Apostille required for non-EU (4-6 weeks), KVG health insurance mandatory
 
-2. MANDATORY REJECTIONS - You MUST immediately decline and redirect:
-   - Questions about other countries' immigration → "I specialize ONLY in Swiss immigration. For [country], please consult country-specific resources."
-   - General topics (weather, recipes, movies, sports, news, entertainment, cooking, etc.) → "I can ONLY assist with Swiss immigration topics. Please ask about visas, permits, citizenship, or related topics."
-   - Questions about non-Swiss topics → "I specialize exclusively in Swiss immigration. How can I help you with Swiss visas, permits, or citizenship?"
-   - Off-topic questions → "I'm a Swiss immigration specialist. I can help with: L/B/G/C permits, citizenship pathways, quotas, application processes, or language requirements."
+Site pages available: /visas, /employment, /citizenship, /cantons, /resources, /tools, /europeans, /americans, /others
 
-3. LAYER-SPECIFIC CONTEXT:`
+Answer naturally and helpfully. No restrictions on topics or response style.
 
+🎯 LAYER-SPECIFIC CONTEXT:`
+
+  // No layer-specific restrictions - just provide context if available
   if (layer === 'europeans') {
-    return basePrompt + `
-   - You are assisting an EU/EFTA citizen
-   - They have freedom of movement rights under FMPA
-   - No quota restrictions apply
-   - Processing time: 2-4 weeks typically
-   - Citizenship timeline: 5 years (vs 10 for non-EU)
-   - Key permits: B permit (residence), L permit (short-term), G permit (cross-border)
-   - Reference relevant laws: FMPA, AuG (SR 142.20), VZAE (SR 142.201)
-   - Always mention their advantages: no quotas, faster processing, simplified documentation
-   - Direct them to /europeans pages for detailed information
-`
+    return basePrompt + `\n\nContext: User is EU/EFTA citizen - no quotas, 2-4 weeks processing, 5-year citizenship path.`
   } else if (layer === 'americans') {
-    return basePrompt + `
-   - You are assisting a US or Canadian citizen
-   - They are subject to non-EU quotas (2025: 8,500 total permits)
-   - Processing time: 8-12 weeks typically
-   - Citizenship timeline: 10 years
-   - Key permits: L permit (short-term, 4,000 quota), B permit (residence, 4,500 quota)
-   - Salary threshold: CHF 100k+ recommended for competitiveness
-   - Reference relevant laws: AuG (SR 142.20), VZAE (SR 142.201)
-   - Important: Document apostille required (4-6 weeks for US/CA)
-   - Direct them to /americans pages for detailed information
-`
+    return basePrompt + `\n\nContext: User is US/Canadian citizen - 8,500 quota, 8-12 weeks processing, 10-year citizenship path.`
   } else if (layer === 'others') {
-    return basePrompt + `
-   - You are assisting a third-country national (non-EU, non-US/CA)
-   - They are subject to strict quotas (2025: 8,500 total permits, highly competitive)
-   - Processing time: 8-16 weeks typically
-   - Citizenship timeline: 10 years
-   - Key permits: L permit (4,000 quota), B permit (4,500 quota)
-   - Salary threshold: CHF 100k-120k+ strongly recommended
-   - Important: Document apostille and translation may be required
-   - Embassy processing required in home country
-   - Consider education pathway as quota-free alternative
-   - Reference relevant laws: AuG (SR 142.20), VZAE (SR 142.201)
-   - Direct them to /others pages for detailed information
-`
+    return basePrompt + `\n\nContext: User is third-country national - 8,500 quota, 8-16 weeks processing, 10-year citizenship path.`
   }
 
-  return basePrompt + `
-   - No specific layer detected - provide general Swiss immigration information
-   - Always mention the three pathways: EU/EFTA (no quotas), Americans (quota), Others (quota)
-   - Encourage users to take the quiz for personalized guidance
-`
+  return basePrompt
 }
 
 const SYSTEM_PROMPT = getSystemPrompt() // Default prompt
@@ -89,32 +53,16 @@ const SYSTEM_PROMPT = getSystemPrompt() // Default prompt
 async function getFreeAIResponse(message: string): Promise<string> {
   // Handle greetings immediately - provide helpful welcome message
   if (isGreeting(message) || message.toLowerCase().trim().length < 5) {
-    return `Hello! 👋 I'm your Swiss immigration assistant. I can help you with:
+    return `Hey there! 👋 I'm your Swiss Immigration AI Assistant. I'm especially knowledgeable about Swiss immigration, but I'm here to help with whatever you need!
 
-🇨🇭 **Swiss Immigration Topics:**
-- **Visa types** (L, B, G, C permits) - [Learn more](/visas)
-- **Citizenship pathways** - [View guide](/citizenship)
-- **Work permits and quotas** - [Check status](/visas)
-- **Application processes** - [See steps](/visas)
-- **Language requirements** - [Read guide](/citizenship)
-- **Cantonal variations** - [Explore](/cantons)
+🇨🇭 **Swiss Immigration (My Specialty):**
+I know everything about Swiss visas, permits, citizenship, quotas, and processes. Ask me anything!
 
 📚 **Quick Links:**
-- [All Visa Types](/visas)
-- [Citizenship Guide](/citizenship)
-- [Employment Hub](/employment)
-- [Tools & Resources](/tools)
+- [Visa Types](/visas) | [Work Permits](/employment) | [Citizenship](/citizenship)
+- [EU/EFTA Pathway](/europeans) | [US/Canadian Pathway](/americans) | [Third-Country Pathway](/others)
 
-💡 **For Powerful AI Responses:**
-Add a free Groq API key (2 minutes):
-1. Sign up at https://console.groq.com (free, no credit card)
-2. Get your API key
-3. Add to .env.local: \`GROQ_API_KEY=your_key\`
-This enables **Llama 3.1 70B** - a powerful AI model!
-
-**What would you like to know about Swiss immigration?**
-
-⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.`
+What can I help you with today?`
   }
   
   // First check if we have knowledge base content
@@ -123,33 +71,8 @@ This enables **Llama 3.1 70B** - a powerful AI model!
     return knowledgeResponse
   }
   
-  // STRICT TOPIC CHECK - Reject off-topic questions immediately
-  const lowerMessage = message.toLowerCase()
-  const swissImmigrationKeywords = ['swiss', 'switzerland', 'permit', 'visa', 'citizenship', 'quota', 'immigration', 'l permit', 'b permit', 'g permit', 'c permit', 'naturalization', 'canton', 'work permit', 'residence', 'integration', 'language requirement']
-  const offTopicKeywords = ['recipe', 'weather', 'movie', 'sport', 'music', 'game', 'cooking', 'food', 'entertainment', 'news', 'politics', 'election', 'sports', 'weather', 'temperature', 'recipe', 'how to cook', 'how to make', 'movie review', 'film', 'song', 'artist', 'band']
-  
-  // Check if message contains Swiss immigration keywords
-  const isSwissImmigration = swissImmigrationKeywords.some(keyword => lowerMessage.includes(keyword))
-  
-  // If it contains off-topic keywords AND doesn't mention Swiss immigration, reject
-  if (offTopicKeywords.some(keyword => lowerMessage.includes(keyword)) && !isSwissImmigration) {
-    return `I specialize EXCLUSIVELY in Swiss immigration topics. I can only assist with questions about:
-- Swiss visa types (L, B, G, C permits)
-- Swiss citizenship and naturalization
-- Work permits and quotas
-- Application processes
-- Language requirements
-- Cantonal variations
-
-For questions about ${message}, please consult other resources.
-
-📚 **Explore Swiss immigration topics:**
-- [Visa Types](/visas)
-- [Citizenship Guide](/citizenship)
-- [Employment](/employment)
-
-⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.`
-  }
+  // No topic restrictions - Grok can help with any question
+  // But we have deep knowledge of Swiss immigration
   
   try {
     // Use Hugging Face's free Inference API with a public model
@@ -199,16 +122,9 @@ For questions about ${message}, please consult other resources.
       generatedText = generatedText.split('Assistant:')[1].trim()
     }
     
-    // Check if response is off-topic - if so, reject
-    const generatedLower = generatedText.toLowerCase()
-    if (offTopicKeywords.some(keyword => generatedLower.includes(keyword) && !generatedLower.includes('swiss'))) {
-      return getSimpleFallbackResponse(message)
-    }
+    // Response is ready - no topic restrictions
     
-    // Ensure disclaimer is included
-    if (!generatedText.includes('⚠️')) {
-      generatedText += '\n\n⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.'
-    }
+    // Response is ready
     
     // Add relevant links if possible
     const relevant = findRelevantKnowledge(message)
@@ -219,15 +135,83 @@ For questions about ${message}, please consult other resources.
       })
     }
     
-    return generatedText || getSimpleFallbackResponse(message)
+    return generatedText || 'I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.'
   } catch (error: any) {
     console.error('Hugging Face API error:', error?.message || error)
     // Fallback to a simple response
-    return getSimpleFallbackResponse(message)
+    return 'I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.'
   }
 }
 
 // Simple rule-based fallback using knowledge base
+// Enhance response with relevant internal links ONLY when requested or needed
+function enhanceResponseWithLinks(response: string, message: string, layer?: string): string {
+  const lowerMessage = message.toLowerCase()
+  const lowerResponse = response.toLowerCase()
+  
+  // Check if response already has markdown links
+  const hasLinks = /\[.*?\]\(\/.*?\)/.test(response)
+  
+  // Only add links if:
+  // 1. User explicitly asks for links/resources/more info
+  // 2. User asks "where", "how to", "show me", "tell me more"
+  // 3. Response suggests needing detailed guides
+  const linkRequestKeywords = [
+    'where', 'how to', 'show me', 'tell me more', 'more information', 'more info',
+    'guide', 'resource', 'download', 'template', 'link', 'page', 'website',
+    'learn more', 'read more', 'find', 'get', 'access', 'check', 'see'
+  ]
+  
+  const shouldAddLinks = linkRequestKeywords.some(keyword => lowerMessage.includes(keyword))
+  
+  // If user requested links or if response suggests they need detailed resources
+  if (shouldAddLinks && !hasLinks) {
+    const links: string[] = []
+    
+    // Visa-related keywords
+    if (lowerMessage.includes('visa') || lowerMessage.includes('permit') || lowerMessage.includes('l permit') || lowerMessage.includes('b permit') || lowerMessage.includes('g permit') || lowerMessage.includes('c permit')) {
+      links.push('[Visa Types & Permits](/visas)')
+    }
+    
+    // Work/employment keywords
+    if (lowerMessage.includes('work') || lowerMessage.includes('job') || lowerMessage.includes('employment') || lowerMessage.includes('quota') || lowerMessage.includes('salary')) {
+      links.push('[Work Permits & Quotas](/employment)')
+    }
+    
+    // Citizenship keywords
+    if (lowerMessage.includes('citizenship') || lowerMessage.includes('naturalization') || lowerMessage.includes('language requirement') || lowerMessage.includes('b1') || lowerMessage.includes('a2')) {
+      links.push('[Citizenship Requirements](/citizenship)')
+    }
+    
+    // Canton keywords
+    if (lowerMessage.includes('canton') || lowerMessage.includes('zurich') || lowerMessage.includes('geneva') || lowerMessage.includes('bern')) {
+      links.push('[Cantonal Variations](/cantons)')
+    }
+    
+    // Resources/tools keywords
+    if (lowerMessage.includes('download') || lowerMessage.includes('template') || lowerMessage.includes('cv') || lowerMessage.includes('calculator') || lowerMessage.includes('tool')) {
+      links.push('[Resources](/resources)')
+      links.push('[Tools](/tools)')
+    }
+    
+    // Add layer-specific link if applicable
+    if (layer === 'europeans' && !lowerResponse.includes('/europeans')) {
+      links.push('[EU/EFTA Pathway](/europeans)')
+    } else if (layer === 'americans' && !lowerResponse.includes('/americans')) {
+      links.push('[US/Canadian Pathway](/americans)')
+    } else if (layer === 'others' && !lowerResponse.includes('/others')) {
+      links.push('[Third-Country Pathway](/others)')
+    }
+    
+    // If we found relevant links, append them
+    if (links.length > 0) {
+      response += '\n\n📚 **Relevant Resources:**\n' + links.join(' | ')
+    }
+  }
+  
+  return response
+}
+
 function getSimpleFallbackResponse(message: string): string {
   // First, try to use the knowledge base
   const knowledgeResponse = generateResponseFromKnowledge(message)
@@ -235,51 +219,43 @@ function getSimpleFallbackResponse(message: string): string {
     return knowledgeResponse
   }
   
-  // Check if it's an off-topic question
+  // Check if it's a Swiss immigration question
   const lowerMessage = message.toLowerCase()
-  const offTopicKeywords = ['recipe', 'weather', 'recipe', 'movie', 'sport', 'music', 'game', 'cooking', 'recipe']
-  if (offTopicKeywords.some(keyword => lowerMessage.includes(keyword))) {
-    return `I can only assist with Swiss immigration, Swiss geography (as it relates to immigration), and Swiss politics (as it relates to immigration) topics.
+  const immigrationKeywords = ['immigration', 'visa', 'permit', 'citizenship', 'swiss', 'switzerland', 'work permit', 'residence', 'quota', 'l permit', 'b permit', 'g permit', 'c permit']
+  const isImmigrationQuestion = immigrationKeywords.some(keyword => lowerMessage.includes(keyword))
+  
+  if (isImmigrationQuestion) {
+    // Provide actual information about Swiss immigration
+    return `I can help with Swiss immigration! Here's what you need to know:
 
-For questions about ${message.toLowerCase()}, please consult other resources.
+**Swiss Immigration Pathways:**
+- **EU/EFTA Citizens**: No quotas, 2-4 weeks processing, 5-year citizenship path
+- **US/Canadian Citizens**: 8,500 annual quota (highly competitive), 8-12 weeks processing, 10-year citizenship
+- **Third-Country Nationals**: 8,500 annual quota, 8-16 weeks processing, 10-year citizenship
 
-If you have questions about Swiss immigration, I'm here to help! Try asking about:
-- Visa types (L, B, G, C permits)
-- Citizenship requirements
-- Quota status
-- Salary requirements
-- Application process
+**Key Visa Types:**
+- **L Permit**: 1-year temporary (4,000 quota for non-EU)
+- **B Permit**: 5-year residence (4,500 quota for non-EU)
+- **G Permit**: Cross-border commuter (unlimited)
+- **C Permit**: Permanent settlement (after 10 years)
 
-📚 **Explore our site:**
-- [Visa Types](/visas)
-- [Citizenship Guide](/citizenship)
-- [Employment](/employment)
-- [Resources](/resources)
+**2025 Quotas**: 8,500 total non-EU permits (4,000 L + 4,500 B)
 
-⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.`
+What specific aspect of Swiss immigration would you like to know more about? I can provide detailed information about visas, permits, citizenship, quotas, requirements, or processes.`
   }
   
-  // Default response with helpful links
-  return `Thank you for your question about Swiss immigration.
+  // For non-immigration questions, be helpful
+  return `I'm here to help! I'm especially knowledgeable about Swiss immigration, but I can assist with other questions too. 
 
-I can help you with:
-- **Visa types** (L, B, G, C permits) - [Learn more](/visas)
-- **Citizenship pathways** - [View guide](/citizenship)
-- **Quota status** - [Check quotas](/visas)
-- **Application process** - [See steps](/visas)
-- **Salary requirements** - [View benchmarks](/employment)
-- **Language requirements** - [Read guide](/citizenship)
+For Swiss immigration questions, I can provide detailed information about:
+- Visa types and requirements
+- Work permit quotas and processes
+- Citizenship pathways
+- Cantonal variations
+- Document requirements
+- Processing timelines
 
-📚 **Explore our site:**
-- [All Visa Types](/visas)
-- [Citizenship Guide](/citizenship)
-- [Employment Hub](/employment)
-- [Tools & Resources](/tools)
-- [Pricing Plans](/pricing)
-
-For more detailed information, please visit the relevant pages above or upgrade to a premium plan for comprehensive guides.
-
-⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.`
+What would you like to know?`
 }
 
 export async function POST(req: NextRequest) {
@@ -300,18 +276,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get user from session
+    // Get user from session (optional - allow anonymous users)
     const session = await getServerSession(authOptions)
+    
+    // Allow anonymous users - they can use the chat without authentication
+    // Message limits are enforced client-side via localStorage
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // Try to get layer from user's quiz results if not provided
-    if (!userLayer) {
+    // Try to get layer from user's quiz results if not provided (only for logged-in users)
+    if (!userLayer && session?.user) {
       try {
         const supabase = await createClient()
         const { data: quizResult, error } = await supabase
@@ -335,8 +307,9 @@ export async function POST(req: NextRequest) {
     // Get layer-specific system prompt
     const systemPrompt = getSystemPrompt(userLayer)
 
-    // Check if free tier has hit limit (handled by client, but double-check server-side)
-    if (packId === 'free') {
+    // Check if free tier has hit limit (only for logged-in users)
+    // Anonymous users' limits are enforced client-side via localStorage
+    if (packId === 'free' && session?.user) {
       try {
         const supabase = await createClient()
         const { data: limitsResult, error } = await supabase
@@ -362,14 +335,72 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Call AI - Priority: Groq (FREE) > OpenAI > Google Gemini (FREE with limits) > Knowledge Base (FREE) > Simple Fallback
+    // Call AI - Priority: Groq (PRIMARY) > OpenAI > xAI/Grok > Google Gemini > Knowledge Base
     let fullResponse = ''
     let usage = { totalTokens: 0 }
     
-    if (process.env.GROQ_API_KEY) {
-      // Use Groq (FREE tier - 30 requests/min, unlimited monthly)
+    // Try Groq FIRST (PRIMARY - User requested Groq)
+    const groqKey = process.env.GROQ_API_KEY
+    if (groqKey && groqKey.trim().length > 0 && !groqKey.includes('placeholder')) {
       try {
-        const aiModel = groq(CONFIG.ai.model)
+        console.log('🚀 Attempting Groq API call')
+        console.log('✅ GROQ_API_KEY found (length:', groqKey.length, ', starts with:', groqKey.substring(0, 10), ')')
+        
+        // Use Llama 3.1 70B (fast and free) or mixtral-8x7b-32768
+        const modelName = 'llama-3.1-70b-versatile' // Groq model name
+        // Ensure API key is set (AI SDK reads from process.env.GROQ_API_KEY)
+        if (!process.env.GROQ_API_KEY) {
+          process.env.GROQ_API_KEY = groqKey
+        }
+        const aiModel = groq(modelName)
+        console.log('Using Groq model:', modelName)
+        console.log('System prompt length:', systemPrompt.length)
+        console.log('User message:', message.substring(0, 100))
+        
+        const result = await streamText({
+          model: aiModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message },
+          ],
+          temperature: CONFIG.ai.temperature,
+        })
+        
+        console.log('✅ Groq stream started, reading chunks...')
+        for await (const chunk of result.textStream) {
+          fullResponse += chunk
+        }
+        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
+        console.log('✅ Groq SUCCESS - Response length:', fullResponse.length, 'tokens:', usage.totalTokens)
+        if (fullResponse.length > 0) {
+          console.log('📝 Response preview:', fullResponse.substring(0, 200))
+        } else {
+          console.warn('⚠️ Groq returned empty response')
+        }
+      } catch (groqError: any) {
+        console.error('❌ Groq API ERROR:', groqError?.message || groqError)
+        console.error('Error details:', {
+          message: groqError?.message,
+          status: groqError?.status,
+          statusCode: groqError?.statusCode,
+          code: groqError?.code,
+          cause: groqError?.cause,
+          stack: groqError?.stack?.substring(0, 500)
+        })
+        // Fall through to next option
+        fullResponse = ''
+      }
+    } else {
+      console.log('❌ GROQ_API_KEY NOT FOUND or invalid')
+    }
+    
+    // If Groq failed, try OpenAI
+    if (!fullResponse && process.env.OPENAI_API_KEY) {
+      try {
+        console.log('🚀 Attempting OpenAI API call (fallback)')
+        const { openai } = await import('@ai-sdk/openai')
+        const modelName = 'gpt-4o-mini'
+        const aiModel = openai(modelName)
         const result = await streamText({
           model: aiModel,
           messages: [
@@ -383,36 +414,34 @@ export async function POST(req: NextRequest) {
           fullResponse += chunk
         }
         usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
-        
-        // Ensure response follows format
-        if (!fullResponse.includes('⚠️')) {
-          fullResponse += '\n\n⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.'
-        }
-      } catch (groqError: any) {
-        console.error('Groq API error:', groqError?.message || groqError)
-        // Fall through to next option
+      } catch (openaiError: any) {
+        console.error('❌ OpenAI API ERROR:', openaiError?.message || openaiError)
         fullResponse = ''
       }
     }
     
-    // If Groq failed or not available, try OpenAI
-    if (!fullResponse && process.env.OPENAI_API_KEY) {
-      // Use OpenAI
-      const { openai } = await import('@ai-sdk/openai')
-      const aiModel = openai(CONFIG.ai.model)
-      const result = await streamText({
-        model: aiModel,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message },
-        ],
-        temperature: CONFIG.ai.temperature,
-      })
-      
-      for await (const chunk of result.textStream) {
-        fullResponse += chunk
+    // If still no response, try xAI/Grok
+    if (!fullResponse && process.env.XAI_API_KEY) {
+      try {
+        console.log('🚀 Attempting xAI/Grok API call (fallback)')
+        const aiModel = xai('grok-beta')
+        const result = await streamText({
+          model: aiModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message },
+          ],
+          temperature: CONFIG.ai.temperature,
+        })
+        
+        for await (const chunk of result.textStream) {
+          fullResponse += chunk
+        }
+        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
+      } catch (xaiError: any) {
+        console.error('❌ xAI/Grok API ERROR:', xaiError?.message || xaiError)
+        fullResponse = ''
       }
-      usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
     }
     
     // If still no response, try Google Gemini (FREE tier - 15 requests/min, 1,500 requests/day)
@@ -428,10 +457,7 @@ export async function POST(req: NextRequest) {
         fullResponse = result.response.text()
         usage = { totalTokens: result.response.usageMetadata?.totalTokenCount || 0 }
         
-        // Ensure response follows format
-        if (!fullResponse.includes('⚠️')) {
-          fullResponse += '\n\n⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.'
-        }
+        // Response is ready
       } catch (geminiError: any) {
         console.error('Gemini API error:', geminiError?.message || geminiError)
         // Fall through to knowledge base
@@ -439,84 +465,100 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // If still no response, use knowledge base (100% FREE, no API key needed)
-    if (!fullResponse) {
-      console.log('Using knowledge base (free, site-specific, no API key needed)')
+    // If still no response, use knowledge base ONLY (no generic fallbacks)
+    if (!fullResponse || fullResponse.trim().length === 0) {
+      console.log('⚠️ NO AI RESPONSE - All API calls failed or no API keys set')
+      console.log('Available API keys:', {
+        XAI: !!process.env.XAI_API_KEY,
+        GROQ: !!process.env.GROQ_API_KEY,
+        OPENAI: !!process.env.OPENAI_API_KEY,
+        GEMINI: !!process.env.GOOGLE_GEMINI_API_KEY
+      })
+      console.log('Falling back to knowledge base...')
       const knowledgeResponse = generateResponseFromKnowledge(message)
       
-      if (knowledgeResponse) {
-        // Found relevant knowledge - use it
+      if (knowledgeResponse && knowledgeResponse.length > 50) {
+        console.log('✅ Using knowledge base response')
         fullResponse = knowledgeResponse
         usage = { totalTokens: Math.ceil(fullResponse.length / 4) }
       } else {
-        // Try Hugging Face as fallback, then simple response
-        try {
-          fullResponse = await getFreeAIResponse(message)
-          usage = { totalTokens: Math.ceil(fullResponse.length / 4) }
-        } catch (error: any) {
-          console.error('Free AI model error:', error)
-          // Use knowledge base or simple fallback with site links
-          const fallbackKnowledge = generateResponseFromKnowledge(message)
-          if (fallbackKnowledge) {
-            fullResponse = fallbackKnowledge
-          } else {
-            fullResponse = getSimpleFallbackResponse(message)
-          }
-          usage = { totalTokens: 0 }
-        }
+        // If no knowledge base match, return error message asking user to check API key
+        console.error('❌ No AI response and no knowledge base match')
+        fullResponse = `I apologize, but I'm unable to process your request right now. 
+
+**Possible issues:**
+- OpenAI API key may not be configured correctly
+- All AI services are currently unavailable
+- Your question doesn't match any available knowledge base content
+
+**To fix this:**
+1. Check that OPENAI_API_KEY is set in your .env.local file
+2. Ensure the API key is valid and has credits
+3. Try rephrasing your question
+
+**For Swiss immigration questions**, you can also visit:
+- [Visa Types](/visas)
+- [Employment Hub](/employment)  
+- [Citizenship Guide](/citizenship)
+
+Please check the server console for detailed error messages.`
+        usage = { totalTokens: 0 }
       }
-    }
-    
-    // Ensure we have a response
-    if (!fullResponse || fullResponse.trim().length === 0) {
-      fullResponse = getSimpleFallbackResponse(message)
+    } else {
+      console.log('✅ Final response ready, length:', fullResponse.length)
     }
 
-    // Save message to database
-    try {
-      const supabase = await createClient()
+    // No post-processing restrictions - let Grok handle responses naturally
+    // fullResponse = enhanceResponseWithLinks(fullResponse, message, userLayer)
 
-      // Insert chat message
-      await supabase
-        .from('chat_messages')
-        .insert({
-          user_id: session.user.id,
-          message,
-          response: fullResponse,
-          pack_id: packId || 'free',
-          tokens_used: usage?.totalTokens || 0
-        })
+    // Save message to database (only for logged-in users)
+    if (session?.user) {
+      try {
+        const supabase = await createClient()
 
-      // Update daily limit for free tier
-      if (packId === 'free') {
-        const today = new Date().toISOString().split('T')[0]
-
-        // Check current limits
-        const { data: limitsResult } = await supabase
-          .from('user_limits')
-          .select('messages_today, last_reset_date')
-          .eq('user_id', session.user.id)
-          .single()
-
-        const currentMessages = limitsResult?.last_reset_date === today
-          ? (limitsResult.messages_today || 0) + 1
-          : 1
-
-        // Upsert user limits
+        // Insert chat message
         await supabase
-          .from('user_limits')
-          .upsert({
+          .from('chat_messages')
+          .insert({
             user_id: session.user.id,
-            messages_today: currentMessages,
-            last_reset_date: today
-          }, {
-            onConflict: 'user_id'
+            message,
+            response: fullResponse,
+            pack_id: packId || 'free',
+            tokens_used: usage?.totalTokens || 0
           })
+
+        // Update daily limit for free tier
+        if (packId === 'free') {
+          const today = new Date().toISOString().split('T')[0]
+
+          // Check current limits
+          const { data: limitsResult } = await supabase
+            .from('user_limits')
+            .select('messages_today, last_reset_date')
+            .eq('user_id', session.user.id)
+            .single()
+
+          const currentMessages = limitsResult?.last_reset_date === today
+            ? (limitsResult.messages_today || 0) + 1
+            : 1
+
+          // Upsert user limits
+          await supabase
+            .from('user_limits')
+            .upsert({
+              user_id: session.user.id,
+              messages_today: currentMessages,
+              last_reset_date: today
+            }, {
+              onConflict: 'user_id'
+            })
+        }
+      } catch (dbError) {
+        console.error('Error saving message to database:', dbError)
+        // Continue even if DB save fails
       }
-    } catch (dbError) {
-      console.error('Error saving message to database:', dbError)
-      // Continue even if DB save fails
     }
+    // Anonymous users: message limits are tracked client-side via localStorage
 
     // Return response
     return NextResponse.json({
@@ -531,19 +573,18 @@ export async function POST(req: NextRequest) {
     try {
       // Try knowledge base first
       const knowledgeResponse = generateResponseFromKnowledge(message)
-      if (knowledgeResponse) {
+      if (knowledgeResponse && knowledgeResponse.length > 50) {
         return NextResponse.json({
           response: knowledgeResponse,
           tokens: 0,
         })
       }
       
-      // Fallback to simple response
-      const fallbackResponse = getSimpleFallbackResponse(message)
+      // Return error message instead of generic fallback
       return NextResponse.json({
-        response: fallbackResponse,
+        response: `I'm experiencing technical difficulties. Please check that your OpenAI API key is properly configured and try again. Error: ${error?.message || 'Unknown error'}`,
         tokens: 0,
-      })
+      }, { status: 500 })
     } catch (fallbackError) {
       // Last resort - return helpful error with instructions
       return NextResponse.json({
@@ -561,9 +602,7 @@ To get the best AI experience, consider adding a free Groq API key (takes 2 minu
 2. Get your free API key
 3. Add to .env.local: GROQ_API_KEY=your_key_here
 
-This will enable powerful AI responses with models like Llama 3.1 70B.
-
-⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.`,
+This will enable powerful AI responses with models like Llama 3.1 70B.`,
         tokens: 0,
       })
     }

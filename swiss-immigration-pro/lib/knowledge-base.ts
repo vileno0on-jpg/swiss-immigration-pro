@@ -13,6 +13,38 @@ export interface KnowledgeEntry {
 
 export const KNOWLEDGE_BASE: KnowledgeEntry[] = [
   {
+    topic: 'Swiss Immigration Overview',
+    content: `Swiss Immigration Pathways (2025):
+
+**EU/EFTA Citizens:**
+- No quota restrictions (freedom of movement)
+- Processing: 2-4 weeks
+- Citizenship: 5 years
+- Permits: B permit (residence), L permit (short-term), G permit (cross-border)
+
+**US/Canadian Citizens:**
+- Annual quota: 8,500 permits (highly competitive)
+- Processing: 8-12 weeks
+- Citizenship: 10 years
+- Permits: L permit (4,000 quota), B permit (4,500 quota)
+- Salary: CHF 100k+ recommended
+
+**Third-Country Nationals:**
+- Annual quota: 8,500 permits (very competitive)
+- Processing: 8-16 weeks
+- Citizenship: 10 years
+- Permits: L permit (4,000 quota), B permit (4,500 quota)
+- Salary: CHF 100k-120k+ recommended
+
+**2025 Quotas**: 8,500 total non-EU permits (4,000 L + 4,500 B)`,
+    links: [
+      { label: 'View Visa Types', url: '/visas' },
+      { label: 'Employment Hub', url: '/employment' },
+      { label: 'Citizenship Guide', url: '/citizenship' }
+    ],
+    keywords: ['immigration', 'swiss immigration', 'overview', 'pathway', 'pathways', 'introduction', 'basics']
+  },
+  {
     topic: 'L Permit (Short-term Residence)',
     content: `The L Permit is for temporary residence up to 12 months. Key requirements:
 - Job offer from Swiss employer required
@@ -25,22 +57,56 @@ export const KNOWLEDGE_BASE: KnowledgeEntry[] = [
       { label: 'View Visa Types', url: '/visas' },
       { label: 'Pricing Plans', url: '/pricing' }
     ],
-    keywords: ['l permit', 'short-term', 'temporary', '12 months', 'quota']
+    keywords: ['l permit', 'short-term', 'temporary', '12 months', 'quota', 'immigration']
   },
   {
     topic: 'B Permit (Residence Permit)',
-    content: `The B Permit is for long-term residence (1-5 years). Requirements:
-- Job offer from Swiss employer
-- Quota availability: 4,500 total in 2025 (~1,300 remaining)
-- Typical salary: CHF 90,000+ (varies by canton)
-- Processing time: 8-12 weeks
+    content: `# How to Apply for a B Permit in Switzerland
+
+The B Permit is a **residence permit** for long-term employment in Switzerland (valid for 1-5 years, renewable annually).
+
+## Application Process:
+
+### Step 1: Secure Job Offer
+- You need a **valid employment contract** from a Swiss employer
+- The employer must prove they couldn't find a suitable Swiss/EU candidate (labor market test)
+- Legal basis: AuG Art. 21, VZAE Art. 18-25
+
+### Step 2: Employer Submits Application
+- Your **employer submits** the permit application to the cantonal migration office
+- Required documents: employment contract, your CV, diplomas (apostilled), motivation letter
+- Processing time: **8-12 weeks** (varies by canton)
+
+### Step 3: Quota Availability
+- **2025 Quota**: 4,500 B permits for non-EU citizens
+- Quotas are allocated by canton and fill quickly (apply early in the year)
+- EU/EFTA citizens: **No quota required** (freedom of movement)
+
+### Step 4: Requirements
+- **Salary**: CHF 90,000+ typical (varies by canton and industry)
+- **Qualifications**: University degree or equivalent professional experience
+- **Health Insurance**: Mandatory KVG-compliant insurance
+- **Language**: Basic knowledge of local language (German/French/Italian) helpful
+
+### Step 5: After Approval
+- Receive B permit card
+- Register with local commune (Gemeinde) within 14 days
 - Annual renewal required
-- Can lead to C permit (permanent residence) after 5-10 years`,
+- Can convert to **C permit** (permanent residence) after 5-10 years
+
+## Important Notes:
+- **EU/EFTA citizens**: No quota, faster processing (2-4 weeks)
+- **Non-EU citizens**: Subject to quota, competitive process
+- **Processing varies by canton**: Basel-Stadt (8 weeks), Zurich (12 weeks), Geneva (14 weeks)
+
+Legal basis: Foreign Nationals Act (AuG, SR 142.20), VZAE (SR 142.201)`,
     links: [
-      { label: 'View Visa Types', url: '/visas' },
-      { label: 'Citizenship Guide', url: '/citizenship' }
+      { label: 'View All Visa Types', url: '/visas' },
+      { label: 'Employment Hub', url: '/employment' },
+      { label: 'Citizenship Guide', url: '/citizenship' },
+      { label: 'Requirements Checklist', url: '/requirements' }
     ],
-    keywords: ['b permit', 'residence', 'long-term', '1-5 years', 'annual renewal']
+    keywords: ['b permit', 'residence', 'long-term', '1-5 years', 'annual renewal', 'apply', 'application', 'how to apply', 'b permit application', 'residence permit']
   },
   {
     topic: 'G Permit (Cross-border Commuter)',

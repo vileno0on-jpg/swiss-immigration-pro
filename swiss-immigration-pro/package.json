@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 5000",
+    "dev": "next dev -p 5050",
     "build": "next build",
     "start": "next start -p 5000",
     "lint": "eslint"
@@ -11,6 +11,7 @@
   "dependencies": {
     "@ai-sdk/groq": "^2.0.27",
     "@ai-sdk/openai": "^2.0.59",
+    "@ai-sdk/xai": "^2.0.33",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@huggingface/inference": "^4.13.0",

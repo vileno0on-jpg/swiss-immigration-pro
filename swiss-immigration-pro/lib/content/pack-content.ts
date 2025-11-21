@@ -78,19 +78,19 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 
 ## The Three Fastest Legal Pathways (Updated 2025)
 
-### 1. EU/EFTA Freedom of Movement (FMPA) - "The Golden Ticket"
-- **Legal basis**: Agreement on the Free Movement of Persons (FMPA), AuG (SR 142.20) Art. 2, VZAE (SR 142.201) Art. 7-23  
+### 1. <span class="notranslate" translate="no">EU/EFTA</span> Freedom of Movement (<span class="notranslate" translate="no">FMPA</span>) - "The Golden Ticket"
+- **Legal basis**: Agreement on the Free Movement of Persons (<span class="notranslate" translate="no">FMPA</span>), <span class="notranslate" translate="no">AuG</span> (<span class="notranslate" translate="no">SR 142.20</span>) <span class="notranslate" translate="no">Art.</span> 2, <span class="notranslate" translate="no">VZAE</span> (<span class="notranslate" translate="no">SR 142.201</span>) <span class="notranslate" translate="no">Art.</span> 7-23  
 - **Turnaround**: 2-4 weeks once documents are ready (vs. 8-12 weeks for non-EU)
 - **Success Rate**: 94% approval rate (based on SEM 2024 data)
-- **What you need**: Employment contract, health insurance (KVG-compliant), commune registration within 14 days
+- **What you need**: Employment contract, health insurance (<span class="notranslate" translate="no">KVG</span>-compliant), commune registration within 14 days
 - **Hidden Advantage**: No labor market test required - you bypass the quota system entirely
-- **Official source**: [SEM – EU/EFTA Citizens](https://www.sem.admin.ch/sem/en/home/themen/arbeit/eu_efta-angehoerige.html)
+- **Official source**: [<span class="notranslate" translate="no">SEM</span> – <span class="notranslate" translate="no">EU/EFTA</span> Citizens](https://www.sem.admin.ch/sem/en/home/themen/arbeit/eu_efta-angehoerige.html)
 
-**Pro Tip**: Even as EU citizens, 23% get rejected for incomplete health insurance. Our templates ensure KVG compliance.
+**Pro Tip**: Even as <span class="notranslate" translate="no">EU</span> citizens, 23% get rejected for incomplete health insurance. Our templates ensure <span class="notranslate" translate="no">KVG</span> compliance.
 
-### 2. Highly Skilled Non-EU Specialists (Permits L & B) - "The Competitive Path"
-- **Legal basis**: AuG Art. 21-24, VZAE Art. 23 (L permits), Art. 18-25 (B permits)  
-- **Quota availability (2025)**: 4,000 L + 4,500 B permits for third-country nationals
+### 2. Highly Skilled Non-<span class="notranslate" translate="no">EU</span> Specialists (Permits <span class="notranslate" translate="no">L</span> & <span class="notranslate" translate="no">B</span>) - "The Competitive Path"
+- **Legal basis**: <span class="notranslate" translate="no">AuG Art.</span> 21-24, <span class="notranslate" translate="no">VZAE Art.</span> 23 (<span class="notranslate" translate="no">L</span> permits), <span class="notranslate" translate="no">Art.</span> 18-25 (<span class="notranslate" translate="no">B</span> permits)  
+- **Quota availability (2025)**: 4,000 <span class="notranslate" translate="no">L</span> + 4,500 <span class="notranslate" translate="no">B</span> permits for third-country nationals
 - **Competition Level**: Extremely competitive - average applicant-to-permit ratio: 8:1
 - **What we optimise**: Salary benchmarks by canton, employer motivation letters, strategic canton selection, perfect timing
 - **Key Success Factor**: Salary above cantonal minimum + demonstrated unique qualifications

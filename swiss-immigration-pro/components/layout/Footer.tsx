@@ -130,10 +130,6 @@ export default function Footer() {
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-xs text-gray-500">
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full">
               <span className="text-green-400">✓</span>
-              <span>30-Day Money-Back Guarantee</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full">
-              <span className="text-green-400">✓</span>
               <span>No Credit Card Required (Free Tier)</span>
             </div>
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full">
@@ -143,6 +139,10 @@ export default function Footer() {
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full">
               <span className="text-green-400">✓</span>
               <span>SSL Secured</span>
+            </div>
+            <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full">
+              <span className="text-green-400">✓</span>
+              <span>GDPR Compliant</span>
             </div>
           </div>
 

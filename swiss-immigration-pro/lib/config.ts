@@ -15,10 +15,10 @@ export const CONFIG = {
     dark: '#1A1A1A',
   },
   ai: {
-    provider: 'groq', // or 'openai'
-    model: 'llama-3.1-70b-versatile',
+    provider: 'groq', // Primary: Groq (Llama 3.1 70B), fallback: OpenAI, xAI/Grok
+    model: 'llama-3.1-70b-versatile', // Groq model (llama-3.1-70b-versatile, mixtral-8x7b-32768)
     maxTokens: 1000,
-    freeDailyLimit: 3,
+    freeDailyLimit: 30,
     temperature: 0.7,
   },
   discord: {

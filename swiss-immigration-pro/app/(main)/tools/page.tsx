@@ -111,7 +111,7 @@ export default function ToolsPage() {
   const timeline = calculateTimeline()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-24">
+    <div className="min-h-screen bg-white py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -119,23 +119,23 @@ export default function ToolsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Swiss Immigration Tools
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Interactive calculators to plan your move to Switzerland
           </p>
         </motion.div>
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-12">
-          <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
+          <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
             <button
               onClick={() => setActiveTab('cost')}
               className={`px-6 py-3 rounded-md font-semibold transition-all ${
                 activeTab === 'cost'
                   ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <Calculator className="w-5 h-5 inline-block mr-2" />
@@ -146,7 +146,7 @@ export default function ToolsPage() {
               className={`px-6 py-3 rounded-md font-semibold transition-all ${
                 activeTab === 'timeline'
                   ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <Clock className="w-5 h-5 inline-block mr-2" />
@@ -157,7 +157,7 @@ export default function ToolsPage() {
               className={`px-6 py-3 rounded-md font-semibold transition-all ${
                 activeTab === 'canton'
                   ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <MapPin className="w-5 h-5 inline-block mr-2" />
@@ -175,13 +175,13 @@ export default function ToolsPage() {
           >
             {/* Input Panel */}
             <div className="card p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Your Details
               </h2>
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Annual Salary (CHF)
                   </label>
                   <input
@@ -193,19 +193,19 @@ export default function ToolsPage() {
                     onChange={(e) => setSalary(Number(e.target.value))}
                     className="w-full"
                   />
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
+                  <div className="text-2xl font-bold text-blue-600 mt-2">
                     CHF {salary.toLocaleString()}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Canton
                   </label>
                   <select
                     value={canton}
                     onChange={(e) => setCanton(e.target.value)}
-                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full p-3 rounded-lg border border-gray-300 bg-white text-gray-900"
                   >
                     {cantons.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -214,13 +214,13 @@ export default function ToolsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Family Size
                   </label>
                   <select
                     value={familySize}
                     onChange={(e) => setFamilySize(Number(e.target.value))}
-                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full p-3 rounded-lg border border-gray-300 bg-white text-gray-900"
                   >
                     <option value="1">Single</option>
                     <option value="2">Couple</option>
@@ -230,13 +230,13 @@ export default function ToolsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Housing Type
                   </label>
                   <select
                     value={housing}
                     onChange={(e) => setHousing(e.target.value)}
-                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full p-3 rounded-lg border border-gray-300 bg-white text-gray-900"
                   >
                     <option value="apartment">Apartment</option>
                     <option value="house">House</option>
@@ -248,7 +248,7 @@ export default function ToolsPage() {
             {/* Results Panel */}
             <div className="space-y-6">
               <div className="card p-8">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
                   Monthly Breakdown
                 </h3>
                 <div className="space-y-3">
@@ -260,9 +260,9 @@ export default function ToolsPage() {
                     { label: 'Utilities', value: costs.utilities },
                     { label: 'Other', value: costs.misc },
                   ].map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <span className="text-gray-700 dark:text-gray-300">{item.label}</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
+                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-gray-700">{item.label}</span>
+                      <span className="font-semibold text-gray-900">
                         CHF {Math.round(item.value).toLocaleString()}
                       </span>
                     </div>
@@ -291,7 +291,7 @@ export default function ToolsPage() {
                   </div>
                   <div className="flex justify-between items-center pt-4">
                     <span className="text-xl font-semibold">Net Savings</span>
-                    <span className={`text-3xl font-bold ${costs.netSavings > 0 ? 'text-green-300' : 'text-red-300'}`}>
+                    <span className={`text-3xl font-bold ${costs.netSavings > 0 ? 'text-blue-200' : 'text-blue-300'}`}>
                       CHF {Math.round(costs.netSavings).toLocaleString()}
                     </span>
                   </div>
@@ -314,19 +314,19 @@ export default function ToolsPage() {
           >
             {/* Input Panel */}
             <div className="card p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Your Situation
               </h2>
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nationality
                   </label>
                   <select
                     value={nationality}
                     onChange={(e) => setNationality(e.target.value)}
-                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full p-3 rounded-lg border border-gray-300 bg-white text-gray-900"
                   >
                     <option value="non-eu">Non-EU/EFTA (USA, India, China, etc.)</option>
                     <option value="eu">EU/EFTA Citizen</option>
@@ -334,7 +334,7 @@ export default function ToolsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Do you have a job offer?
                   </label>
                   <div className="flex gap-4">
@@ -342,8 +342,8 @@ export default function ToolsPage() {
                       onClick={() => setHasJobOffer(true)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         hasJobOffer
-                          ? 'border-blue-600 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300'
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-gray-300 text-gray-700'
                       }`}
                     >
                       <CheckCircle className="w-6 h-6 mx-auto mb-2" />
@@ -353,8 +353,8 @@ export default function ToolsPage() {
                       onClick={() => setHasJobOffer(false)}
                       className={`flex-1 p-4 rounded-lg border-2 transition-all ${
                         !hasJobOffer
-                          ? 'border-blue-600 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300'
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-gray-300 text-gray-700'
                       }`}
                     >
                       <Clock className="w-6 h-6 mx-auto mb-2" />
@@ -377,19 +377,19 @@ export default function ToolsPage() {
               </div>
 
               <div className="card p-8">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">
                   Phase Breakdown
                 </h3>
                 <div className="space-y-4">
                   {timeline.steps.map((step, idx) => (
                     <div key={idx} className="border-l-4 border-blue-600 pl-4 py-3">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="font-bold text-gray-900 dark:text-white">{step.phase}</div>
-                        <div className="text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900 px-3 py-1 rounded-full">
+                        <div className="font-bold text-gray-900">{step.phase}</div>
+                        <div className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                           {step.weeks} weeks
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{step.description}</div>
+                      <div className="text-sm text-gray-600">{step.description}</div>
                     </div>
                   ))}
                 </div>
@@ -405,18 +405,18 @@ export default function ToolsPage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="card p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Canton Comparison
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b-2 border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-4 px-4 text-gray-900 dark:text-white font-bold">Canton</th>
-                      <th className="text-center py-4 px-4 text-gray-900 dark:text-white font-bold">Avg. Rent (1BR)</th>
-                      <th className="text-center py-4 px-4 text-gray-900 dark:text-white font-bold">Tax Rate</th>
-                      <th className="text-center py-4 px-4 text-gray-900 dark:text-white font-bold">Approval Rate</th>
-                      <th className="text-center py-4 px-4 text-gray-900 dark:text-white font-bold">Best For</th>
+                    <tr className="border-b-2 border-gray-200 bg-blue-50">
+                      <th className="text-left py-4 px-4 text-gray-900 font-bold">Canton</th>
+                      <th className="text-center py-4 px-4 text-gray-900 font-bold">Avg. Rent (1BR)</th>
+                      <th className="text-center py-4 px-4 text-gray-900 font-bold">Tax Rate</th>
+                      <th className="text-center py-4 px-4 text-gray-900 font-bold">Approval Rate</th>
+                      <th className="text-center py-4 px-4 text-gray-900 font-bold">Best For</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -428,20 +428,20 @@ export default function ToolsPage() {
                       { ...cantons[4], bestFor: 'Low Taxes & Trading' },
                       { ...cantons[5], bestFor: 'Quality of Life' },
                     ].map((canton, idx) => (
-                      <tr key={idx} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td className="py-4 px-4 font-semibold text-gray-900 dark:text-white">{canton.name}</td>
-                        <td className="py-4 px-4 text-center text-gray-700 dark:text-gray-300">CHF {canton.rent}</td>
+                      <tr key={idx} className="border-b border-gray-200 hover:bg-blue-50 transition-colors">
+                        <td className="py-4 px-4 font-semibold text-gray-900">{canton.name}</td>
+                        <td className="py-4 px-4 text-center text-gray-700">CHF {canton.rent}</td>
                         <td className="py-4 px-4 text-center">
-                          <span className={`font-bold ${canton.tax < 20 ? 'text-green-600 dark:text-green-400' : canton.tax > 23 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                          <span className={`font-bold ${canton.tax < 20 ? 'text-blue-600' : canton.tax > 23 ? 'text-blue-800' : 'text-gray-700'}`}>
                             {canton.tax}%
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <span className={`font-bold ${canton.approval > 85 ? 'text-green-600 dark:text-green-400' : canton.approval < 75 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                          <span className={`font-bold ${canton.approval > 85 ? 'text-blue-600' : canton.approval < 75 ? 'text-blue-800' : 'text-gray-700'}`}>
                             {canton.approval}%
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center text-sm text-blue-600 dark:text-blue-400 font-medium">{canton.bestFor}</td>
+                        <td className="py-4 px-4 text-center text-sm text-blue-600 font-medium">{canton.bestFor}</td>
                       </tr>
                     ))}
                   </tbody>

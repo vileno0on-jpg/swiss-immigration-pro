@@ -861,16 +861,19 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {pack.modules.map((module) => (
-                <Link
+                <button
                   key={module.id}
-                  href={`/admin/module/${module.id}`}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer group"
+                  type="button"
+                  onClick={() => {
+                    router.push(`/admin/module/${module.id}`)
+                  }}
+                  className="w-full text-left border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer group relative focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                       {module.title}
                     </h4>
-                    <Eye className="w-4 h-4 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                    <Eye className="w-4 h-4 text-gray-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                     {module.description}
@@ -887,11 +890,12 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
-                      Open admin view →
-                    </span>
+                    <div className="text-xs text-purple-600 dark:text-purple-400 font-medium flex items-center justify-between group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                      <span>Open admin view</span>
+                      <span>→</span>
+                    </div>
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </div>

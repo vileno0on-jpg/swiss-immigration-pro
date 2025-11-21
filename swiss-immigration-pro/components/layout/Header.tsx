@@ -3,12 +3,10 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, LogOut, Shield, Settings } from 'lucide-react'
+import { Menu, X, User, LogOut, Shield, Settings, Globe } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 
 import AdvancedSearch from '@/components/AdvancedSearch'
-
-type LayerKey = 'europeans' | 'americans' | 'others'
 
 type AppUser = {
   id?: string
@@ -32,39 +30,13 @@ const defaultNavigation: NavItem[] = [
   { href: '/tools', label: 'Tools' },
 ]
 
-const layerNavigation: Record<LayerKey, NavItem[]> = {
-  europeans: [
-    { href: '/europeans', label: 'Home' },
-    { href: '/europeans/visas', label: 'Visas' },
-    { href: '/europeans/process', label: 'Process' },
-    { href: '/europeans/requirements', label: 'Requirements' },
-    { href: '/europeans/resources', label: 'Resources' },
-  ],
-  americans: [
-    { href: '/americans', label: 'Home' },
-    { href: '/americans/visas', label: 'Visas' },
-    { href: '/americans/process', label: 'Process' },
-    { href: '/americans/requirements', label: 'Requirements' },
-    { href: '/americans/resources', label: 'Resources' },
-  ],
-  others: [
-    { href: '/others', label: 'Home' },
-    { href: '/others/visas', label: 'Visas' },
-    { href: '/others/process', label: 'Process' },
-    { href: '/others/requirements', label: 'Requirements' },
-    { href: '/others/resources', label: 'Resources' },
-  ],
-}
+// Layer-specific navigation removed - using classic header for all layers
 
-const setThemeClasses = (dark: boolean) => {
-  if (typeof document === 'undefined') return
-  document.documentElement.classList.toggle('dark', dark)
-  document.body.classList.toggle('dark-mode', dark)
-}
+// Theme functions removed - light mode only
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [logoError, setLogoError] = useState(false)
   const pathname = usePathname()
   const { data: session } = useSession()
 
@@ -83,12 +55,8 @@ export default function Header() {
     }
   }, [session])
 
-  const currentLayer = useMemo<LayerKey | undefined>(() => {
-    const match = pathname?.match(/\/(europeans|americans|others)(\/|$)/)
-    return match ? (match[1] as LayerKey) : undefined
-  }, [pathname])
-
-  const navigationItems = currentLayer ? layerNavigation[currentLayer] : defaultNavigation
+  // Use classic navigation for all layers - no layer-specific customization
+  const navigationItems = defaultNavigation
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), [])
 
@@ -96,89 +64,48 @@ export default function Header() {
     setIsMenuOpen((previous) => !previous)
   }, [])
 
-  const applyTheme = useCallback((dark: boolean) => {
-    setThemeClasses(dark)
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('darkMode', String(dark))
-    }
-  }, [])
-
+  // Force light mode only - dark mode removed
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const readStoredPreference = () => {
-      const stored = window.localStorage.getItem('darkMode')
-      if (stored !== null) {
-        return stored === 'true'
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('dark')
+      document.body.classList.remove('dark-mode')
+      // Remove any stored dark mode preference
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('darkMode')
       }
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-
-    const frameId = window.requestAnimationFrame(() => {
-      const initialDark = readStoredPreference()
-      setIsDarkMode(initialDark)
-      setThemeClasses(initialDark)
-    })
-
-    const mediaQuery =
-      typeof window.matchMedia === 'function'
-        ? window.matchMedia('(prefers-color-scheme: dark)')
-        : null
-
-    const handleChange = (event: MediaQueryListEvent) => {
-      if (window.localStorage.getItem('darkMode') !== null) {
-        return
-      }
-      const nextMode = event.matches
-      window.requestAnimationFrame(() => {
-        setIsDarkMode(nextMode)
-        setThemeClasses(nextMode)
-      })
-    }
-
-    mediaQuery?.addEventListener('change', handleChange)
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-      mediaQuery?.removeEventListener('change', handleChange)
     }
   }, [])
-
-  const toggleDarkMode = useCallback(() => {
-    const nextMode = !isDarkMode
-    setIsDarkMode(nextMode)
-    applyTheme(nextMode)
-
-    if (typeof document !== 'undefined') {
-      const root = document.documentElement
-      root.style.transition = 'background-color 0.3s ease, color 0.3s ease'
-      window.setTimeout(() => {
-        root.style.transition = ''
-      }, 300)
-    }
-  }, [applyTheme, isDarkMode])
 
   const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: '/' })
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200/80 dark:border-gray-800/80 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm">
       <nav className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between sm:h-20">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-2xl shadow-lg transition-transform duration-200 hover:scale-105">
-              🇨🇭
-            </div>
+            {logoError ? (
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-2xl shadow-lg transition-transform duration-200 hover:scale-105">
+                🇨🇭
+              </div>
+            ) : (
+              <div className="flex h-11 w-11 items-center justify-center transition-transform duration-200 hover:scale-105 overflow-hidden">
+                <img
+                  src="/images/logo-removebg.png"
+                  alt="Swiss Immigration Pro"
+                  className="w-full h-full object-contain"
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            )}
             <div className="hidden sm:flex flex-col leading-tight">
-              <span className="font-semibold text-gray-900 dark:text-white">
-                Swiss<span className="text-blue-600 dark:text-blue-400">Immigration</span>Pro
+              <span className="font-semibold text-gray-900">
+                Swiss<span className="text-blue-600">Immigration</span>Pro
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">Expert Guidance</span>
+              <span className="text-xs text-gray-500">Expert Guidance</span>
             </div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white sm:hidden">
+            <span className="text-lg font-semibold text-gray-900 sm:hidden">
               SIP
             </span>
           </Link>
@@ -188,26 +115,27 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50/60 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800/60 dark:hover:text-blue-400"
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                  pathname === item.href
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-blue-50/60 hover:text-blue-600'
+                }`}
               >
                 {item.label}
               </Link>
             ))}
 
-            {currentLayer === 'americans' && (
-              <Link
-                href="/us-citizens"
-                className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50/60 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800/60 dark:hover:text-blue-400"
-              >
-                🇺🇸 US Resources
-              </Link>
-            )}
-
             <Link
               href="/pricing"
-              className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-md"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50/60 hover:text-blue-600"
             >
               Pricing
+            </Link>
+            <Link
+              href="/employment"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-blue-50/60 hover:text-blue-600"
+            >
+              Employment
             </Link>
           </div>
 
@@ -216,16 +144,6 @@ export default function Header() {
               <AdvancedSearch />
             </div>
 
-            <button
-              onClick={toggleDarkMode}
-              className="group relative rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 hover:bg-gray-100 dark:hover:border-gray-700 dark:hover:bg-gray-800"
-              aria-label="Toggle dark mode"
-              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              <span className="text-xl transition-transform duration-200 group-hover:scale-110">
-                {isDarkMode ? '🌙' : '☀️'}
-              </span>
-            </button>
 
             {appUser ? (
               <div className="hidden items-center gap-2 lg:flex">
@@ -233,14 +151,14 @@ export default function Header() {
                   <>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 rounded-lg border border-blue-200/50 px-4 py-2 text-sm font-medium text-blue-600 transition-all duration-200 hover:bg-blue-50/60 dark:border-blue-900/50 dark:text-blue-400 dark:hover:bg-gray-800/60"
+                      className="flex items-center gap-2 rounded-lg border border-blue-200/50 px-4 py-2 text-sm font-medium text-blue-600 transition-all duration-200 hover:bg-blue-50/60"
                     >
                       <User className="h-4 w-4" />
                       Dashboard
                     </Link>
                     <Link
                       href="/profile"
-                      className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                      className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100"
                     >
                       <User className="h-4 w-4" />
                       Profile
@@ -259,7 +177,7 @@ export default function Header() {
                     </Link>
                     <Link
                       href="/admin/settings"
-                      className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                      className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100"
                     >
                       <Settings className="h-4 w-4" />
                       Settings
@@ -269,7 +187,7 @@ export default function Header() {
 
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:text-red-600"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign out
@@ -284,15 +202,29 @@ export default function Header() {
               </Link>
             )}
 
+            {/* Language Switcher Button */}
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.openInitialQuiz) {
+                  window.openInitialQuiz()
+                }
+              }}
+              className="ml-2 rounded-lg p-2 transition-colors hover:bg-gray-100 hidden sm:flex items-center space-x-1"
+              aria-label="Change Language"
+              title="Change Language"
+            >
+              <Globe className="h-5 w-5 text-gray-700" />
+            </button>
+
             <button
               onClick={toggleMenu}
-              className="ml-1 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden"
+              className="ml-1 rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
               aria-label="Toggle navigation menu"
             >
               {isMenuOpen ? (
-                <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <X className="h-5 w-5 text-gray-700" />
               ) : (
-                <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <Menu className="h-5 w-5 text-gray-700" />
               )}
             </button>
           </div>
@@ -300,7 +232,7 @@ export default function Header() {
 
         {isMenuOpen && (
           <div className="lg:hidden">
-            <div className="space-y-3 border-t border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+            <div className="space-y-3 border-t border-gray-200 bg-white p-4 shadow-lg">
               <div className="sm:hidden">
                 <AdvancedSearch />
               </div>
@@ -310,42 +242,55 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={closeMenu}
-                  className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50 dark:text-gray-200 dark:hover:bg-gray-800"
+                  className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50"
                 >
                   {item.label}
                 </Link>
               ))}
 
-              {currentLayer === 'americans' && (
-                <Link
-                  href="/us-citizens"
-                  onClick={closeMenu}
-                  className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50 dark:text-gray-200 dark:hover:bg-gray-800"
-                >
-                  🇺🇸 US Resources
-                </Link>
-              )}
-
               <Link
                 href="/pricing"
                 onClick={closeMenu}
-                className="block rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-base font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg"
+                className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50"
               >
                 Pricing
               </Link>
+              <Link
+                href="/employment"
+                onClick={closeMenu}
+                className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50"
+              >
+                Employment
+              </Link>
 
-              <div className="border-t border-gray-200 pt-3 dark:border-gray-700">
+              {/* Language Switcher in Mobile Menu */}
+              <div className="border-t border-gray-200 pt-3">
+                <button
+                  onClick={() => {
+                    closeMenu()
+                    if (typeof window !== 'undefined' && window.openInitialQuiz) {
+                      window.openInitialQuiz()
+                    }
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                >
+                  <Globe className="h-4 w-4" />
+                  Change Language
+                </button>
+              </div>
+
+              <div className="border-t border-gray-200 pt-3">
                 {appUser ? (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800/60">
+                    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
                         {appUser.name?.charAt(0)?.toUpperCase() ?? <User className="h-5 w-5" />}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <p className="text-sm font-semibold text-gray-900">
                           {appUser.name ?? 'Member'}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500">
                           {appUser.email ?? 'No email set'}
                         </p>
                       </div>
@@ -356,7 +301,7 @@ export default function Header() {
                         <Link
                           href="/dashboard"
                           onClick={closeMenu}
-                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                         >
                           <User className="h-4 w-4" />
                           Dashboard
@@ -364,7 +309,7 @@ export default function Header() {
                         <Link
                           href="/profile"
                           onClick={closeMenu}
-                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                         >
                           <User className="h-4 w-4" />
                           Profile
@@ -377,7 +322,7 @@ export default function Header() {
                         <Link
                           href="/admin"
                           onClick={closeMenu}
-                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-purple-600 transition-colors hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-gray-800"
+                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-purple-600 transition-colors hover:bg-purple-50"
                         >
                           <Shield className="h-4 w-4" />
                           Admin
@@ -385,7 +330,7 @@ export default function Header() {
                         <Link
                           href="/admin/settings"
                           onClick={closeMenu}
-                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                          className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                         >
                           <Settings className="h-4 w-4" />
                           Settings
@@ -398,7 +343,7 @@ export default function Header() {
                         closeMenu()
                         await handleSignOut()
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-red-400"
+                      className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
                     >
                       <LogOut className="h-4 w-4" />
                       Sign out
@@ -416,7 +361,7 @@ export default function Header() {
                     <Link
                       href="/auth/register"
                       onClick={closeMenu}
-                      className="block rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                      className="block rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                     >
                       Create account
                     </Link>

@@ -1,0 +1,21 @@
+import { MetadataRoute } from 'next'
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Swiss Immigration Pro',
+    short_name: 'SwissImmigration',
+    description: 'AI-Powered Swiss Immigration & Citizenship Mastery Platform',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#ffffff',
+    theme_color: '#0056B3',
+    icons: [
+      {
+        src: '/favicon.ico',
+        sizes: 'any',
+        type: 'image/x-icon',
+      },
+    ],
+  }
+}
+

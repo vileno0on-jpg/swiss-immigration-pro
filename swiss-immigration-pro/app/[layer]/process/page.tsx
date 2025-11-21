@@ -2,10 +2,26 @@
 
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, Clock, Sparkles, TrendingUp } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Clock, TrendingUp, Briefcase, FileText, Building2, MapPin, Award, Users, Globe, Search, CheckSquare, Plane, Home, Shield, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
+
+// Icon mapping for process steps
+const getStepIcon = (stepTitle: string, stepIndex: number) => {
+  const titleLower = stepTitle.toLowerCase()
+  if (titleLower.includes('job') || titleLower.includes('employer') || titleLower.includes('offer') || titleLower.includes('search')) return Search
+  if (titleLower.includes('document') || titleLower.includes('paper') || titleLower.includes('certificate') || titleLower.includes('prepare')) return FileText
+  if (titleLower.includes('application') || titleLower.includes('apply') || titleLower.includes('submit') || titleLower.includes('permit')) return CheckSquare
+  if (titleLower.includes('embassy') || titleLower.includes('consulate') || titleLower.includes('visa') || titleLower.includes('interview')) return MapPin
+  if (titleLower.includes('arrival') || titleLower.includes('arrive') || titleLower.includes('register') || titleLower.includes('moving')) return Plane
+  if (titleLower.includes('citizenship') || titleLower.includes('naturalization') || titleLower.includes('permanent') || titleLower.includes('settle')) return Shield
+  if (titleLower.includes('approval') || titleLower.includes('approved') || titleLower.includes('receive')) return Zap
+  if (titleLower.includes('residence') || titleLower.includes('living') || titleLower.includes('home')) return Home
+  // Default icons based on step index
+  const defaultIcons = [Search, FileText, CheckSquare, MapPin, Plane, Shield, Home, Zap]
+  return defaultIcons[stepIndex % defaultIcons.length]
+}
 
 export default function ProcessPage() {
   const params = useParams()
@@ -17,75 +33,25 @@ export default function ProcessPage() {
   const content = LAYER_CONTENT[layer]
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
-      {/* Conversion Header - Sticky */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            {/* Left: Urgency Message */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold">🔥 2025 Quotas Filling Fast</span>
-              </div>
-              <div className="hidden md:flex items-center space-x-2 text-sm">
-                <Sparkles className="w-4 h-4" />
-                <span>Only 2,500 permits left</span>
-              </div>
-            </div>
-
-            {/* Center: Premium Benefits */}
-            <div className="hidden lg:flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>Unlimited AI Chat</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>20+ CV Templates</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-green-300" />
-                <span>Expert Support</span>
-              </div>
-            </div>
-
-            {/* Right: CTA Buttons */}
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/pricing"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-md"
-              >
-                ⭐ Upgrade Now
-              </Link>
-              <Link
-                href="/auth/register"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm font-semibold px-4 py-2 rounded-lg text-sm transition-colors border border-white/30"
-              >
-                Start Free
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
-          <Link href={`/${layer}`} className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-4">
+          <Link href={`/${layer}`} className="inline-flex items-center text-blue-600 hover:underline mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to {layer.charAt(0).toUpperCase() + layer.slice(1)} Home
+            Back
           </Link>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             {content.process.title}
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl">
+          <p className="text-lg text-gray-600 max-w-3xl">
             {content.process.description}
           </p>
         </div>
 
         {/* Process Steps */}
         <div className="relative">
-          <div className="absolute left-8 top-0 bottom-0 w-1 bg-blue-200 dark:bg-blue-900 hidden md:block" />
+          <div className="absolute left-8 top-0 bottom-0 w-1 bg-blue-200 hidden md:block" />
           <div className="space-y-12">
             {content.process.steps.map((step, idx) => (
               <motion.div
@@ -98,21 +64,80 @@ export default function ProcessPage() {
                 <div className="flex-shrink-0 w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl z-10 shadow-lg">
                   {step.step}
                 </div>
-                <div className="flex-1 card p-8">
+                <div className="flex-1 bg-white border border-gray-200 rounded-xl p-8">
+                  {/* Process Step Image (first step only) or Icon (other steps) */}
+                  {idx === 0 ? (
+                    <div className="relative mb-6 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+                      <img 
+                        src={`/images/${layer}/process-${layer === 'europeans' ? 'registration' : layer === 'americans' ? 'embassy' : 'embassy'}.${layer === 'europeans' ? 'png' : 'png'}`}
+                        alt={`Step ${step.step}: ${step.title} - ${layer === 'europeans' ? 'EU/EFTA' : layer === 'americans' ? 'US' : 'International'} Swiss Immigration Process`}
+                        title={`Step ${step.step}: ${step.title} - Swiss Immigration Process for ${layer === 'europeans' ? 'EU/EFTA Citizens' : layer === 'americans' ? 'US Citizens' : 'International Citizens'}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        width={800}
+                        height={400}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = '/images/environment/mountains-2982087_1280.jpg'
+                        }}
+                      />
+                    </div>
+                  ) : idx === 1 && layer === 'americans' ? (
+                    <div className="relative mb-6 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+                      <img 
+                        src="/images/americans/process-quota-system.jpeg"
+                        alt={`Step ${step.step}: ${step.title} - Quota System Process for US Citizens`}
+                        title={`Step ${step.step}: ${step.title} - US Citizens Quota System Process`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        width={800}
+                        height={400}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = '/images/environment/mountains-2982087_1280.jpg'
+                        }}
+                      />
+                    </div>
+                  ) : idx === 1 && layer === 'others' ? (
+                    <div className="relative mb-6 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+                      <img 
+                        src="/images/others/process-quota-system.jpeg"
+                        alt={`Step ${step.step}: ${step.title} - Quota System Process for International Citizens`}
+                        title={`Step ${step.step}: ${step.title} - International Citizens Quota System Process`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        width={800}
+                        height={400}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = '/images/environment/mountains-2982087_1280.jpg'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative mb-6 h-32 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center">
+                      {(() => {
+                        const IconComponent = getStepIcon(step.title, idx)
+                        return (
+                          <IconComponent className="w-12 h-12 text-blue-600" />
+                        )
+                      })()}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-2xl font-bold text-gray-900">
                       {step.title}
                     </h2>
-                    <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                    <div className="flex items-center space-x-2 text-blue-600">
                       <Clock className="w-5 h-5" />
                       <span className="font-semibold">{step.timeline}</span>
                     </div>
                   </div>
-                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-lg text-gray-600 mb-4">
                     {step.description}
                   </p>
                   {idx < content.process.steps.length - 1 && (
-                    <div className="flex items-center text-blue-600 dark:text-blue-400 mt-4">
+                    <div className="flex items-center text-blue-600 mt-4">
                       <ArrowLeft className="w-4 h-4 mr-2 rotate-[-90deg]" />
                       <span className="text-sm">Next: {content.process.steps[idx + 1].title}</span>
                     </div>
@@ -128,57 +153,57 @@ export default function ProcessPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-12 card p-8 bg-blue-50 dark:bg-blue-900"
+          className="mt-12 bg-blue-50 border border-blue-200 rounded-xl p-8"
         >
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
             💡 Pro Tips for {layer.charAt(0).toUpperCase() + layer.slice(1)}
           </h3>
           <ul className="space-y-3">
             {layer === 'europeans' && (
               <>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Register with your commune within 14 days of arrival - it's mandatory!</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Register with your commune within 14 days of arrival - it's mandatory!</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">You don't need a job offer for the first 3 months - you can search while in Switzerland.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">You don't need a job offer for the first 3 months - you can search while in Switzerland.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Consider G permit if you live near the border - it offers tax advantages.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Consider G permit if you live near the border - it offers tax advantages.</span>
                 </li>
               </>
             )}
             {layer === 'americans' && (
               <>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Start document apostille process early - it takes 4-6 weeks from the US.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Start document apostille process early - it takes 4-6 weeks from the US.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Apply in January-March for best quota availability.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Apply in January-March for best quota availability.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Negotiate salary of CHF 100k+ to be competitive in the quota system.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Negotiate salary of CHF 100k+ to be competitive in the quota system.</span>
                 </li>
               </>
             )}
             {layer === 'others' && (
               <>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Quota timing is critical - apply early in the year (January-March) for best chances.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Quota timing is critical - apply early in the year (January-March) for best chances.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Choose cantons with lower competition - Basel, St. Gallen, or Aargau over Zurich/Geneva.</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Choose cantons with lower competition - Basel, St. Gallen, or Aargau over Zurich/Geneva.</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 dark:text-gray-300">Consider education pathway - study in Switzerland first, then convert to work permit (no quota needed).</span>
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Consider education pathway - study in Switzerland first, then convert to work permit (no quota needed).</span>
                 </li>
               </>
             )}
@@ -187,7 +212,7 @@ export default function ProcessPage() {
 
         {/* CTA */}
         <div className="mt-12 text-center">
-          <Link href={`/${layer}/requirements`} className="btn-primary">
+          <Link href={`/${layer}/requirements`} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors inline-block">
             View Requirements Checklist →
           </Link>
         </div>

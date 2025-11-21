@@ -1,10 +1,24 @@
 @import "tailwindcss";
 
+/* Prevent Google Translate from translating technical terms and proper nouns */
+.notranslate,
+[translate="no"] {
+  display: inline;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     /* Enable hardware acceleration for smooth scrolling */
     -webkit-overflow-scrolling: touch;
+    /* Force light mode - no dark mode */
+    color-scheme: light !important;
+    background-color: white !important;
+  }
+
+  html.dark {
+    color-scheme: light !important;
+    background-color: white !important;
   }
 
   body {
@@ -13,55 +27,373 @@
     -moz-osx-font-smoothing: grayscale;
     /* Optimize text rendering */
     text-rendering: optimizeLegibility;
-    /* Enable GPU acceleration */
-    transform: translateZ(0);
-    will-change: scroll-position;
-  }
-
-  /* Performance optimizations */
-  * {
-    /* Optimize painting and compositing */
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  /* Hardware-accelerated scrolling containers */
-  .scroll-container {
-    will-change: transform;
-    transform: translateZ(0);
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Mobile optimizations */
-  @media (max-width: 768px) {
-    html {
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      -webkit-touch-callout: none;
-    }
-  }
-
-  /* Reduced motion support */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
+    /* Force light mode - white background */
+    background-color: white !important;
+    color: #111827 !important;
   }
 }
 
+/* Chat Widget - Ensure it stays fixed */
+[data-chat-widget] {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
 @layer components {
-  /* Advanced Glassmorphism effects */
   .glass {
-    @apply bg-white/80 dark:bg-gray-900/80;
+    @apply bg-white/80;
     @apply backdrop-blur-xl backdrop-saturate-150;
-    @apply border border-white/20 dark:border-white/10;
+    @apply border border-white/20;
     @apply shadow-2xl shadow-black/10;
     @apply transition-all duration-300;
   }
+
+  .card {
+    @apply bg-white;
+    @apply border border-gray-200;
+    @apply rounded-xl;
+    @apply shadow-sm;
+    @apply transition-all duration-300;
+  }
+
+  .card:hover {
+    @apply shadow-md;
+    @apply border-gray-300;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600;
+    @apply hover:bg-blue-700;
+    @apply text-white;
+    @apply font-semibold;
+    @apply px-6 py-3;
+    @apply rounded-lg;
+    @apply transition-all duration-200;
+    @apply shadow-sm;
+    @apply hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100;
+    @apply hover:bg-gray-200;
+    @apply text-gray-900;
+    @apply font-semibold;
+    @apply px-6 py-3;
+    @apply rounded-lg;
+    @apply transition-all duration-200;
+    @apply border border-gray-300;
+  }
+
+  .prose {
+    @apply text-gray-900;
+    @apply leading-relaxed;
+  }
+
+  .prose h1 {
+    @apply text-4xl font-bold text-gray-900 mb-6;
+  }
+
+  .prose h2 {
+    @apply text-3xl font-bold text-gray-900 mb-4 mt-8;
+  }
+
+  .prose h3 {
+    @apply text-2xl font-semibold text-gray-900 mb-3 mt-6;
+  }
+
+  .prose h4 {
+    @apply text-xl font-semibold text-gray-900 mb-2 mt-4;
+  }
+
+  .prose h5 {
+    @apply text-lg font-semibold text-gray-900 mb-2 mt-4;
+  }
+
+  .prose h6 {
+    @apply text-base font-semibold text-gray-900 mb-2 mt-4;
+  }
+
+  .prose p {
+    @apply mb-4 text-gray-900;
+  }
+
+  .prose ul {
+    @apply list-disc pl-6 mb-4 text-gray-900;
+  }
+
+  .prose ol {
+    @apply list-decimal pl-6 mb-4 text-gray-900;
+  }
+
+  .prose li {
+    @apply mb-2 text-gray-900;
+  }
+
+  .prose a {
+    @apply text-blue-600 hover:text-blue-700 underline;
+  }
+
+  .prose strong {
+    @apply font-semibold text-gray-900;
+  }
+
+  .prose em {
+    @apply italic text-gray-900;
+  }
+
+  .prose code {
+    @apply bg-gray-100 text-gray-900 px-2 py-1 rounded text-sm font-mono;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic my-4 text-gray-900;
+  }
+
+  .prose table {
+    @apply text-gray-900;
+  }
+
+  .prose th {
+    @apply text-gray-900 font-semibold;
+  }
+
+  .prose td {
+    @apply text-gray-900;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-in-out;
+}
+
+/* Utility classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Swiss Chat Portal Container - Side panel that pushes content */
+#swiss-chat-portal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+  isolation: isolate !important;
+  /* Ensure it doesn't affect page layout */
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+#swiss-chat-portal > * {
+  pointer-events: auto !important;
+  /* Ensure children are positioned relative to viewport, not parent */
+  position: fixed !important;
+}
+
+/* Adjust main content when sidebar is open - ASUS Style */
+body {
+  transition: margin-right 0.3s ease-out;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Ensure main content doesn't overflow when sidebar is open */
+main {
+  transition: margin-right 0.3s ease-out;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Prevent content from being hidden behind sidebar */
+html {
+  overflow-x: hidden;
+}
+
+/* Print Styles */
+@media print {
+  /* Hide non-essential elements when printing */
+  header,
+  footer,
+  nav,
+  .no-print,
+  [data-chat-widget],
+  button,
+  .btn-primary,
+  .btn-secondary {
+    display: none !important;
+  }
+
+  /* Optimize page layout for printing */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Ensure links are visible in print */
+  a {
+    color: black !important;
+    text-decoration: underline;
+  }
+
+  /* Page breaks */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Remove shadows and backgrounds for cleaner print */
+  * {
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  .bg-blue-50,
+  .bg-gray-50,
+  .bg-indigo-50 {
+    background: #f9fafb !important;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  /* Larger touch targets for mobile */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing on mobile */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Optimize text for mobile reading */
+  body {
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.6;
+  }
+
+  /* Better table scrolling on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Loading Skeleton Animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #f8f8f8 40px,
+    #f0f0f0 80px
+  );
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Skip to main content link for screen readers */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+}
+
+.skip-to-main:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  top: 1rem;
+}
+
   
   .glass:hover {
     @apply bg-white/90 dark:bg-gray-900/90;
@@ -136,7 +468,6 @@
     @apply absolute inset-0 bg-gradient-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0;
     @apply transition-all duration-500;
     @apply opacity-0;
-    pointer-events: none;
   }
   
   .card:hover::before {
@@ -426,7 +757,6 @@
     background-size: 200% 100%;
     animation: shimmer 2s infinite linear;
   }
-}
 
 /* Enhanced Custom scrollbar */
 ::-webkit-scrollbar {
@@ -485,6 +815,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
 }
 
 .mobile-menu-enter {
