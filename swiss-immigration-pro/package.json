@@ -51,6 +51,7 @@
     "node": "20"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.14.7",
     "@tailwindcss/postcss": "^4",
     "@types/next-auth": "^3.13.0",
     "@types/node": "^20",
