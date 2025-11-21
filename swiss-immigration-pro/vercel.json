@@ -1,6 +1,18 @@
 {
+  "version": 2,
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "regions": ["fra1"]
+  "regions": ["fra1"],
+  "functions": {
+    "app/**/*.js": {
+      "runtime": "@vercel/next"
+    },
+    "app/**/*.ts": {
+      "runtime": "@vercel/next"
+    },
+    "app/**/*.tsx": {
+      "runtime": "@vercel/next"
+    }
+  }
 }
  
