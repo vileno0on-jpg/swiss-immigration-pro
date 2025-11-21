@@ -89,6 +89,10 @@ const nextConfig: NextConfig = {
 
   // Power optimization
   poweredByHeader: false,
+
+  // Enable static export for better Vercel compatibility
+  output: 'export',
+  trailingSlash: true,
 };
 
 export default nextConfig;
