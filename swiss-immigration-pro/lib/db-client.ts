@@ -30,6 +30,11 @@ class QueryBuilder {
     return this
   }
 
+  neq(column: string, value: any): this {
+    this.conditions.push({ type: 'neq', column, value })
+    return this
+  }
+
   order(column: string, options?: { ascending?: boolean }): this {
     this.orderBy = { column, ascending: options?.ascending !== false }
     return this
@@ -60,6 +65,10 @@ class QueryBuilder {
         paramIndex++
       } else if (condition.type === 'gte') {
         whereParts.push(`${condition.column} >= $${paramIndex}`)
+        params.push(condition.value)
+        paramIndex++
+      } else if (condition.type === 'neq') {
+        whereParts.push(`${condition.column} != $${paramIndex}`)
         params.push(condition.value)
         paramIndex++
       }

@@ -38,6 +38,7 @@ export default function ModuleView() {
   const sectionTimers = useRef<Record<string, NodeJS.Timeout>>({})
   const [categories, setCategories] = useState<Array<{ title: string; sections: Array<{ id: string; title: string; level: number }> }>>([])
   const [isLocked, setIsLocked] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   // Helper functions - defined before useEffect to avoid hoisting issues
   const extractSections = (content: string) => {
@@ -108,7 +109,8 @@ export default function ModuleView() {
       return
     }
 
-    const isAdmin = session?.user?.isAdmin || false
+    const adminStatus = session?.user?.isAdmin || false
+    setIsAdmin(adminStatus)
     const userPackId = session?.user?.packId || 'free'
 
     const moduleId = params.id as string
@@ -116,7 +118,7 @@ export default function ModuleView() {
     let foundPack: any = null
     let locked = false
 
-    if (isAdmin) {
+    if (adminStatus) {
       const allModules = getAllModulesForAdmin()
       const matched = allModules.find((mod: any) => mod.id === moduleId)
       if (matched) {
@@ -433,7 +435,6 @@ export default function ModuleView() {
   }
 
   const sections = module.content ? extractSections(module.content) : []
-  const isAdmin = session?.user?.isAdmin || false
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

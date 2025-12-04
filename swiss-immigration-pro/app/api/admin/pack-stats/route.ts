@@ -14,10 +14,12 @@ export async function GET(req: NextRequest) {
     const supabase = await createClient()
 
     // Get pack statistics
-    const { data: profiles } = await supabase
+    const profilesResult = await supabase
       .from('profiles')
       .select('pack_id, pack_expires_at')
       .neq('pack_id', 'free')
+      .execute()
+    const profiles = profilesResult.data || []
 
     const packStats = profiles ? profiles.reduce((acc: any, profile: any) => {
       const packId = profile.pack_id
@@ -34,15 +36,19 @@ export async function GET(req: NextRequest) {
     }, {}) : {}
 
     // Get revenue by pack
-    const { data: payments } = await supabase
+    const paymentsResult = await supabase
       .from('payments')
       .select('user_id, amount, status')
       .eq('status', 'succeeded')
+      .execute()
+    const payments = paymentsResult.data || []
 
-    const { data: userPacks } = await supabase
+    const userPacksResult = await supabase
       .from('profiles')
       .select('id, pack_id')
       .neq('pack_id', 'free')
+      .execute()
+    const userPacks = userPacksResult.data || []
 
     const userPackMap: { [key: string]: string } = {}
     userPacks?.forEach((profile: any) => {

@@ -18,11 +18,13 @@ export async function GET(
     const { id: userId } = await params
 
     // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    const profileResult = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
+    const profile = profileResult.data
+    const profileError = profileResult.error
 
     if (profileError || !profile) {
       console.error('Profile fetch error:', profileError)
@@ -30,32 +32,39 @@ export async function GET(
     }
 
     // Get user's subscriptions
-    const { data: subscriptions, error: subsError } = await supabase
+    const subscriptionsResult = await supabase
       .from('subscriptions')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
+      .execute()
+    const subscriptions = subscriptionsResult.data || []
 
     // Get user's payments
-    const { data: payments, error: paymentsError } = await supabase
+    const paymentsResult = await supabase
       .from('payments')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(20)
+      .execute()
+    const payments = paymentsResult.data || []
 
     // Get user's chat messages count
-    const { count: messageCount, error: countError } = await supabase
+    const messageCountResult = await supabase
       .from('chat_messages')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
+      .execute()
+    const messageCount = messageCountResult.count || 0
 
     // Get user limits
-    const { data: limits, error: limitsError } = await supabase
+    const limitsResult = await supabase
       .from('user_limits')
       .select('*')
       .eq('user_id', userId)
       .single()
+    const limits = limitsResult.data || null
 
     return NextResponse.json({
       profile,
