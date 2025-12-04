@@ -16,6 +16,7 @@ import { PRICING_PACKS } from '@/lib/stripe'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import ChatWidget from '@/components/chat/ChatWidget'
+import EnhancedModuleDisplay from '@/components/modules/EnhancedModuleDisplay'
 
 export default function ModuleView() {
   const router = useRouter()
@@ -344,6 +345,29 @@ export default function ModuleView() {
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-700">
             Back to Dashboard
           </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Check if this is an enhanced module with interactive components
+  if (module.enhancedModule && !isLocked) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Back Button */}
+          <div className="mb-6">
+            <Link
+              href={isAdmin ? "/admin" : "/dashboard"}
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to {isAdmin ? "Admin" : "Dashboard"}
+            </Link>
+          </div>
+          
+          {/* Enhanced Module Display */}
+          <EnhancedModuleDisplay module={module.enhancedModule} />
         </div>
       </div>
     )

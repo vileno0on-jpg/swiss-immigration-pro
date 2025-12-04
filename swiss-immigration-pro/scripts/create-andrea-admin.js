@@ -1,104 +1,117 @@
-#!/usr/bin/env node
+const { Pool } = require('pg')
+const bcrypt = require('bcryptjs')
+require('dotenv').config({ path: '.env.local' })
 
-/**
- * Create Andrea Von Flue as Admin User
- * Run this script to create the admin user via API
- */
-
-const https = require('https');
-const http = require('http');
-
-// Configuration
-const API_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-const ADMIN_DATA = {
-  email: 'andrea.vonflue@gmail.com',
-  password: 'Andreavf0222',
-  fullName: 'Andrea Von Flue'
-};
-
-function makeRequest(options, data) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let body = '';
-
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-
-      res.on('end', () => {
-        try {
-          const response = JSON.parse(body);
-          resolve({ status: res.statusCode, data: response });
-        } catch (e) {
-          resolve({ status: res.statusCode, data: body });
-        }
-      });
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    if (data) {
-      req.write(JSON.stringify(data));
-    }
-
-    req.end();
-  });
-}
+const pool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME || 'swiss_immigration',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+})
 
 async function createAdminUser() {
-  console.log('🚀 Creating Andrea Von Flue as Admin User');
-  console.log('=' .repeat(50));
-  console.log(`Email: ${ADMIN_DATA.email}`);
-  console.log(`Name: ${ADMIN_DATA.fullName}`);
-  console.log('=' .repeat(50));
-
+  const client = await pool.connect()
+  
   try {
-    const options = {
-      hostname: API_URL.replace('http://', '').replace('https://', '').split(':')[0],
-      port: API_URL.includes('localhost') ? 3001 : (API_URL.startsWith('https://') ? 443 : 80),
-      path: '/api/admin/create-admin',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': JSON.stringify(ADMIN_DATA).length
-      }
-    };
-
-    console.log('📡 Sending request to:', `${API_URL}/api/admin/create-admin`);
-
-    const response = await makeRequest(options, ADMIN_DATA);
-
-    if (response.status === 200 && response.data.success) {
-      console.log('\n✅ SUCCESS! Admin user created successfully!');
-      console.log('\n📧 Login Credentials:');
-      console.log(`   Email: ${ADMIN_DATA.email}`);
-      console.log(`   Password: ${ADMIN_DATA.password}`);
-      console.log(`   Name: ${ADMIN_DATA.fullName}`);
-      console.log(`   Admin: ${response.data.user.isAdmin ? 'YES' : 'NO'}`);
-      console.log('\n🔗 Login URL: /auth/login');
-      console.log('\n👑 Admin Dashboard: /admin');
+    const email = 'andreavonflue@gmail.com'
+    const password = 'andreavf222222'
+    const fullName = 'Andrea Von Flue'
+    
+    console.log('Creating admin user...')
+    console.log('Email:', email)
+    
+    // Check if user exists
+    const userCheck = await client.query(
+      'SELECT id FROM public.users WHERE email = $1',
+      [email]
+    )
+    
+    let userId
+    
+    if (userCheck.rows.length > 0) {
+      // Update existing user
+      userId = userCheck.rows[0].id
+      console.log('User exists, updating password...')
+      
+      // Hash password with bcrypt (for NextAuth compatibility)
+      const passwordHash = await bcrypt.hash(password, 10)
+      
+      await client.query(
+        'UPDATE public.users SET password_hash = $1, email_verified = TRUE, email_verified_at = NOW(), updated_at = NOW() WHERE id = $2',
+        [passwordHash, userId]
+      )
+      
+      console.log('Password updated for existing user')
     } else {
-      console.log('\n❌ FAILED to create admin user');
-      console.log('Response:', response.data);
+      // Create new user
+      console.log('Creating new user...')
+      
+      // Hash password with bcrypt
+      const passwordHash = await bcrypt.hash(password, 10)
+      
+      const userResult = await client.query(
+        'INSERT INTO public.users (email, password_hash, email_verified, email_verified_at) VALUES ($1, $2, TRUE, NOW()) RETURNING id',
+        [email, passwordHash]
+      )
+      
+      userId = userResult.rows[0].id
+      console.log('User created with ID:', userId)
     }
-
+    
+    // Create/update profile with admin privileges
+    await client.query(
+      `INSERT INTO public.profiles (id, email, full_name, pack_id, is_admin, created_at, updated_at)
+       VALUES ($1, $2, $3, 'free', TRUE, NOW(), NOW())
+       ON CONFLICT (id) DO UPDATE SET
+         is_admin = TRUE,
+         full_name = $3,
+         email = $2,
+         updated_at = NOW()`,
+      [userId, email, fullName]
+    )
+    
+    console.log('Profile created/updated with admin privileges')
+    
+    // Create user limits entry
+    await client.query(
+      `INSERT INTO public.user_limits (user_id, messages_today, last_reset_date)
+       VALUES ($1, 0, CURRENT_DATE)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [userId]
+    )
+    
+    console.log('User limits created')
+    
+    // Verify
+    const verifyResult = await client.query(
+      'SELECT p.id, p.email, p.full_name, p.is_admin, p.pack_id FROM public.profiles p WHERE p.id = $1',
+      [userId]
+    )
+    
+    console.log('\n✅ Admin user created successfully!')
+    console.log('User details:')
+    console.log(JSON.stringify(verifyResult.rows[0], null, 2))
+    console.log('\nLogin credentials:')
+    console.log('Email:', email)
+    console.log('Password:', password)
+    console.log('Admin: TRUE')
+    
   } catch (error) {
-    console.log('\n❌ ERROR:', error.message);
-    console.log('\n💡 Make sure:');
-    console.log('   1. The application is running');
-    console.log('   2. Environment variables are configured');
-    console.log('   3. Database is set up correctly');
-    console.log('\n🔧 Alternative: Use the SQL script in scripts/create-admin-user.sql');
+    console.error('Error creating admin user:', error)
+    throw error
+  } finally {
+    client.release()
+    await pool.end()
   }
 }
 
-// Run the script
-createAdminUser();
-
-
-
-
-
-
+createAdminUser()
+  .then(() => {
+    console.log('\nDone!')
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('Failed:', error)
+    process.exit(1)
+  })

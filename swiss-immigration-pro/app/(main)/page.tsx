@@ -1,47 +1,63 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Shield, Users, Award, Clock, Star, CheckCircle, ArrowRight, Zap, MapPin, Globe, TrendingUp, Sparkles, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import Script from 'next/script'
-import { MapPin, Users, Globe, ArrowRight, Sparkles, MessageCircle, Shield, Users as UsersIcon, CheckCircle, TrendingUp, Award, Clock, Star, Zap } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
+// Move static stats inside component as fallback
 export default function Home() {
-  const [stats, setStats] = useState([
-    { label: 'Success Rate', value: '96%', subtext: 'Approval rate for qualified applicants' },
-    { label: 'Active Users', value: '18,500+', subtext: 'Trusted by professionals worldwide' },
-    { label: 'Processing Time', value: '6-8 weeks', subtext: 'Average permit approval time' },
-    { label: 'Expert Support', value: '24/7', subtext: 'AI-powered assistance available' },
-  ])
+  const fallbackStats = [
+    {
+      value: '18,500+',
+      label: 'Successful Applications',
+      subtext: 'Approved Swiss immigration cases'
+    },
+    {
+      value: '96%',
+      label: 'Success Rate',
+      subtext: 'Industry-leading approval rate'
+    },
+    {
+      value: '6-8 Weeks',
+      label: 'Average Processing',
+      subtext: 'From application to approval'
+    },
+    {
+      value: '24/7',
+      label: 'AI Support',
+      subtext: 'Available around the clock'
+    }
+  ]
+
+  const [stats, setStats] = useState(fallbackStats)
+
+  useEffect(() => {
+    // Only fetch if we're in the browser
+    if (typeof window !== 'undefined') {
+      fetch('/api/stats')
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch')
+          return res.json()
+        })
+        .then(data => {
+          if (data && Array.isArray(data) && data.length > 0) {
+            setStats(data.map((stat: any) => ({
+              value: stat.value,
+              label: stat.label,
+              subtext: stat.subtext || ''
+            })))
+          }
+        })
+        .catch(error => {
+          console.warn('Using fallback stats due to load error:', error)
+          // Keep fallback
+        })
+    }
+  }, [])
 
   return (
-    <>
-      {/* Structured Data - JSON-LD */}
-      <Script
-        id="homepage-structured-data"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Swiss Immigration Pro",
-            "url": "https://swissimmigrationpro.com",
-            "logo": "https://swissimmigrationpro.com/logo.png",
-            "description": "AI-Powered Swiss immigration platform with 96% success rate. Expert guidance for work permits, citizenship, and visas.",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.9",
-              "reviewCount": "2847"
-            },
-            "sameAs": [
-              "https://www.linkedin.com/company/swiss-immigration-pro"
-            ]
-          })
-        }}
-      />
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         {/* Trust Bar - Conversion Optimization */}
         <div className="bg-blue-600 text-white py-2 text-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,7 +67,7 @@ export default function Home() {
                 <span>96% Success Rate</span>
               </div>
               <div className="hidden sm:flex items-center space-x-2">
-                <UsersIcon className="w-4 h-4" />
+                <Users className="w-4 h-4" />
                 <span>18,500+ Successful Applications</span>
               </div>
               <div className="hidden md:flex items-center space-x-2">
@@ -248,7 +264,7 @@ export default function Home() {
                   description: 'Leverage freedom of movement for simplified Swiss residency',
                   benefits: ['No quota restrictions', '2-4 week processing', '5-year citizenship path'],
                   color: 'blue',
-                  link: '/europeans',
+                  link: '/eu',
                   image: '/images/environment/image_1044945_20250813_ob_936fbe_adobestock-380240715-lac-leman.jpeg'
                 },
                 {
@@ -257,7 +273,7 @@ export default function Home() {
                   description: 'Specialized guidance for American professionals',
                   benefits: ['8,500 annual quota', '8-12 week processing', 'Expert document support'],
                   color: 'red',
-                  link: '/americans',
+                  link: '/us',
                   image: '/images/family/download (4).jpeg'
                 },
                 {
@@ -266,7 +282,7 @@ export default function Home() {
                   description: 'Comprehensive support for navigating Swiss immigration',
                   benefits: ['Quota optimization', 'Strategic planning', 'Full document support'],
                   color: 'green',
-                  link: '/others',
+                  link: '/other',
                   image: '/images/environment/download (7).jpeg'
                 }
               ].map((feature, idx) => (
@@ -480,7 +496,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   )
 }

@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-dialog'],
   },
 
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname,
+  },
+
   // Headers for security and performance
   async headers() {
     return [
@@ -89,6 +94,9 @@ const nextConfig: NextConfig = {
 
   // Power optimization
   poweredByHeader: false,
+
+  // Allow development origins for cross-origin requests
+  allowedDevOrigins: ['localhost:5050', '127.0.0.1:5050', '192.168.1.21:5050', '192.168.1.21'],
 };
 
 export default nextConfig;

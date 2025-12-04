@@ -21,12 +21,12 @@ A full-stack SaaS platform for Swiss immigration education, featuring AI chatbot
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend**: Supabase (Auth, Database, Storage)
-- **Payments**: Stripe
-- **AI**: Groq (Llama 3.1 70B) / OpenAI
+- **Backend**: Local PostgreSQL Database
+- **Payments**: Stripe (optional)
+- **AI**: Groq (Llama 3.1 70B) / OpenAI (optional)
 - **Animations**: Framer Motion
 - **Charts**: Recharts
-- **Deployment**: Vercel
+- **Deployment**: Self-hosted (runs on your PC)
 
 ## 📁 Project Structure
 
@@ -67,30 +67,33 @@ npm install
 Create `.env.local` file:
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+# Local PostgreSQL Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=swiss_immigration
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
 
-# Stripe
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=your_webhook_secret
+# Stripe (optional - for payments)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+STRIPE_SECRET_KEY=sk_test_placeholder
+STRIPE_WEBHOOK_SECRET=whsec_placeholder
 
-# AI
-GROQ_API_KEY=your_groq_api_key
-OPENAI_API_KEY=your_openai_api_key
+# AI (optional - for chatbot)
+GROQ_API_KEY=your_groq_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 
 # App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_ADMIN_EMAIL=admin@example.com
+NEXT_PUBLIC_APP_URL=http://localhost:5050
+NEXT_PUBLIC_ADMIN_EMAIL=admin@swissimmigrationpro.com
 ```
 
 ### 3. Database Setup
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run the SQL from `lib/database/schema.sql` in your Supabase SQL Editor
-3. This creates all tables, RLS policies, and default data
+1. Install PostgreSQL from [postgresql.org](https://www.postgresql.org/download/)
+2. Create database: `psql -U postgres -c "CREATE DATABASE swiss_immigration;"`
+3. Import schema: `psql -U postgres -d swiss_immigration -f lib/database/schema.sql`
+4. Or use the setup script: `SETUP_LOCAL_DB.bat`
 
 ### 4. Stripe Setup
 

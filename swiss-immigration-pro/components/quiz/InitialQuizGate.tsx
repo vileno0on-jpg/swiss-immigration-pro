@@ -40,6 +40,15 @@ export function InitialQuizGate() {
     try {
       if (typeof window !== 'undefined') {
         const pathname = window.location.pathname
+        
+        // Check for pending redirect after page reload
+        const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
+        if (pendingRedirect && pathname !== pendingRedirect) {
+          localStorage.removeItem('pendingLayerRedirect')
+          window.location.href = pendingRedirect
+          return
+        }
+
         // Don't auto-show on admin pages, layer pages, or if already completed
         if (pathname.startsWith('/admin') || pathname.startsWith('/europeans') || pathname.startsWith('/americans') || pathname.startsWith('/others')) {
           return
@@ -49,13 +58,15 @@ export function InitialQuizGate() {
         const detectionCompleted = localStorage.getItem('detectionCompleted')
         const detectionSkipped = localStorage.getItem('detectionSkipped')
 
+        // DISABLED AUTO-OPEN FOR TESTING
         // Only auto-open if not completed and not skipped
-        if (!detectionCompleted && !detectionSkipped) {
-        const timer = setTimeout(() => {
-          setIsOpen(true)
-          }, 1000)
-        return () => clearTimeout(timer)
-        }
+        // Increased delay to 3 seconds to allow page to fully load
+        // if (!detectionCompleted && !detectionSkipped) {
+        // const timer = setTimeout(() => {
+        //   setIsOpen(true)
+        //   }, 3000)
+        // return () => clearTimeout(timer)
+        // }
       }
     } catch {
       // Ignore localStorage access issues

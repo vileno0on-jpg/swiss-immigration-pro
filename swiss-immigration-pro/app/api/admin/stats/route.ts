@@ -51,7 +51,7 @@ export async function GET() {
       .select('amount')
       .eq('status', 'succeeded')
 
-    const totalRevenue = revenueData ? revenueData.reduce((sum, payment) => sum + payment.amount, 0) / 100 : 0
+    const totalRevenue = revenueData ? revenueData.reduce((sum: number, payment: any) => sum + payment.amount, 0) / 100 : 0
 
     // Get monthly revenue
     const startOfMonth = new Date()
@@ -64,7 +64,7 @@ export async function GET() {
       .eq('status', 'succeeded')
       .gte('created_at', startOfMonth.toISOString())
 
-    const monthlyRevenue = monthlyRevenueData ? monthlyRevenueData.reduce((sum, payment) => sum + payment.amount, 0) / 100 : 0
+    const monthlyRevenue = monthlyRevenueData ? monthlyRevenueData.reduce((sum: number, payment: any) => sum + payment.amount, 0) / 100 : 0
 
     return NextResponse.json({
       totalUsers: Number(userCount || 0),

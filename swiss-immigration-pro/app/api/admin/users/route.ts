@@ -38,11 +38,11 @@ export async function GET(req: NextRequest) {
     const subscriptionCounts: { [key: string]: number } = {}
     const paymentStats: { [key: string]: { count: number; total: number } } = {}
 
-    subscriptions?.forEach(sub => {
+    subscriptions?.forEach((sub: any) => {
       subscriptionCounts[sub.user_id] = (subscriptionCounts[sub.user_id] || 0) + 1
     })
 
-    payments?.forEach(payment => {
+    payments?.forEach((payment: any) => {
       if (!paymentStats[payment.user_id]) {
         paymentStats[payment.user_id] = { count: 0, total: 0 }
       }
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     })
 
     // Combine data
-    const users = profiles?.map(profile => ({
+    const users = profiles?.map((profile: any) => ({
       id: profile.id,
       email: profile.email,
       full_name: profile.full_name,

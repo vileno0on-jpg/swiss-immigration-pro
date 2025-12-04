@@ -3,6 +3,12 @@
 import { ADVANCED_MODULE_CONTENT } from './modules/advanced-modules'
 import { ADV_MODULES_3_TO_9 } from './modules/adv-03-to-09'
 import { ADV_MODULES_7_TO_9 as ADV_MODULES_7_TO_9_CONTENT } from './modules/adv-07-to-09'
+import { workPermitsEnhancedModule } from './enhanced-modules/work-permits-enhanced'
+import { 
+  freeModule01Enhanced, 
+  freeModule02Enhanced, 
+  freeModule03Enhanced 
+} from './enhanced-modules/free-modules'
 
 export interface PackContent {
   packId: string
@@ -33,6 +39,7 @@ export interface Module {
     title: string
     description: string
   }>
+  enhancedModule?: any // For enhanced modules with interactive components
 }
 
 export interface Resource {
@@ -58,16 +65,14 @@ export const PACK_CONTENT: Record<string, PackContent> = {
     modules: [
       {
         id: 'free-01',
-        title: 'Swiss Immigration Fast-Track Foundations (2025)',
-        description: 'Discover the three fastest legal pathways to Switzerland and how we guide you through each step.',
-        type: 'guide',
-        duration: '12 min read',
+        title: freeModule01Enhanced.title,
+        description: freeModule01Enhanced.description,
+        type: 'interactive',
+        duration: freeModule01Enhanced.estimatedReadTime,
         order: 1,
         completed: false,
-        attachments: [
-          'SEM-Official-Quicklinks.pdf',
-          'Fast-Track-Roadmap.png'
-        ],
+        content: '',
+        enhancedModule: freeModule01Enhanced,
         content: `# Swiss Immigration Fast-Track Foundations (2025)
 
 ## The Swiss Immigration Reality Check
@@ -238,16 +243,14 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
       },
       {
         id: 'free-02',
-        title: 'Permit Approval Readiness Checklist',
-        description: 'Audit your documents against SEM requirements before you apply.',
-        type: 'guide',
-        duration: '15 min workshop',
+        title: freeModule02Enhanced.title,
+        description: freeModule02Enhanced.description,
+        type: 'interactive',
+        duration: freeModule02Enhanced.estimatedReadTime,
         order: 2,
         completed: false,
-        attachments: [
-          'Permit-Readiness-Checklist.xlsx',
-          'Employer-Motivation-Letter-Template.docx'
-        ],
+        content: '',
+        enhancedModule: freeModule02Enhanced,
         content: `# Permit Approval Readiness Checklist
 
 ## The 41% Rejection Reality
@@ -357,6 +360,17 @@ Most applicants waste 6-12 months on rejected applications. Don't be one of them
 
 **Next Action**: Download the Excel checklist and score your current readiness.
 `
+      },
+      {
+        id: 'free-03',
+        title: freeModule03Enhanced.title,
+        description: freeModule03Enhanced.description,
+        type: 'interactive',
+        duration: freeModule03Enhanced.estimatedReadTime,
+        order: 3,
+        completed: false,
+        content: '',
+        enhancedModule: freeModule03Enhanced
       }
     ],
     resources: [

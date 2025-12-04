@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, BookOpen, CheckCircle, Clock, Play, FileText, Download, Award, HelpCircle, BarChart3, Menu, X, MessageCircle, Maximize2, Minimize2, Bookmark } from 'lucide-react'
+import { ArrowLeft, BookOpen, CheckCircle, Clock, Play, FileText, Download, Award, HelpCircle, BarChart3, Menu, X, Maximize2, Minimize2, Bookmark } from 'lucide-react'
 import { getAllModulesForAdmin, getModulePack } from '@/lib/content/pack-content'
 import { PRICING_PACKS } from '@/lib/stripe'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import EnhancedModuleDisplay from '@/components/modules/EnhancedModuleDisplay'
 
 export default function AdminModuleView() {
   const router = useRouter()
@@ -24,20 +26,32 @@ export default function AdminModuleView() {
   const [showTableOfContents, setShowTableOfContents] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('')
-  const [chatOpen, setChatOpen] = useState(false)
   const [categories, setCategories] = useState<Array<{ title: string; sections: Array<{ id: string; title: string; level: number }> }>>([])
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
+  const sidebarRef = useRef<HTMLDivElement>(null)
+  const activeSectionRef = useRef<string>('')
+  const contentRef = useRef<HTMLDivElement>(null)
+  const visibleSectionsRef = useRef<Set<string>>(new Set())
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Define helper functions using useCallback to ensure they're available
   const extractSectionsLocal = useCallback((content: string): Array<{ id: string; title: string; level: number }> => {
     const lines = content.split('\n')
     const sections: Array<{ id: string; title: string; level: number }> = []
     
+    // Helper function to strip HTML tags from text
+    const stripHtml = (html: string): string => {
+      return html.replace(/<[^>]*>/g, '').trim()
+    }
+    
     lines.forEach((line) => {
       if (line.startsWith('#')) {
         const level = (line.match(/^#+/)?.[0] || '').length
-        const title = line.replace(/^#+\s*/, '').trim()
-        const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-        sections.push({ id, title, level })
+        let title = line.replace(/^#+\s*/, '').trim()
+        // Strip HTML tags from title for display
+        const cleanTitle = stripHtml(title)
+        const id = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        sections.push({ id, title: cleanTitle, level })
       }
     })
     
@@ -108,12 +122,109 @@ export default function AdminModuleView() {
         const sections = extractSectionsLocal(matched.content)
         const organized = organizeSectionsIntoCategoriesLocal(sections)
         setCategories(organized)
-        setActiveSection(sections[0]?.id || '')
+        const firstSectionId = sections[0]?.id || ''
+        activeSectionRef.current = firstSectionId
+        setActiveSection(firstSectionId)
+        // Show first section immediately
+        visibleSectionsRef.current = new Set([firstSectionId])
+        setVisibleSections(new Set([firstSectionId]))
       }
     }
 
     setLoading(false)
   }, [session, status, router, params.id, extractSectionsLocal, organizeSectionsIntoCategoriesLocal])
+
+  // Compute sections early (before early returns) to avoid hook order issues
+  // Use useMemo to ensure stable reference - use module?.id to avoid reference issues
+  const sections = useMemo(() => {
+    if (!module?.content) return []
+    return extractSectionsLocal(module.content)
+  }, [module?.id, module?.content, extractSectionsLocal])
+
+  // Track scroll position and update active section
+  useEffect(() => {
+    if (!module?.content || sections.length === 0) return
+
+    const handleScroll = () => {
+      // Clear any pending timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+
+      // Throttle state updates to prevent infinite loops
+      scrollTimeoutRef.current = setTimeout(() => {
+        // Use contentRef if available, otherwise query
+        const mainContent = contentRef.current || document.querySelector('.flex-1.overflow-y-auto') as HTMLElement
+        const scrollPosition = mainContent 
+          ? mainContent.scrollTop + 150 
+          : window.scrollY + 150 // Offset for header
+        
+        // Find which section is currently in view
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const section = sections[i]
+          const element = document.getElementById(section.id)
+          if (element) {
+            const elementTop = mainContent 
+              ? element.offsetTop - mainContent.offsetTop
+              : element.offsetTop
+            
+            if (scrollPosition >= elementTop) {
+              // Only update state if the active section actually changed
+              if (activeSectionRef.current !== section.id) {
+                activeSectionRef.current = section.id
+                setActiveSection(section.id)
+              }
+              
+              // Track visible sections in ref first, then update state only if needed
+              const needsUpdate = !visibleSectionsRef.current.has(section.id)
+              if (needsUpdate) {
+                visibleSectionsRef.current.add(section.id)
+                // Also add next section if it exists
+                const currentIndex = sections.findIndex(s => s.id === section.id)
+                if (currentIndex < sections.length - 1) {
+                  visibleSectionsRef.current.add(sections[currentIndex + 1].id)
+                }
+                // Update state with a new Set to trigger re-render
+                setVisibleSections(new Set(visibleSectionsRef.current))
+              }
+              
+              // Calculate progress based on scroll position
+              if (mainContent) {
+                const scrollTop = mainContent.scrollTop
+                const scrollHeight = mainContent.scrollHeight
+                const clientHeight = mainContent.clientHeight
+                const scrollableHeight = scrollHeight - clientHeight
+                if (scrollableHeight > 0) {
+                  const progressPercent = Math.round((scrollTop / scrollableHeight) * 100)
+                  setProgress(progressPercent)
+                }
+              }
+              
+              break
+            }
+          }
+        }
+      }, 100) // Throttle to 100ms
+    }
+
+    // Listen to both window and content container scroll
+    const mainContent = contentRef.current || document.querySelector('.flex-1.overflow-y-auto') as HTMLElement
+    if (mainContent) {
+      mainContent.addEventListener('scroll', handleScroll, { passive: true })
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Initial check
+    
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      if (mainContent) {
+        mainContent.removeEventListener('scroll', handleScroll)
+      }
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [module?.id, sections.length, showTableOfContents])
 
   const handleQuizSubmit = () => {
     // Mock quiz scoring - in real app, compare with correct answers
@@ -147,7 +258,28 @@ export default function AdminModuleView() {
     )
   }
 
-  const sections = module.content ? extractSectionsLocal(module.content) : []
+  // Check if this is an enhanced module with interactive components
+  if (module.enhancedModule) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Back Button */}
+          <div className="mb-6">
+            <Link
+              href="/admin"
+              className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </div>
+          
+          {/* Enhanced Module Display */}
+          <EnhancedModuleDisplay module={module.enhancedModule} />
+        </div>
+      </div>
+    )
+  }
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -168,16 +300,21 @@ export default function AdminModuleView() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Sidebar - Table of Contents */}
-      {showTableOfContents && (
-        <motion.div
-          initial={{ x: -300 }}
-          animate={{ x: 0 }}
-          className="w-80 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 overflow-y-auto"
-        >
-          {/* Sidebar Header */}
-          <div className="p-6 border-b border-gray-200">
+        <div className="min-h-screen bg-gray-50 flex">
+            {/* Left Sidebar - Table of Contents - Sticky */}
+            {showTableOfContents && (
+              <motion.div
+                initial={{ x: -320 }}
+                animate={{ x: 0 }}
+                exit={{ x: -320 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="w-80 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 flex-shrink-0 z-[9999]"
+                style={{ 
+                  maxHeight: '100vh'
+                }}
+              >
+          {/* Sidebar Header - Fixed */}
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-between mb-4">
               <Link
                 href="/admin"
@@ -188,7 +325,8 @@ export default function AdminModuleView() {
               </Link>
               <button
                 onClick={() => setShowTableOfContents(false)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Collapse sidebar"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -213,7 +351,16 @@ export default function AdminModuleView() {
           </div>
 
           {/* Table of Contents - Organized by Categories */}
-          <div className="flex-1 p-4 overflow-y-auto">
+          <div 
+            ref={sidebarRef}
+            className="flex-1 p-4 min-h-0 hide-scrollbar" 
+            style={{ 
+              overflowY: 'auto', 
+              overflowX: 'hidden', 
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth'
+            }}
+          >
             <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
               Table of Contents
             </h3>
@@ -230,20 +377,40 @@ export default function AdminModuleView() {
                   </div>
                   
                   {/* Category Sections */}
-                  {category.sections.map((section, idx) => (
-                    <button
-                      key={`${catIdx}-${idx}`}
-                      onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
-                        activeSection === section.id
-                          ? 'bg-purple-50 text-purple-700 font-medium shadow-sm'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                      style={{ paddingLeft: `${(section.level - 1) * 12 + 12}px` }}
-                    >
-                      {section.title}
-                    </button>
-                  ))}
+                  {category.sections.map((section, idx) => {
+                    const isVisible = visibleSections.has(section.id)
+                    
+                    return (
+                      <motion.button
+                        key={`${catIdx}-${idx}`}
+                        data-section-id={section.id}
+                        onClick={() => {
+                          scrollToSection(section.id)
+                          setVisibleSections(prev => {
+                            const newSet = new Set(prev)
+                            newSet.add(section.id)
+                            return newSet
+                          })
+                        }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ 
+                          opacity: 1, 
+                          y: 0 
+                        }}
+                        transition={{ duration: 0.3 }}
+                        className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all duration-200 mb-2 ${
+                          activeSection === section.id
+                            ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium shadow-lg'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm hover:shadow-md'
+                        }`}
+                        style={{ paddingLeft: `${(section.level - 1) * 12 + 16}px` }}
+                      >
+                        <div className="flex items-start">
+                          <span className="flex-1 leading-relaxed">{section.title}</span>
+                        </div>
+                      </motion.button>
+                    )
+                  })}
                 </div>
               ))}
             </nav>
@@ -285,19 +452,20 @@ export default function AdminModuleView() {
         </motion.div>
       )}
 
+      {/* Left Tab Button - Always visible and sticky */}
+      <button
+        onClick={() => setShowTableOfContents(!showTableOfContents)}
+        className="fixed left-0 top-24 z-[10000] bg-purple-600 hover:bg-purple-700 text-white px-2 py-3 rounded-r-lg shadow-lg transition-colors"
+        title={showTableOfContents ? "Close sidebar" : "Open sidebar"}
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className={`flex-1 min-h-screen ${showTableOfContents ? 'ml-80' : ''}`}>
         {/* Top Bar */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center space-x-4">
-            {!showTableOfContents && (
-              <button
-                onClick={() => setShowTableOfContents(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-            )}
             <div>
               <h1 className="text-lg font-bold text-gray-900">
                 {module.title}
@@ -308,68 +476,94 @@ export default function AdminModuleView() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setChatOpen(!chatOpen)}
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <MessageCircle className="w-5 h-5 text-gray-600" />
-              {chatOpen && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-              )}
-            </button>
+            {/* Chat button removed */}
           </div>
         </div>
 
-        {/* Content + Chat Layout */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Content Layout */}
+        <div className="w-full">
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="overflow-y-auto" ref={contentRef} style={{ paddingBottom: '140px' }}>
+            <div className="mx-auto px-6 py-8 max-w-[95%] lg:max-w-[98%]">
               {/* Module Content */}
               {module.content && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="prose prose-lg max-w-none mb-8 text-gray-900"
+                  className="prose prose-sm lg:prose-base max-w-none mb-8"
+                  style={{ color: '#111827' }}
                 >
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
                     components={{
                       h1: ({ node, ...props }) => (
-                        <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-bold" {...props} />
+                        <h1 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-bold" style={{ color: '#111827', fontSize: showTableOfContents ? '2rem' : '1.75rem' }} {...props} />
                       ),
                       h2: ({ node, ...props }) => (
-                        <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-bold" {...props} />
+                        <h2 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-bold" style={{ color: '#111827', fontSize: showTableOfContents ? '1.5rem' : '1.25rem' }} {...props} />
                       ),
                       h3: ({ node, ...props }) => (
-                        <h3 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-semibold" {...props} />
+                        <h3 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-semibold" style={{ color: '#111827', fontSize: showTableOfContents ? '1.25rem' : '1.125rem' }} {...props} />
+                      ),
+                      h4: ({ node, ...props }) => (
+                        <h4 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-semibold mt-6 mb-3" style={{ color: '#111827', fontSize: showTableOfContents ? '1.125rem' : '1rem' }} {...props} />
+                      ),
+                      h5: ({ node, ...props }) => (
+                        <h5 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-medium mt-4 mb-2" style={{ color: '#111827', fontSize: showTableOfContents ? '1rem' : '0.875rem' }} {...props} />
+                      ),
+                      h6: ({ node, ...props }) => (
+                        <h6 id={props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="scroll-mt-20 text-gray-900 font-medium mt-4 mb-2" style={{ color: '#111827', fontSize: showTableOfContents ? '0.875rem' : '0.75rem' }} {...props} />
                       ),
                       p: ({ node, ...props }) => (
-                        <p className="text-gray-900 mb-4 leading-relaxed" {...props} />
+                        <p className="text-gray-900 mb-4 leading-relaxed" style={{ color: '#111827', fontSize: showTableOfContents ? '1rem' : '0.875rem' }} {...props} />
                       ),
                       ul: ({ node, ...props }) => (
-                        <ul className="text-gray-900 mb-4 ml-6 list-disc space-y-2" {...props} />
+                        <ul className="text-gray-900 mb-4 ml-6 list-disc space-y-2" style={{ color: '#111827' }} {...props} />
                       ),
                       ol: ({ node, ...props }) => (
-                        <ol className="text-gray-900 mb-4 ml-6 list-decimal space-y-2" {...props} />
+                        <ol className="text-gray-900 mb-4 ml-6 list-decimal space-y-2" style={{ color: '#111827' }} {...props} />
                       ),
                       li: ({ node, ...props }) => (
-                        <li className="text-gray-900 leading-relaxed" {...props} />
+                        <li className="text-gray-900 leading-relaxed" style={{ color: '#111827' }} {...props} />
                       ),
                       strong: ({ node, ...props }) => (
-                        <strong className="text-gray-900 font-semibold" {...props} />
+                        <strong className="text-gray-900 font-semibold" style={{ color: '#111827' }} {...props} />
                       ),
                       em: ({ node, ...props }) => (
-                        <em className="text-gray-900 italic" {...props} />
+                        <em className="text-gray-900 italic" style={{ color: '#111827' }} {...props} />
                       ),
+                      span: ({ node, className, ...props }: any) => {
+                        // Preserve notranslate spans for translation prevention
+                        const isNotranslate = className?.includes('notranslate')
+                        return (
+                          <span 
+                            className={className || ''} 
+                            translate={isNotranslate ? 'no' : undefined}
+                            style={{ color: '#111827' }}
+                            {...props}
+                          />
+                        )
+                      },
                       code: ({ node, inline, ...props }: any) => {
                         if (inline) {
-                          return <code className="text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                          return <code className="text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" style={{ color: '#111827' }} {...props} />
                         }
-                        return <code className="text-gray-900 bg-gray-100 block p-4 rounded-lg text-sm font-mono overflow-x-auto mb-4" {...props} />
+                        return <code className="text-gray-900 bg-gray-100 block p-4 rounded-lg text-sm font-mono overflow-x-auto mb-4" style={{ color: '#111827' }} {...props} />
                       },
                       blockquote: ({ node, ...props }) => (
-                        <blockquote className="text-gray-900 border-l-4 border-blue-500 pl-4 italic my-4" {...props} />
+                        <blockquote className="text-gray-900 border-l-4 border-blue-500 pl-4 italic my-4" style={{ color: '#111827' }} {...props} />
+                      ),
+                      table: ({ node, ...props }) => (
+                        <div className="overflow-x-auto my-6">
+                          <table className="min-w-full border-collapse border border-gray-300 text-gray-900" style={{ color: '#111827' }} {...props} />
+                        </div>
+                      ),
+                      th: ({ node, ...props }) => (
+                        <th className="border border-gray-300 px-4 py-2 bg-gray-100 font-semibold text-left text-gray-900" style={{ color: '#111827' }} {...props} />
+                      ),
+                      td: ({ node, ...props }) => (
+                        <td className="border border-gray-300 px-4 py-2 text-gray-900" style={{ color: '#111827' }} {...props} />
                       ),
                     }}
                   >
@@ -534,7 +728,7 @@ export default function AdminModuleView() {
                     setProgress(100)
                     alert('Module completed! 🎉')
                   }}
-                  className="px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
+                  className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center space-x-2"
                 >
                   <CheckCircle className="w-5 h-5" />
                   <span>Mark as Complete</span>
@@ -543,60 +737,20 @@ export default function AdminModuleView() {
             </div>
           </div>
 
-          {/* Right Sidebar - AI Chat */}
-          {chatOpen && (
-            <motion.div
-              initial={{ x: 400 }}
-              animate={{ x: 0 }}
-              className="w-96 bg-white border-l border-gray-200 flex flex-col h-screen"
-            >
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
-                  <MessageCircle className="w-5 h-5 text-purple-600" />
-                  <span>AI Study Assistant</span>
-                </h3>
-                <button
-                  onClick={() => setChatOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="space-y-4">
-                  <div className="bg-purple-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-700">
-                      👋 Hi! I'm here to help you understand this module. Ask me anything about:
-                    </p>
-                    <ul className="mt-2 space-y-1 text-xs text-gray-600">
-                      <li>• Key concepts and definitions</li>
-                      <li>• Step-by-step processes</li>
-                      <li>• Real-world examples</li>
-                      <li>• Clarification on confusing parts</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 border-t border-gray-200">
-                <div className="text-sm text-gray-600 text-center">
-                  AI chat powered by Groq
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {/* Right Sidebar - AI Chat removed */}
         </div>
       </div>
 
-      {/* Mobile TOC Toggle */}
-      {!showTableOfContents && (
-        <button
-          onClick={() => setShowTableOfContents(true)}
-          className="fixed bottom-6 left-6 lg:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors z-50"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      )}
-    </div>
-  )
+          {/* Mobile TOC Toggle */}
+          {!showTableOfContents && (
+            <button
+              onClick={() => setShowTableOfContents(true)}
+              className="fixed bottom-24 left-6 lg:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors z-50"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          )}
+      </div>
+    )
 }
 

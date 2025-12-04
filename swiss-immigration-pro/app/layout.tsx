@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
+import { InitialQuizGate } from "@/components/quiz/InitialQuizGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,201 +74,21 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Force light mode - remove dark mode */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                if (typeof document !== 'undefined') {
-                  // Force remove dark class
-                  document.documentElement.classList.remove('dark');
-                  document.documentElement.setAttribute('data-theme', 'light');
-                  document.body.classList.remove('dark-mode', 'dark');
-                  // Prevent dark mode from being set
-                  const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                        document.documentElement.classList.remove('dark');
-                        document.body.classList.remove('dark-mode', 'dark');
-                      }
-                    });
-                  });
-                  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-                  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-                  if (typeof window !== 'undefined' && window.localStorage) {
-                    window.localStorage.removeItem('darkMode');
-                    window.localStorage.setItem('theme', 'light');
-                  }
-                }
-              })();
-            `,
-          }}
-        />
-        {/* Hide Google Translate banner */}
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              .goog-te-banner-frame { display: none !important; }
-              .goog-te-balloon-frame { display: none !important; }
-              body { top: 0 !important; }
-              .goog-te-menu-value { color: inherit !important; }
-              .goog-te-menu-value span { color: inherit !important; }
-              .goog-te-gadget { font-family: inherit !important; }
-              .goog-te-gadget-simple { background-color: transparent !important; border: none !important; }
-              html { color-scheme: light !important; }
-              html.dark { color-scheme: light !important; }
-            `,
-          }}
-        />
+        {/* Simple dark mode prevention - CSS only */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            :root { color-scheme: light; }
+            html, body { background-color: #ffffff !important; color: #111827 !important; }
+            html.dark { color-scheme: light; }
+            .dark { display: block !important; }
+          `
+        }} />
       </head>
       <body className={`${inter.variable} antialiased bg-white`} suppressHydrationWarning>
         {/* Skip to main content for accessibility */}
         <a href="#main-content" className="skip-to-main">
           Skip to main content
         </a>
-        {/* Google Translate will be initialized by CountryLanguageDetectionModal */}
-        {/* Script to prevent translation of technical terms */}
-        <Script
-          id="prevent-bad-translations"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // Function to mark technical terms as non-translatable
-                function markTermsNonTranslatable() {
-                  // Common technical terms that should not be translated
-                  const terms = [
-                    'EU/EFTA', 'EU', 'EFTA', 'FMPA',
-                    'L Permit', 'B Permit', 'G Permit', 'C Permit', 'N Permit', 'CI Permit',
-                    'CHF', 'AuG', 'VZAE', 'SEM', 'StAG', 'KVG', 'OLN', 'DBG',
-                    'Switzerland', 'Swiss', 'Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne',
-                    'SR 142.20', 'SR 142.201', 'SR 141.0', 'Art.', 'Art'
-                  ];
-                  
-                  // Collect all text nodes first, then process them
-                  function collectTextNodes(node, textNodes) {
-                    if (node.nodeType === 3) { // Text node
-                      textNodes.push(node);
-                    } else if (node.nodeType === 1) { // Element node
-                      // Skip if already marked as notranslate
-                      if (node.classList && node.classList.contains('notranslate')) {
-                        return;
-                      }
-                      // Process children
-                      const children = Array.from(node.childNodes);
-                      children.forEach(child => collectTextNodes(child, textNodes));
-                    }
-                  }
-                  
-                  // Process a single text node
-                  function processTextNode(textNode) {
-                    const text = textNode.textContent;
-                    const parent = textNode.parentNode;
-                    
-                    if (!parent || !text || text.length === 0) return false;
-                    
-                    // Skip if parent is already notranslate
-                    if (parent.classList && parent.classList.contains('notranslate')) {
-                      return false;
-                    }
-                    
-                    // Check if any term exists in the text
-                    let foundTerm = null;
-                    for (const term of terms) {
-                      if (text.indexOf(term) !== -1) {
-                        foundTerm = term;
-                        break;
-                      }
-                    }
-                    
-                    if (!foundTerm) return false;
-                    
-                    // Create replacement fragment
-                    const parts = text.split(foundTerm);
-                    if (parts.length <= 1) return false;
-                    
-                    const fragment = document.createDocumentFragment();
-                    parts.forEach((part, index) => {
-                      if (part) {
-                        fragment.appendChild(document.createTextNode(part));
-                      }
-                      if (index < parts.length - 1) {
-                        const span = document.createElement('span');
-                        span.className = 'notranslate';
-                        span.setAttribute('translate', 'no');
-                        span.textContent = foundTerm;
-                        fragment.appendChild(span);
-                      }
-                    });
-                    
-                    // Replace the text node with the fragment
-                    try {
-                      parent.replaceChild(fragment, textNode);
-                      return true;
-                    } catch (e) {
-                      console.warn('Could not replace text node:', e);
-                      return false;
-                    }
-                  }
-                  
-                  // Main processing function
-                  function process() {
-                    const textNodes = [];
-                    collectTextNodes(document.body, textNodes);
-                    
-                    // Process text nodes (in reverse to avoid index issues)
-                    let processed = 0;
-                    for (let i = textNodes.length - 1; i >= 0; i--) {
-                      if (processTextNode(textNodes[i])) {
-                        processed++;
-                      }
-                    }
-                    
-                    return processed > 0;
-                  }
-                  
-                  // Run processing
-                  try {
-                    process();
-                  } catch (e) {
-                    console.warn('Error processing text nodes:', e);
-                  }
-                }
-                
-                // Debounce function to avoid too many calls
-                let timeoutId = null;
-                function debouncedMarkTerms() {
-                  if (timeoutId) {
-                    clearTimeout(timeoutId);
-                  }
-                  timeoutId = setTimeout(() => {
-                    markTermsNonTranslatable();
-                  }, 500);
-                }
-                
-                // Run on page load
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', () => {
-                    setTimeout(markTermsNonTranslatable, 2000);
-                  });
-                } else {
-                  setTimeout(markTermsNonTranslatable, 2000);
-                }
-                
-                // Also run after Google Translate translates (with debounce)
-                const observer = new MutationObserver(() => {
-                  debouncedMarkTerms();
-                });
-                
-                observer.observe(document.body, {
-                  childList: true,
-                  subtree: true,
-                  characterData: true
-                });
-              })();
-            `,
-          }}
-        />
         {/* Structured Data for SEO */}
         <Script
           id="structured-data"
@@ -345,6 +166,7 @@ export default function RootLayout({
           }}
         />
         <ClientErrorBoundary>
+          <InitialQuizGate />
           {children}
         </ClientErrorBoundary>
       </body>

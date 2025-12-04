@@ -98,11 +98,13 @@ export async function PUT(
 
     // Update profile fields
     if (Object.keys(updates).length > 1) { // More than just updated_at
-      const { error: updateError } = await supabase
+      const updateResult = await supabase
         .from('profiles')
         .update(updates)
         .eq('id', userId)
+        .execute()
 
+      const updateError = (updateResult as any).error
       if (updateError) {
         console.error('Profile update error:', updateError)
         return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
@@ -111,14 +113,16 @@ export async function PUT(
 
     // Update admin status separately if provided
     if (isAdmin !== undefined) {
-      const { error: adminError } = await supabase
+      const adminResult = await supabase
         .from('profiles')
         .update({
           is_admin: isAdmin,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
+        .execute()
 
+      const adminError = (adminResult as any).error
       if (adminError) {
         console.error('Admin status update error:', adminError)
         return NextResponse.json({ error: 'Failed to update admin status' }, { status: 500 })
@@ -127,14 +131,16 @@ export async function PUT(
 
     // Update full name separately if provided
     if (fullName !== undefined) {
-      const { error: nameError } = await supabase
+      const nameResult = await supabase
         .from('profiles')
         .update({
           full_name: fullName,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
+        .execute()
 
+      const nameError = (nameResult as any).error
       if (nameError) {
         console.error('Full name update error:', nameError)
         return NextResponse.json({ error: 'Failed to update full name' }, { status: 500 })

@@ -40,3 +40,19 @@ env.local.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SSH private keys (SECURITY - never commit these!)
+*.pem
+*_key
+*_key1
+*_key2
+sppppp.txt
+sippp.txt
+sip.txt
+sips.txt
+*.rsa
+*.ed25519
+
+# Deployment temporary files
+deploy-temp/
+deploy-temp-*/

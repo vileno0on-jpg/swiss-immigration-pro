@@ -47,13 +47,14 @@ export async function POST(req: NextRequest) {
       const hashedPassword = await bcrypt.hash(password, 10)
 
       // Update user password
-      const { error: userUpdateError } = await supabase
+      const userUpdateResult = await supabase
         .from('users')
         .update({
           password_hash: hashedPassword,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
+      const userUpdateError = (userUpdateResult as any).error
 
       if (userUpdateError) {
         console.error('User update error:', userUpdateError)
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Update profile to admin
-      const { error: profileUpdateError } = await supabase
+      const profileUpdateResult = await supabase
         .from('profiles')
         .update({
           is_admin: true,
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest) {
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
+      const profileUpdateError = (profileUpdateResult as any).error
 
       if (profileUpdateError) {
         console.error('Profile update error:', profileUpdateError)
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
       // Create new user
       const hashedPassword = await bcrypt.hash(password, 10)
 
-      const { data: newUser, error: userCreateError } = await supabase
+      const newUserResult = await supabase
         .from('users')
         .insert({
           email,
@@ -88,6 +90,9 @@ export async function POST(req: NextRequest) {
         .select('id')
         .single()
 
+      const newUser = (newUserResult as any).data
+      const userCreateError = (newUserResult as any).error
+
       if (userCreateError || !newUser) {
         console.error('User creation error:', userCreateError)
         return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
@@ -96,7 +101,7 @@ export async function POST(req: NextRequest) {
       userId = newUser.id
 
       // Create admin profile
-      const { error: profileCreateError } = await supabase
+      const profileCreateResult = await supabase
         .from('profiles')
         .insert({
           id: userId,
@@ -105,6 +110,7 @@ export async function POST(req: NextRequest) {
           pack_id: 'free',
           is_admin: true
         })
+      const profileCreateError = (profileCreateResult as any).error
 
       if (profileCreateError) {
         console.error('Profile creation error:', profileCreateError)
@@ -113,13 +119,14 @@ export async function POST(req: NextRequest) {
 
       // Create user limits
       const today = new Date().toISOString().split('T')[0]
-      const { error: limitsError } = await supabase
+      const limitsResult = await supabase
         .from('user_limits')
         .insert({
           user_id: userId,
           messages_today: 0,
           last_reset_date: today
         })
+      const limitsError = (limitsResult as any).error
 
       if (limitsError) {
         console.error('Limits creation error:', limitsError)
@@ -127,11 +134,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify
-    const { data: admin, error: verifyError } = await supabase
+    const verifyResult = await supabase
       .from('profiles')
       .select('id, email, full_name, is_admin, pack_id')
       .eq('id', userId)
       .single()
+    const admin = (verifyResult as any).data
+    const verifyError = (verifyResult as any).error
 
     if (verifyError || !admin) {
       console.error('Verification error:', verifyError)
@@ -157,4 +166,3 @@ export async function POST(req: NextRequest) {
     )
   }
 }
-

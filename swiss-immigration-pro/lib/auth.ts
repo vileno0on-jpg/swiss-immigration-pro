@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { createClient } from '@/lib/supabase/server'
+import { query } from './db'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
@@ -17,48 +17,67 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const supabase = await createClient()
+          // Find user by email
+          const userResult = await query(
+            'SELECT id, email, password_hash FROM public.users WHERE email = $1',
+            [credentials.email]
+          )
 
-          // For now, we'll use a custom users table in Supabase
-          // This maintains compatibility with existing auth flow
-          const { data: users, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', credentials.email)
-            .single()
-
-          if (error || !users) {
+          if (userResult.rows.length === 0) {
             return null
           }
 
-          // Verify password
-          const isValid = await bcrypt.compare(credentials.password, users.password_hash)
+          const user = userResult.rows[0]
 
+          // Get profile data
+          const profileResult = await query(
+            'SELECT id, email, full_name, pack_id, is_admin FROM public.profiles WHERE id = $1',
+            [user.id]
+          )
+
+          const profile = profileResult.rows[0] || {
+            id: user.id,
+            email: user.email,
+            full_name: null,
+            pack_id: 'free',
+            is_admin: false
+          }
+
+          // Verify password
+          // PostgreSQL crypt format: crypt(plaintext, existing_hash) returns the hash if match
+          // bcrypt format: use bcrypt.compare()
+          const passwordHash = user.password_hash
+          
+          let isValid = false
+          
+          // Try PostgreSQL crypt format first (since schema uses crypt)
+          try {
+            const cryptResult = await query(
+              'SELECT crypt($1, $2) = $2 as valid',
+              [credentials.password, passwordHash]
+            )
+            isValid = cryptResult.rows[0]?.valid === true
+          } catch (cryptError) {
+            // If crypt fails, try bcrypt
+            try {
+              isValid = await bcrypt.compare(credentials.password, passwordHash)
+            } catch (bcryptError) {
+              console.error('Password verification error:', { cryptError, bcryptError })
+              return null
+            }
+          }
+          
           if (!isValid) {
             return null
           }
 
-          // Get user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', users.id)
-            .single()
-
-          console.log('Auth successful for user:', users.email)
-          console.log('Profile data:', profile)
-          console.log('isAdmin value:', profile?.is_admin)
-
-          const userData = {
-            id: users.id,
-            email: users.email,
-            name: profile?.full_name || null,
-            isAdmin: profile?.is_admin || false,
-            packId: profile?.pack_id || 'free',
+          return {
+            id: user.id,
+            email: user.email,
+            name: profile.full_name || user.email,
+            packId: profile.pack_id || 'free',
+            isAdmin: profile.is_admin || false
           }
-
-          console.log('Returning user data:', userData)
-          return userData
         } catch (error) {
           console.error('Auth error:', error)
           return null
@@ -68,39 +87,30 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/auth/login',
-    signOut: '/auth/login',
-    error: '/auth/login',
+    error: '/auth/login'
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log('JWT callback - user:', user)
-      console.log('JWT callback - token before:', token)
       if (user) {
         token.id = user.id
-        token.isAdmin = user.isAdmin
-        token.packId = user.packId
-        console.log('JWT callback - setting isAdmin:', user.isAdmin)
+        token.packId = (user as any).packId
+        token.isAdmin = (user as any).isAdmin
       }
-      console.log('JWT callback - token after:', token)
       return token
     },
     async session({ session, token }) {
-      console.log('Session callback - token:', token)
-      console.log('Session callback - session before:', session)
       if (session.user) {
         session.user.id = token.id as string
-        session.user.isAdmin = token.isAdmin as boolean
-        session.user.packId = token.packId as string
-        console.log('Session callback - setting isAdmin:', token.isAdmin)
+        ;(session.user as any).packId = token.packId
+        ;(session.user as any).isAdmin = token.isAdmin
       }
-      console.log('Session callback - session after:', session)
       return session
     }
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60 // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key-change-in-production'
 }
 

@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       .neq('pack_id', 'free')
 
     const userPackMap: { [key: string]: string } = {}
-    userPacks?.forEach(profile => {
+    userPacks?.forEach((profile: any) => {
       userPackMap[profile.id] = profile.pack_id
     })
 

@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create profile
-    const { error: profileError } = await supabase
+    const profileResult = await supabase
       .from('profiles')
       .insert({
         id: user.id,
@@ -67,20 +67,24 @@ export async function POST(req: NextRequest) {
         full_name: fullName || null,
         pack_id: 'free'
       })
+      .execute()
 
+    const profileError = (profileResult as any).error
     if (profileError) {
       console.error('Profile creation error:', profileError)
     }
 
     // Create user limits
-    const { error: limitsError } = await supabase
+    const limitsResult = await supabase
       .from('user_limits')
       .insert({
         user_id: user.id,
         messages_today: 0,
         last_reset_date: new Date().toISOString().split('T')[0]
       })
+      .execute()
 
+    const limitsError = (limitsResult as any).error
     if (limitsError) {
       console.error('Limits creation error:', limitsError)
     }

@@ -144,6 +144,21 @@ export default function CountryLanguageDetectionModal({
     detectUserPreferences()
   }, [isOpen])
 
+  // Handle escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        localStorage.setItem('detectionSkipped', 'true')
+      }
+    }
+    
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose])
+
   // Lock body scroll while modal is open and reset scroll position
   useEffect(() => {
     if (!isOpen) return
@@ -177,6 +192,7 @@ export default function CountryLanguageDetectionModal({
 
     // Determine layer from country
     const layer = classifyLayer(selectedData.country)
+    const layerRoute = getLayerRoute(layer)
 
     // Save preferences
     localStorage.setItem('userCountry', selectedData.country)
@@ -185,6 +201,8 @@ export default function CountryLanguageDetectionModal({
     localStorage.setItem('userCurrency', selectedData.currency)
     localStorage.setItem('userLayer', layer)
     localStorage.setItem('detectionCompleted', 'true')
+    // Save redirect destination in case page reloads
+    localStorage.setItem('pendingLayerRedirect', layerRoute)
 
     // Set cookies
     const oneYear = 60 * 60 * 24 * 365
@@ -192,14 +210,6 @@ export default function CountryLanguageDetectionModal({
     document.cookie = `userLanguage=${selectedData.language}; path=/; max-age=${oneYear}`
     document.cookie = `userCurrency=${selectedData.currency}; path=/; max-age=${oneYear}`
     document.cookie = `userLayer=${layer}; path=/; max-age=${oneYear}`
-
-    // Apply translation
-    await applyTranslation(selectedData.language)
-
-    // Update HTML lang attribute
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = selectedData.language
-    }
 
     // Call completion handler
     onComplete({
@@ -212,12 +222,17 @@ export default function CountryLanguageDetectionModal({
 
     setHasApplied(true)
 
-    // Redirect to layer route after a short delay
-    setTimeout(() => {
-      router.push(getLayerRoute(layer))
-      setIsApplying(false)
-      onClose()
-    }, 1500)
+    // Redirect to layer route immediately (before translation to avoid reload issues)
+    onClose()
+    router.push(layerRoute)
+    
+    // Apply translation after redirect starts (non-blocking)
+    applyTranslation(selectedData.language).catch(console.error)
+
+    // Update HTML lang attribute
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = selectedData.language
+    }
   }, [selectedData, router, onComplete, onClose])
 
   const applyTranslation = async (languageCode: string) => {
@@ -306,23 +321,28 @@ export default function CountryLanguageDetectionModal({
       // Wait a bit for Google Translate to initialize
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Trigger translation
-        const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
-        if (select) {
-          select.value = targetLang
+      // Trigger translation (avoid reload if redirect is pending)
+      const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
+      if (select) {
+        select.value = targetLang
         select.dispatchEvent(new Event('change', { bubbles: true }))
-      } else {
+      } else if (!pendingRedirect) {
+        // Only reload if no redirect is pending (avoid interrupting navigation)
         // If select not found, reload page to apply translation
         window.location.reload()
       }
     } catch (error) {
       console.error('Error applying translation:', error)
-      // Fallback: set cookie and reload
+      // Fallback: set cookie and reload (only if no redirect pending)
+      const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
       const targetLang = languageCode === 'en' ? 'en' : languageCode
       document.cookie = `googtrans=/en/${targetLang}; path=/; max-age=31536000; SameSite=Lax`
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      if (!pendingRedirect) {
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
+      }
     }
   }
 
@@ -353,7 +373,8 @@ export default function CountryLanguageDetectionModal({
             justifyContent: 'center',
             zIndex: 9999,
             padding: '1rem',
-            paddingTop: '2rem'
+            paddingTop: '2rem',
+            pointerEvents: 'auto'
           }}
           onClick={handleSkip}
         >
@@ -368,8 +389,11 @@ export default function CountryLanguageDetectionModal({
               top: 0,
               left: 0,
               right: 0,
-              bottom: 0
+              bottom: 0,
+              pointerEvents: 'auto',
+              cursor: 'pointer'
             }}
+            onClick={handleSkip}
           />
           {/* Modal Content */}
           <motion.div

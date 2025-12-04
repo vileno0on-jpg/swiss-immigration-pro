@@ -47,19 +47,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, [isHomePage])
 
-  // Don't render anything until mounted to prevent flash
-  if (!mounted) {
-    return (
-      <div className="flex min-h-screen flex-col bg-white">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Removed loading screen - render content immediately
 
   return (
     <SessionProvider>

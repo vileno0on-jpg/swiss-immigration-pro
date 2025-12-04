@@ -15,20 +15,27 @@ export async function GET() {
 
     // Get basic stats that work with current Supabase setup
     const [
-      { count: totalUsers },
-      { count: totalMessages },
-      { count: totalPayments }
+      usersResult,
+      messagesResult,
+      paymentsResult
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
       supabase.from('chat_messages').select('*', { count: 'exact', head: true }),
       supabase.from('payments').select('*', { count: 'exact', head: true })
     ])
 
+    // Handle both Supabase and local DB responses
+    const totalUsers = (usersResult as any).count || 0
+    const totalMessages = (messagesResult as any).count || 0
+    const totalPayments = (paymentsResult as any).count || 0
+
     // Revenue by pack (simplified)
-    const { data: paymentsData } = await supabase
+    const paymentsQueryResult = await supabase
       .from('payments')
       .select('pack_id, amount, status')
       .eq('status', 'succeeded')
+    
+    const paymentsData = (paymentsQueryResult as any).data || []
 
     const revenueByPack = paymentsData ? paymentsData.reduce((acc: any, payment: any) => {
       const packId = payment.pack_id
@@ -40,10 +47,63 @@ export async function GET() {
       return acc
     }, {}) : {}
 
+    // Add revenueByMonth
+    const revenueByMonth = paymentsData.reduce((acc: any, payment: any) => {
+      if (payment.created_at) {
+        const month = new Date(payment.created_at).toISOString().slice(0, 7)
+        acc[month] = (acc[month] || 0) + (payment.amount / 100)
+      }
+      return acc
+    }, {})
+
+    // Add userGrowth: new users per month
+    const usersQueryResult = await supabase
+      .from('profiles')
+      .select('created_at')
+
+    const usersData = (usersQueryResult as any).data || []
+
+    const userGrowth = usersData.reduce((acc: any, user: any) => {
+      if (user.created_at) {
+        const month = new Date(user.created_at).toISOString().slice(0, 7)
+        acc[month] = (acc[month] || 0) + 1
+      }
+      return acc
+    }, {})
+
+    // Add dailyActiveUsers: unique users with messages per day
+    const messagesQueryResult = await supabase
+      .from('chat_messages')
+      .select('user_id, created_at')
+
+    const messagesData = (messagesQueryResult as any).data || []
+
+    const dailyActive = messagesData.reduce((acc: any, msg: any) => {
+      if (msg.created_at) {
+        const day = new Date(msg.created_at).toISOString().slice(0, 10)
+        acc[day] = acc[day] || new Set()
+        acc[day].add(msg.user_id)
+      }
+      return acc
+    }, {})
+
+    // Add topUsers: users with most messages
+    const messageCounts = messagesData.reduce((acc: any, msg: any) => {
+      acc[msg.user_id] = (acc[msg.user_id] || 0) + 1
+      return acc
+    }, {})
+
+    const topUsersList = Object.entries(messageCounts)
+      .map(([userId, count]) => ({ userId, messageCount: count as number }))
+      .sort((a, b) => b.messageCount - a.messageCount)
+      .slice(0, 10)
+
     // Module completion stats (simplified)
-    const { data: progressData } = await supabase
+    const progressResult = await supabase
       .from('masterclass_progress')
       .select('module_id, progress_percent')
+    
+    const progressData = (progressResult as any).data || []
 
     const moduleStats = progressData ? progressData.reduce((acc: any, progress: any) => {
       const moduleId = progress.module_id
@@ -78,11 +138,19 @@ export async function GET() {
         completedUsers: stats.completed_users,
         avgProgress: stats.total_users > 0 ? stats.total_progress / stats.total_users : 0,
       })),
-      // Placeholder data for complex queries that need RPC functions
-      revenueByMonth: [],
-      userGrowth: [],
-      dailyActiveUsers: [],
-      topUsers: []
+      revenueByMonth: Object.entries(revenueByMonth).map(([month, revenue]) => ({
+        month,
+        revenue: revenue as number
+      })).sort((a, b) => a.month.localeCompare(b.month)),
+      userGrowth: Object.entries(userGrowth).map(([month, count]) => ({
+        month,
+        count: count as number
+      })).sort((a, b) => a.month.localeCompare(b.month)),
+      dailyActiveUsers: Object.entries(dailyActive).map(([day, userSet]) => ({
+        day,
+        activeUsers: (userSet as Set<string>).size
+      })).sort((a, b) => a.day.localeCompare(b.day)),
+      topUsers: topUsersList
     }
 
     return NextResponse.json(analytics)
@@ -94,4 +162,3 @@ export async function GET() {
     )
   }
 }
-
