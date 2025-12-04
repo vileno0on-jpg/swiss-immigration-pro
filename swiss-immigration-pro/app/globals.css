@@ -14,6 +14,8 @@
     /* Force light mode - no dark mode */
     color-scheme: light !important;
     background-color: white !important;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
   }
 
   html.dark {
@@ -30,6 +32,36 @@
     /* Force light mode - white background */
     background-color: white !important;
     color: #111827 !important;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Better touch handling */
+    touch-action: manipulation;
+  }
+
+  /* Better mobile typography */
+  @media (max-width: 640px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
+  /* Optimize tap targets for mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Smooth image loading */
+  img {
+    transition: opacity 0.3s ease;
+  }
+
+  img[loading] {
+    opacity: 0;
+  }
+
+  img:not([loading]) {
+    opacity: 1;
   }
 }
 
