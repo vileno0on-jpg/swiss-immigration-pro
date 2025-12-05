@@ -76,7 +76,7 @@ export default function RootLayout({
       <head>
         {/* Simple dark mode prevention - CSS only */}
         <style dangerouslySetInnerHTML={{
-          __html: `
+            __html: `
             :root { color-scheme: light; }
             html, body { background-color: #ffffff !important; color: #111827 !important; }
             html.dark { color-scheme: light; }
@@ -92,6 +92,7 @@ export default function RootLayout({
         {/* Structured Data for SEO */}
         <Script
           id="structured-data"
+          strategy="afterInteractive"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -145,6 +146,7 @@ export default function RootLayout({
         />
         <Script
           id="organization-schema"
+          strategy="afterInteractive"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({

@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { SessionProvider } from './SessionProvider'
 import { InitialQuizGate } from '@/components/quiz/InitialQuizGate'
 import { TranslationLoader } from '@/components/TranslationLoader'
-import Header from '@/components/layout/Header'
 import Breadcrumbs from '@/components/layout/Breadcrumbs'
 import ScrollToTop from '@/components/layout/ScrollToTop'
 import { ToastProvider } from '@/components/providers/ToastProvider'
@@ -23,42 +22,18 @@ const FloatingChatWidget = dynamic(
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-  
-  // Hide header on home page - check for exact root path
-  // Normalize pathname by removing trailing slash and checking for root
-  const isHomePage = React.useMemo(() => {
-    if (!pathname) return true // Assume home if no pathname yet
-    const normalized = pathname.replace(/\/$/, '').split('?')[0] // Remove trailing slash and query params
-    return normalized === '' || normalized === '/'
-  }, [pathname])
 
   useEffect(() => {
     setMounted(true)
-    
-    // Add class to body based on route for CSS fallback
-    if (isHomePage) {
-      document.body.classList.add('home-page')
-    } else {
-      document.body.classList.remove('home-page')
-    }
-    
-    return () => {
-      document.body.classList.remove('home-page')
-    }
-  }, [isHomePage])
-
-  // Removed loading screen - render content immediately
+  }, [])
 
   return (
     <SessionProvider>
       <ToastProvider>
         <TranslationLoader />
         <InitialQuizGate />
-        {!isHomePage && pathname ? (
-          <>
-            <Header />
-            <Breadcrumbs />
-          </>
+        {pathname && pathname !== '/' && !pathname.startsWith('/eu') && !pathname.startsWith('/us') && !pathname.startsWith('/other') ? (
+          <Breadcrumbs />
         ) : null}
         <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
           {children}

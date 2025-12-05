@@ -1,21 +1,37 @@
 'use client'
 
-import { use, useEffect, useState, useMemo, useCallback } from 'react'
-import { useParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle, Clock, TrendingUp, FileText, MapPin, Calendar, Award, MessageCircle, Globe, Shield, Badge, FileCheck, Home, Briefcase, Plane, Building, CreditCard, UserCheck } from 'lucide-react'
-import Link from 'next/link'
-import { classifyLayer, getLayerTagline, getLayerDescription, type LayerType } from '@/lib/layerLogic'
-import { LAYER_CONTENT } from '@/lib/layerContent'
-import type { LiveStat } from '@/types'
-import { NoTranslate } from '@/components/NoTranslate'
+import { useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 
 export default function LayerPage() {
   const params = useParams()
+  const router = useRouter()
   const layerParam = params?.layer as string
-  const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
-    ? layerParam 
-    : 'others') as LayerType
+  
+  // Redirect old layer routes to new static routes
+  useEffect(() => {
+    const routeMap: Record<string, string> = {
+      'europeans': '/eu',
+      'americans': '/us',
+      'others': '/other'
+    }
+    
+    if (layerParam && routeMap[layerParam]) {
+      router.replace(routeMap[layerParam])
+    } else {
+      router.replace('/other') // Default fallback
+    }
+  }, [layerParam, router])
+  
+  // Show loading state while redirecting
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecting...</p>
+      </div>
+    </div>
+  )
   
   // Memoize content to avoid recalculation
   const content = useMemo(() => LAYER_CONTENT[layer], [layer])

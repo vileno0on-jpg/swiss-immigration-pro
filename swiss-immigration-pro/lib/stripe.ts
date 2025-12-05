@@ -23,7 +23,7 @@ export const PRICING_PACKS = {
   immigration: {
     id: 'immigration',
     name: 'Immigration Pack',
-    price: 19,
+    price: 9,
     priceId: null, // Will be set with actual Stripe Price ID
     features: [
       'Unlimited AI chatbot access',
@@ -39,7 +39,7 @@ export const PRICING_PACKS = {
   advanced: {
     id: 'advanced',
     name: 'Advanced Pack',
-    price: 49,
+    price: 29,
     priceId: null,
     features: [
       'Everything in Immigration Pack',
@@ -57,7 +57,7 @@ export const PRICING_PACKS = {
   citizenship: {
     id: 'citizenship',
     name: 'Citizenship Pro Pack',
-    price: 149,
+    price: 79,
     priceId: null,
     features: [
       'Everything in Advanced Pack',

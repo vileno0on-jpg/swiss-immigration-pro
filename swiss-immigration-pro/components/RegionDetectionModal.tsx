@@ -39,9 +39,10 @@ export default function RegionDetectionModal({ isOpen, onClose }: RegionDetectio
   useEffect(() => {
     if (isOpen) {
       const completed = localStorage.getItem('quizCompleted')
-      const layer = localStorage.getItem('userLayer')
+      const layer = localStorage.getItem('userLayer') as LayerType
       if (completed === 'true' && layer) {
-        router.push(`/${layer}`)
+        const layerRoute = layer === 'europeans' ? '/eu' : layer === 'americans' ? '/us' : '/other'
+        router.push(layerRoute)
         return
       }
     }
@@ -83,9 +84,10 @@ export default function RegionDetectionModal({ isOpen, onClose }: RegionDetectio
         localStorage.setItem('quizCompleted', 'true')
         localStorage.setItem('regionAnswers', JSON.stringify(newAnswers))
 
-        // Redirect after a short delay
+        // Redirect after a short delay (map to static routes)
+        const layerRoute = layer === 'europeans' ? '/eu' : layer === 'americans' ? '/us' : '/other'
         setTimeout(() => {
-          router.push(`/${layer}`)
+          router.push(layerRoute)
         }, 1500)
       }
     }, 500)

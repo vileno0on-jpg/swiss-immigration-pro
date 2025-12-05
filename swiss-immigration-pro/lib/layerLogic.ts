@@ -88,9 +88,19 @@ export function classifyLayer(countryCode: string): LayerType {
 
 /**
  * Gets the layer-specific route path
+ * Maps layer types to static routes (eu, us, other)
  */
 export function getLayerRoute(layer: LayerType): string {
-  return `/${layer}`
+  switch (layer) {
+    case 'europeans':
+      return '/eu'
+    case 'americans':
+      return '/us'
+    case 'others':
+      return '/other'
+    default:
+      return '/other'
+  }
 }
 
 /**

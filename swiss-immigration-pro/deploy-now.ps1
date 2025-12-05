@@ -130,3 +130,4 @@ try {
     Write-Host "2. Copy deploy-remote.sh to server" -ForegroundColor White
     Write-Host "3. Run: bash deploy-remote.sh" -ForegroundColor White
 }
+ 

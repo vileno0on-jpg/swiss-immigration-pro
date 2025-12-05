@@ -55,8 +55,9 @@ export default function QuizPage() {
       localStorage.setItem('userLayer', layer)
       localStorage.setItem('quizCompleted', 'true')
       localStorage.setItem('quizAnswers', JSON.stringify(answers))
-      // Redirect to layer page
-      router.push(`/${layer}`)
+      // Redirect to layer page (map to static routes)
+      const layerRoute = layer === 'europeans' ? '/eu' : layer === 'americans' ? '/us' : '/other'
+      router.push(layerRoute)
     }
   }
 
