@@ -9,6 +9,36 @@ import {
   freeModule02Enhanced, 
   freeModule03Enhanced 
 } from './enhanced-modules/free-modules'
+import { 
+  imm01Enhanced,
+  imm02Enhanced
+} from './enhanced-modules/non-free-enhanced-modules'
+// Import all individual enhanced module files
+import { imm01Enhanced as imm01EnhancedNew } from './enhanced-modules/imm-01-enhanced'
+import { imm02Enhanced as imm02EnhancedNew } from './enhanced-modules/imm-02-enhanced'
+import { imm03Enhanced } from './enhanced-modules/imm-03-enhanced'
+import { imm04Enhanced } from './enhanced-modules/imm-04-enhanced'
+import { imm05Enhanced } from './enhanced-modules/imm-05-enhanced'
+import { adv01Enhanced } from './enhanced-modules/adv-01-enhanced'
+import { adv02Enhanced } from './enhanced-modules/adv-02-enhanced'
+import { adv03Enhanced } from './enhanced-modules/adv-03-enhanced'
+import { adv04Enhanced } from './enhanced-modules/adv-04-enhanced'
+import { adv05Enhanced } from './enhanced-modules/adv-05-enhanced'
+import { adv06Enhanced } from './enhanced-modules/adv-06-enhanced'
+import { adv07Enhanced } from './enhanced-modules/adv-07-enhanced'
+import { adv08Enhanced } from './enhanced-modules/adv-08-enhanced'
+import { adv09Enhanced } from './enhanced-modules/adv-09-enhanced'
+import { adv10Enhanced } from './enhanced-modules/adv-10-enhanced'
+import { cit01Enhanced } from './enhanced-modules/cit-01-enhanced'
+import { cit02Enhanced } from './enhanced-modules/cit-02-enhanced'
+import { cit03Enhanced } from './enhanced-modules/cit-03-enhanced'
+import { cit04Enhanced } from './enhanced-modules/cit-04-enhanced'
+import { cit05Enhanced } from './enhanced-modules/cit-05-enhanced'
+import { cit06Enhanced } from './enhanced-modules/cit-06-enhanced'
+import { cit07Enhanced } from './enhanced-modules/cit-07-enhanced'
+import { cit08Enhanced } from './enhanced-modules/cit-08-enhanced'
+import { cit09Enhanced } from './enhanced-modules/cit-09-enhanced'
+import { cit10Enhanced } from './enhanced-modules/cit-10-enhanced'
 
 export interface PackContent {
   packId: string
@@ -393,6 +423,7 @@ Most applicants waste 6-12 months on rejected applications. Don't be one of them
         type: 'guide',
         duration: '45 min read',
         order: 1,
+        enhancedModule: imm01Enhanced,
         content: `# Understanding Swiss Visa Types: Complete 2025 Guide
 
 ## Overview: The Swiss Permit System
@@ -1109,11 +1140,12 @@ Based on [Swiss Federal Statistical Office data](https://www.swissinfo.ch/eng/wo
       },
       {
         id: 'imm-02',
-        title: 'Work Permit Application Checklist',
-        description: 'Step-by-step checklist for your permit application',
-        type: 'checklist',
-        duration: '15 min',
+        title: imm02EnhancedNew.title,
+        description: imm02EnhancedNew.description,
+        type: 'interactive',
+        duration: imm02EnhancedNew.estimatedReadTime,
         order: 2,
+        enhancedModule: imm02EnhancedNew,
         content: `# Work Permit Application Checklist
 
 ## Pre-Application Requirements
@@ -1208,304 +1240,32 @@ Use this checklist to track your progress:
       },
       {
         id: 'imm-03',
-        title: 'Swiss CV Template - Complete Guide',
-        description: 'Master the Swiss CV format with 20+ templates',
-        type: 'template',
-        duration: '30 min',
+        title: imm03Enhanced.title,
+        description: imm03Enhanced.description,
+        type: 'interactive',
+        duration: imm03Enhanced.estimatedReadTime,
         order: 3,
-        content: `# Swiss CV Template - Complete Guide
-
-## Swiss CV Format Essentials
-
-The Swiss CV format is different from other countries. Here's what you need to know:
-
-### Key Differences:
-1. **Photo required** (professional headshot)
-2. **Personal details** at top (age, nationality, marital status)
-3. **Chronological format** preferred
-4. **Length**: 1-2 pages maximum
-5. **Language**: Match job posting language
-6. **No cover letter attached** (sent separately)
-
-## Interactive CV Builder Sections
-
-### 1. Personal Information
-- Full name
-- Address in Switzerland (if available)
-- Phone number
-- Email address
-- Date of birth
-- Nationality
-- Marital status (optional)
-- Professional photo
-
-### 2. Professional Summary
-- 2-3 sentences highlighting your key strengths
-- Tailored to the specific job
-- Quantifiable achievements
-
-### 3. Work Experience
-- Company name and location
-- Job title
-- Dates (month/year format)
-- Key responsibilities (bullet points)
-- Achievements with metrics
-
-### 4. Education
-- University/school name
-- Degree/certificate
-- Dates
-- Relevant coursework (if recent graduate)
-
-### 5. Skills
-- Language skills (with proficiency levels)
-- Technical skills
-- Soft skills
-
-### 6. Additional Sections
-- Certifications
-- Publications
-- Projects
-- Volunteer work
-
-## Practice Exercise: Build Your CV
-
-### Step 1: Gather Information
-- [ ] List all work experience
-- [ ] Compile education history
-- [ ] Identify key skills
-- [ ] Prepare professional photo
-
-### Step 2: Choose Template
-- [ ] Tech/IT roles → Modern template
-- [ ] Finance → Traditional template
-- [ ] Creative → Enhanced template
-- [ ] Medical → Professional template
-
-### Step 3: Customize
-- [ ] Match job description keywords
-- [ ] Quantify achievements
-- [ ] Use action verbs
-- [ ] Proofread carefully
-
-## Common Mistakes
-
-❌ **Too long** - Keep it concise
-❌ **No photo** - Required in Switzerland
-❌ **Wrong language** - Match job posting
-❌ **Generic content** - Tailor to each job
-❌ **Typos** - Proofread multiple times
-
-## Templates Available
-
-We provide 20+ templates for different industries:
-- Tech & IT (5 templates)
-- Finance & Banking (4 templates)
-- Medicine & Healthcare (3 templates)
-- Engineering (3 templates)
-- Consulting (2 templates)
-- Legal (1 template)
-- Marketing & Sales (2 templates)`,
-        quiz: {
-          questions: [
-            {
-              question: 'Is a photo required on a Swiss CV?',
-              options: ['No', 'Yes, professional headshot', 'Optional', 'Only for certain jobs'],
-              correct: 1
-            },
-            {
-              question: 'What is the maximum recommended length for a Swiss CV?',
-              options: ['1 page', '1-2 pages', '3 pages', 'No limit'],
-              correct: 1
-            },
-            {
-              question: 'Should you include marital status?',
-              options: ['Always', 'Never', 'Optional', 'Only if married'],
-              correct: 2
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'CV Builder Tool',
-            description: 'Use our interactive CV builder to create your Swiss CV'
-          },
-          {
-            title: 'Template Selector',
-            description: 'Choose the best template for your industry'
-          },
-          {
-            title: 'ATS Optimization',
-            description: 'Learn how to optimize your CV for ATS systems'
-          }
-        ],
-        attachments: ['/templates/cv-tech.pdf', '/templates/cv-finance.pdf'],
+        enhancedModule: imm03Enhanced,
         completed: false
       },
       {
         id: 'imm-04',
-        title: 'Salary Benchmarks by Industry',
-        description: 'Know your worth in the Swiss job market',
-        type: 'guide',
-        duration: '25 min read',
+        title: imm04Enhanced.title,
+        description: imm04Enhanced.description,
+        type: 'interactive',
+        duration: imm04Enhanced.estimatedReadTime,
         order: 4,
-        content: `# Salary Benchmarks by Industry
-
-## Understanding Swiss Salaries
-
-Swiss salaries are among the highest in the world, but they vary significantly by:
-- Industry
-- Experience level
-- Location (canton)
-- Company size
-- Language skills
-
-## Interactive Salary Calculator
-
-Use our calculator to estimate your expected salary based on:
-- Your profession
-- Years of experience
-- Canton of employment
-- Language proficiency
-
-## Industry Benchmarks
-
-### Technology & IT
-- **Software Engineer**: CHF 85,000 - 140,000
-- **Data Scientist**: CHF 95,000 - 150,000
-- **DevOps Engineer**: CHF 90,000 - 145,000
-- **Product Manager**: CHF 100,000 - 160,000
-
-### Finance & Banking
-- **Financial Analyst**: CHF 80,000 - 120,000
-- **Investment Banker**: CHF 120,000 - 200,000+
-- **Auditor**: CHF 75,000 - 110,000
-- **Risk Manager**: CHF 95,000 - 150,000
-
-### Medicine & Healthcare
-- **Medical Doctor**: CHF 120,000 - 200,000+
-- **Registered Nurse**: CHF 65,000 - 90,000
-- **Physiotherapist**: CHF 70,000 - 95,000
-- **Dentist**: CHF 100,000 - 180,000
-
-## Salary Negotiation Tips
-
-1. **Research first** - Know your market value
-2. **Consider total package** - Benefits, bonuses, insurance
-3. **Timing matters** - Best after initial offer
-4. **Be professional** - Frame as value-add
-5. **Know your minimum** - Set walk-away point
-
-## Practice Exercise
-
-**Exercise**: Create your salary negotiation strategy
-1. Research your position's salary range
-2. Identify your unique value propositions
-3. Prepare your negotiation script
-4. Practice with a friend`,
-        quiz: {
-          questions: [
-            {
-              question: 'What is the typical salary range for a Software Engineer in Switzerland?',
-              options: ['CHF 50,000-80,000', 'CHF 85,000-140,000', 'CHF 150,000-200,000', 'CHF 200,000+'],
-              correct: 1
-            },
-            {
-              question: 'What factor does NOT typically affect salary in Switzerland?',
-              options: ['Industry', 'Canton', 'Hair color', 'Experience level'],
-              correct: 2
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Salary Calculator',
-            description: 'Calculate your expected salary based on your profile'
-          },
-          {
-            title: 'Negotiation Practice',
-            description: 'Practice your salary negotiation skills'
-          }
-        ],
+        enhancedModule: imm04Enhanced,
         completed: false
       },
       {
         id: 'imm-05',
-        title: 'Embassy Submission Guide',
-        description: 'Submit documents correctly on the first try',
-        type: 'guide',
-        duration: '20 min read',
+        title: imm05Enhanced.title,
+        description: imm05Enhanced.description,
+        type: 'interactive',
+        duration: imm05Enhanced.estimatedReadTime,
         order: 5,
-        content: `# Embassy Submission Guide
-
-## Before You Go
-
-### Prepare Documents
-- [ ] All original documents
-- [ ] Certified copies (if required)
-- [ ] Passport photos (check requirements)
-- [ ] Application forms (filled correctly)
-- [ ] Payment method (cash/card)
-
-### Check Requirements
-- [ ] Embassy opening hours
-- [ ] Appointment required? (usually yes)
-- [ ] Payment methods accepted
-- [ ] Document checklist
-- [ ] Processing time
-
-## Interactive Submission Planner
-
-### Step 1: Document Preparation
-- [ ] Verify all documents are current
-- [ ] Get certified translations
-- [ ] Make copies of everything
-- [ ] Organize in order specified
-
-### Step 2: Appointment Booking
-- [ ] Book online appointment
-- [ ] Note appointment date/time
-- [ ] Set reminders
-- [ ] Prepare for interview (if required)
-
-### Step 3: Embassy Visit
-- [ ] Arrive 15 minutes early
-- [ ] Bring all documents
-- [ ] Bring payment method
-- [ ] Dress professionally
-- [ ] Be polite and patient
-
-## Common Mistakes
-
-❌ **Missing documents** - Double-check checklist
-❌ **Wrong format** - Follow embassy guidelines
-❌ **Late arrival** - May need to reschedule
-❌ **Incorrect payment** - Check accepted methods
-❌ **Unprofessional appearance** - First impressions matter
-
-## Practice Exercise
-
-Create your embassy submission checklist based on your specific situation.`,
-        quiz: {
-          questions: [
-            {
-              question: 'Should you arrive early for your embassy appointment?',
-              options: ['No', 'Yes, 15 minutes early', 'On time is fine', 'Does not matter'],
-              correct: 1
-            },
-            {
-              question: 'Do you need to book an appointment?',
-              options: ['Never', 'Usually yes', 'Never required', 'Only for certain countries'],
-              correct: 1
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Document Checklist Builder',
-            description: 'Create your personalized embassy submission checklist'
-          }
-        ],
+        enhancedModule: imm05Enhanced,
         completed: false
       }
     ],
@@ -1526,24 +1286,33 @@ Create your embassy submission checklist based on your specific situation.`,
     packName: 'Advanced Pack',
     modules: [
       {
-        ...ADVANCED_MODULE_CONTENT['adv-01'],
-        content: ADVANCED_MODULE_CONTENT['adv-01'].content,
-        attachments: ADVANCED_MODULE_CONTENT['adv-01'].attachments
+        id: 'adv-01',
+        title: adv01Enhanced.title,
+        description: adv01Enhanced.description,
+        type: 'interactive',
+        duration: adv01Enhanced.estimatedReadTime,
+        order: 1,
+        enhancedModule: adv01Enhanced,
+        completed: false
       },
-      // Temporarily disabled adv-02 due to syntax errors
-      // {
-      //   ...ADVANCED_MODULE_CONTENT['adv-02'],
-      //   content: ADVANCED_MODULE_CONTENT['adv-02'].content,
-      //   attachments: ADVANCED_MODULE_CONTENT['adv-02'].attachments
-      // },
+      {
+        id: 'adv-02',
+        title: adv02Enhanced.title,
+        description: adv02Enhanced.description,
+        type: 'interactive',
+        duration: adv02Enhanced.estimatedReadTime,
+        order: 2,
+        enhancedModule: adv02Enhanced,
+        completed: false
+      },
       {
         id: 'adv-03',
-        title: 'Cantonal Immigration Variations Deep Dive',
-        description: 'Maximize your chances by choosing the right canton',
-        type: 'guide',
-        duration: '50 min read',
+        title: adv03Enhanced.title,
+        description: adv03Enhanced.description,
+        type: 'interactive',
+        duration: adv03Enhanced.estimatedReadTime,
         order: 3,
-        content: ADV_MODULES_3_TO_9['adv-03'],
+        enhancedModule: adv03Enhanced,
         quiz: {
           questions: [
             {
@@ -1573,246 +1342,73 @@ Create your embassy submission checklist based on your specific situation.`,
       },
       {
         id: 'adv-04',
-        title: 'Tax & Financial Planning in Switzerland',
-        description: 'Optimize your taxes and build wealth',
-        type: 'guide',
-        duration: '45 min read',
+        title: adv04Enhanced.title,
+        description: adv04Enhanced.description,
+        type: 'interactive',
+        duration: adv04Enhanced.estimatedReadTime,
         order: 4,
-        content: ADV_MODULES_3_TO_9['adv-04'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the maximum annual contribution to Pillar 3a in 2025?',
-              options: ['CHF 5,000', 'CHF 7,056', 'CHF 10,000', 'No limit'],
-              correct: 1
-            },
-            {
-              question: 'Which canton typically has the lowest tax rate for CHF 100k income?',
-              options: ['Zurich', 'Geneva', 'Zug', 'Vaud'],
-              correct: 2
-            },
-            {
-              question: 'Are Pillar 3a contributions tax-deductible?',
-              options: ['No', 'Yes, fully deductible', 'Partially deductible', 'Only for certain cantons'],
-              correct: 1
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Tax Calculator',
-            description: 'Calculate your expected tax burden by canton'
-          },
-          {
-            title: 'Pillar 3a Optimizer',
-            description: 'Calculate optimal Pillar 3a contribution for maximum tax savings'
-          }
-        ],
+        enhancedModule: adv04Enhanced,
         completed: false
       },
       {
         id: 'adv-05',
-        title: 'Language Requirements & Test Prep',
-        description: 'Master Swiss German, French, or Italian',
-        type: 'guide',
-        duration: '60 min read',
+        title: adv05Enhanced.title,
+        description: adv05Enhanced.description,
+        type: 'interactive',
+        duration: adv05Enhanced.estimatedReadTime,
         order: 5,
-        content: ADV_MODULES_3_TO_9['adv-05'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the minimum language level required for Swiss citizenship?',
-              options: ['A2', 'B1', 'B2', 'C1'],
-              correct: 1
-            },
-            {
-              question: 'What is the legal basis for language requirements in citizenship?',
-              options: ['AuG Art. 54', 'StAG Art. 15 para. 1 lit. b', 'VZAE Art. 10', 'No legal basis'],
-              correct: 1
-            },
-            {
-              question: 'How long typically does it take to reach B1 level?',
-              options: ['3-6 months', '6-12 months', '12-18 months', '2+ years'],
-              correct: 2
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Language Learning Progress Tracker',
-            description: 'Track your progress from A1 to B1 and beyond'
-          },
-          {
-            title: 'Test Prep Planner',
-            description: 'Create a personalized study plan for your language test'
-          }
-        ],
+        enhancedModule: adv05Enhanced,
         completed: false
       },
       {
         id: 'adv-06',
-        title: 'Integration Process & Social Adaptation',
-        description: 'Successfully integrate into Swiss society',
-        type: 'guide',
-        duration: '30 min read',
+        title: adv06Enhanced.title,
+        description: adv06Enhanced.description,
+        type: 'interactive',
+        duration: adv06Enhanced.estimatedReadTime,
         order: 6,
-        content: ADV_MODULES_3_TO_9['adv-06'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the legal basis for integration requirements?',
-              options: ['AuG Art. 54', 'StAG Art. 15 para. 1', 'VZAE Art. 15', 'No legal basis'],
-              correct: 1
-            },
-            {
-              question: 'Which of the following is NOT typically assessed for integration?',
-              options: ['Language proficiency', 'Economic independence', 'Hair color', 'Community involvement'],
-              correct: 2
-            },
-            {
-              question: 'How many years of residence are typically required for citizenship?',
-              options: ['3 years', '5 years (EU/EFTA)', '10 years (non-EU)', 'Both 5 and 10 years depending on nationality'],
-              correct: 3
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Integration Score Tracker',
-            description: 'Track your integration progress across all dimensions'
-          },
-          {
-            title: 'Community Engagement Planner',
-            description: 'Plan your community involvement activities'
-          }
-        ],
+        enhancedModule: adv06Enhanced,
         completed: false
       },
       {
         id: 'adv-07',
-        title: 'Healthcare & Insurance System',
-        description: 'Navigate Swiss healthcare like a local',
-        type: 'guide',
-        duration: '25 min read',
+        title: adv07Enhanced.title,
+        description: adv07Enhanced.description,
+        type: 'interactive',
+        duration: adv07Enhanced.estimatedReadTime,
         order: 7,
-        content: ADV_MODULES_7_TO_9_CONTENT['adv-07'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the legal basis for mandatory health insurance in Switzerland?',
-              options: ['AuG Art. 27', 'KVG Art. 3', 'StAG Art. 15', 'No legal requirement'],
-              correct: 1
-            },
-            {
-              question: 'Within how many months must you obtain health insurance after arrival?',
-              options: ['1 month', '3 months', '6 months', '1 year'],
-              correct: 1
-            },
-            {
-              question: 'What is the typical monthly cost for basic health insurance?',
-              options: ['CHF 100-200', 'CHF 300-500', 'CHF 600-800', 'CHF 1,000+'],
-              correct: 1
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Health Insurance Calculator',
-            description: 'Compare insurance options and calculate total costs'
-          },
-          {
-            title: 'Franchise Optimizer',
-            description: 'Determine the best franchise level for your health profile'
-          }
-        ],
+        enhancedModule: adv07Enhanced,
         completed: false
       },
       {
         id: 'adv-08',
-        title: 'Housing & Cost of Living Guide',
-        description: 'Find housing and manage expenses effectively',
-        type: 'guide',
-        duration: '40 min read',
+        title: adv08Enhanced.title,
+        description: adv08Enhanced.description,
+        type: 'interactive',
+        duration: adv08Enhanced.estimatedReadTime,
         order: 8,
-        content: ADV_MODULES_7_TO_9_CONTENT['adv-08'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the standard rule for rent-to-income ratio in Switzerland?',
-              options: ['Rent ≤ 1/4 of income', 'Rent ≤ 1/3 of income', 'Rent ≤ 1/2 of income', 'No standard rule'],
-              correct: 1
-            },
-            {
-              question: 'What is typically included in "Nebenkosten" (ancillary costs)?',
-              options: ['Only rent', 'Utilities, heating, maintenance', 'Internet and phone', 'Nothing'],
-              correct: 1
-            },
-            {
-              question: 'Which website is most popular for finding housing in Switzerland?',
-              options: ['homegate.ch', 'immoscout24.ch', 'comparis.ch', 'All are equally popular'],
-              correct: 0
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Housing Budget Calculator',
-            description: 'Calculate your housing budget based on income and location'
-          },
-          {
-            title: 'Cost of Living Calculator',
-            description: 'Estimate total monthly expenses by canton'
-          }
-        ],
+        enhancedModule: adv08Enhanced,
         completed: false
       },
       {
         id: 'adv-09',
-        title: 'Family Reunification Process',
-        description: 'Bring your family to Switzerland',
-        type: 'guide',
-        duration: '35 min read',
+        title: adv09Enhanced.title,
+        description: adv09Enhanced.description,
+        type: 'interactive',
+        duration: adv09Enhanced.estimatedReadTime,
         order: 9,
-        content: ADV_MODULES_7_TO_9_CONTENT['adv-09'],
-        quiz: {
-          questions: [
-            {
-              question: 'What is the legal basis for family reunification in Switzerland?',
-              options: ['AuG Art. 44-46', 'StAG Art. 15', 'VZAE Art. 10', 'No legal basis'],
-              correct: 0
-            },
-            {
-              question: 'For non-EU applicants, what is typically required for family reunification?',
-              options: ['B permit holder', 'L permit holder', 'Either B or L permit', 'C permit only'],
-              correct: 2
-            },
-            {
-              question: 'What financial requirement is typically needed for family reunification?',
-              options: ['Proof of sufficient income', 'CHF 100k in bank', 'No financial requirement', 'Employer guarantee only'],
-              correct: 0
-            }
-          ]
-        },
-        exercises: [
-          {
-            title: 'Family Reunification Eligibility Checker',
-            description: 'Check if you meet requirements to bring your family'
-          },
-          {
-            title: 'Financial Requirements Calculator',
-            description: 'Calculate required income for family reunification by canton'
-          }
-        ],
+        enhancedModule: adv09Enhanced,
         completed: false
       },
       {
         id: 'adv-10',
-        title: 'Success Stories & Lessons Learned',
-        description: 'Real experiences from successful immigrants',
-        type: 'guide',
-        duration: '30 min read',
+        title: adv10Enhanced.title,
+        description: adv10Enhanced.description,
+        type: 'interactive',
+        duration: adv10Enhanced.estimatedReadTime,
         order: 10,
-        content: `# Success Stories & Lessons Learned
+        enhancedModule: adv10Enhanced,
+        completed: false
 
 ## Real Immigrants, Real Results
 
@@ -1955,92 +1551,102 @@ This module features authentic stories from successful Swiss immigrants who navi
     modules: [
       {
         id: 'cit-01',
-        title: '10-Year Path to Citizenship',
-        description: 'Complete roadmap from resident to citizen',
-        type: 'guide',
-        duration: '50 min read',
+        title: cit01Enhanced.title,
+        description: cit01Enhanced.description,
+        type: 'interactive',
+        duration: cit01Enhanced.estimatedReadTime,
         order: 1,
+        enhancedModule: cit01Enhanced,
         completed: false
       },
       {
         id: 'cit-02',
-        title: 'Spouse Route - 5 Years Faster',
-        description: 'Marriage-based naturalization explained',
-        type: 'guide',
-        duration: '35 min read',
+        title: cit02Enhanced.title,
+        description: cit02Enhanced.description,
+        type: 'interactive',
+        duration: cit02Enhanced.estimatedReadTime,
         order: 2,
+        enhancedModule: cit02Enhanced,
         completed: false
       },
       {
         id: 'cit-03',
-        title: 'Third-Generation Accelerated Path',
-        description: 'Special route for those born in Switzerland',
-        type: 'guide',
-        duration: '30 min read',
+        title: cit03Enhanced.title,
+        description: cit03Enhanced.description,
+        type: 'interactive',
+        duration: cit03Enhanced.estimatedReadTime,
         order: 3,
+        enhancedModule: cit03Enhanced,
         completed: false
       },
       {
         id: 'cit-04',
-        title: 'Language Test Mastery',
-        description: 'B1 certification strategy and preparation',
-        type: 'guide',
-        duration: '45 min read',
+        title: cit04Enhanced.title,
+        description: cit04Enhanced.description,
+        type: 'interactive',
+        duration: cit04Enhanced.estimatedReadTime,
         order: 4,
+        enhancedModule: cit04Enhanced,
         completed: false
       },
       {
         id: 'cit-05',
-        title: 'Integration Test Success',
-        description: 'Pass the integration exam on first try',
-        type: 'guide',
-        duration: '40 min read',
+        title: cit05Enhanced.title,
+        description: cit05Enhanced.description,
+        type: 'interactive',
+        duration: cit05Enhanced.estimatedReadTime,
         order: 5,
+        enhancedModule: cit05Enhanced,
         completed: false
       },
       {
         id: 'cit-06',
-        title: 'Application Submission Guide',
-        description: 'File your application correctly',
-        type: 'guide',
-        duration: '30 min read',
+        title: cit06Enhanced.title,
+        description: cit06Enhanced.description,
+        type: 'interactive',
+        duration: cit06Enhanced.estimatedReadTime,
         order: 6,
+        enhancedModule: cit06Enhanced,
         completed: false
       },
       {
         id: 'cit-07',
-        title: 'Interview Preparation',
-        description: 'Ace your naturalization interview',
-        type: 'guide',
-        duration: '25 min read',
+        title: cit07Enhanced.title,
+        description: cit07Enhanced.description,
+        type: 'interactive',
+        duration: cit07Enhanced.estimatedReadTime,
         order: 7,
+        enhancedModule: cit07Enhanced,
         completed: false
       },
       {
         id: 'cit-08',
-        title: 'Dual Citizenship Strategy',
-        description: 'Keep your original citizenship',
-        type: 'guide',
-        duration: '35 min read',
+        title: cit08Enhanced.title,
+        description: cit08Enhanced.description,
+        type: 'interactive',
+        duration: cit08Enhanced.estimatedReadTime,
         order: 8,
+        enhancedModule: cit08Enhanced,
         completed: false
       },
       {
         id: 'cit-09',
-        title: 'Expedited Processing (Special Cases)',
-        description: 'Apply for faster processing if eligible',
-        type: 'guide',
-        duration: '20 min read',
+        title: cit09Enhanced.title,
+        description: cit09Enhanced.description,
+        type: 'interactive',
+        duration: cit09Enhanced.estimatedReadTime,
         order: 9,
+        enhancedModule: cit09Enhanced,
         completed: false
       },
       {
         id: 'cit-10',
-        title: 'Oath Ceremony & Becoming Swiss',
-        description: 'Final steps to becoming a citizen',
-        type: 'guide',
-        duration: '15 min read',
+        title: cit10Enhanced.title,
+        description: cit10Enhanced.description,
+        type: 'interactive',
+        duration: cit10Enhanced.estimatedReadTime,
         order: 10,
+        enhancedModule: cit10Enhanced,
         completed: false
       }
     ],
