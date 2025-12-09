@@ -25,7 +25,7 @@ export default function LayerPricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <LayerHeader
         layer={layer}
         homeHref={`/${layer}`}
