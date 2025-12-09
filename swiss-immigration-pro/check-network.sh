@@ -19,3 +19,4 @@ echo ""
 echo "=== Network Interfaces ==="
 ip addr show | grep -E "(inet |inet6 )" | head -10
 
+

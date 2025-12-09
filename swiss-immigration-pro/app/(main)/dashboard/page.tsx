@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { UserCircle, Download, BookOpen, MessageCircle, TrendingUp, Crown, ChevronRight, Check, Lock, Play } from 'lucide-react'
+import { UserCircle, Download, BookOpen, MessageCircle, TrendingUp, Crown, ChevronRight, Check, Lock, Play, Home, ArrowLeft } from 'lucide-react'
 import { PRICING_PACKS } from '@/lib/stripe'
 import { getPackContent, getModulesForPack, getProgressPercentage, getAllModulesForAdmin, getModulePack } from '@/lib/content/pack-content'
 
@@ -99,13 +99,22 @@ export default function Dashboard() {
                 Welcome back, {user?.full_name || 'User'}!
               </h1>
             </div>
-            <Link
-              href="/profile"
-              className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <UserCircle className="w-4 h-4 mr-2" />
-              Profile Settings
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Exit to Website
+              </Link>
+              <Link
+                href="/profile"
+                className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <UserCircle className="w-4 h-4 mr-2" />
+                Profile Settings
+              </Link>
+            </div>
           </div>
           <div className="flex items-center space-x-2 flex-wrap gap-2 mt-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">

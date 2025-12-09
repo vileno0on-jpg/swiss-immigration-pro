@@ -38,6 +38,17 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
   useEffect(() => {
     setMounted(true)
+    // Ensure light mode - remove any dark mode
+    if (typeof window !== 'undefined') {
+      const html = document.documentElement
+      html.classList.remove('dark')
+      html.style.colorScheme = 'light'
+      localStorage.removeItem('darkMode')
+      
+      // Ensure body is light
+      document.body.style.removeProperty('background-color')
+      document.body.style.removeProperty('color')
+    }
   }, [])
 
   // Handle session safely - work even if SessionProvider isn't ready
@@ -82,15 +93,6 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
     setIsMenuOpen((previous) => !previous)
   }, [])
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('dark')
-      document.body.classList.remove('dark-mode')
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('darkMode')
-      }
-    }
-  }, [])
 
   const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: '/' })
@@ -110,7 +112,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <nav className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between sm:h-20">
             <Link href={homeHref} className="flex items-center gap-3">
@@ -232,13 +234,13 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
               <button
                 onClick={toggleMenu}
-                className="ml-1 rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden"
+                className="ml-1 rounded-lg p-3 transition-colors hover:bg-gray-100 active:bg-gray-200 lg:hidden touch-manipulation"
                 aria-label="Toggle navigation menu"
               >
                 {isMenuOpen ? (
-                  <X className="h-5 w-5 text-gray-700" />
+                  <X className="h-6 w-6 text-gray-700" />
                 ) : (
-                  <Menu className="h-5 w-5 text-gray-700" />
+                  <Menu className="h-6 w-6 text-gray-700" />
                 )}
               </button>
             </div>
@@ -246,8 +248,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
           {isMenuOpen && (
             <div className="lg:hidden">
-              <div className="space-y-3 border-t border-gray-200 bg-white p-4 shadow-lg">
-                <div className="sm:hidden">
+              <div className="space-y-2 border-t border-gray-200 bg-white p-4 shadow-lg max-h-[calc(100vh-120px)] overflow-y-auto -webkit-overflow-scrolling-touch">
+                <div className="sm:hidden mb-4">
                   <AdvancedSearch />
                 </div>
 
@@ -256,7 +258,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                     key={item.href}
                     href={item.href}
                     onClick={closeMenu}
-                    className="block rounded-lg px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-blue-50"
+                    className="block rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-blue-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
                   >
                     {item.label}
                   </Link>
@@ -280,15 +282,15 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                 <div className="border-t border-gray-200 pt-3">
                   {appUser ? (
                     <div className="space-y-2">
-                      <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
-                          {appUser.name?.charAt(0)?.toUpperCase() ?? <User className="h-5 w-5" />}
+                      <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white flex-shrink-0">
+                          {appUser.name?.charAt(0)?.toUpperCase() ?? <User className="h-6 w-6" />}
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
                             {appUser.name ?? 'Member'}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 truncate">
                             {appUser.email ?? 'No email set'}
                           </p>
                         </div>
@@ -299,17 +301,17 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/dashboard"
                             onClick={closeMenu}
-                            className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
                           >
-                            <User className="h-4 w-4" />
+                            <User className="h-5 w-5" />
                             Dashboard
                           </Link>
                           <Link
                             href="/profile"
                             onClick={closeMenu}
-                            className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
                           >
-                            <User className="h-4 w-4" />
+                            <User className="h-5 w-5" />
                             Profile
                           </Link>
                         </>
@@ -320,17 +322,17 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/admin"
                             onClick={closeMenu}
-                            className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-purple-600 transition-colors hover:bg-purple-50"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-semibold text-purple-600 transition-all active:bg-purple-50 active:scale-[0.98] touch-manipulation min-h-[48px]"
                           >
-                            <Shield className="h-4 w-4" />
+                            <Shield className="h-5 w-5" />
                             Admin
                           </Link>
                           <Link
                             href="/admin/settings"
                             onClick={closeMenu}
-                            className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
                           >
-                            <Settings className="h-4 w-4" />
+                            <Settings className="h-5 w-5" />
                             Settings
                           </Link>
                         </>
@@ -341,25 +343,25 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           closeMenu()
                           await handleSignOut()
                         }}
-                        className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-600 transition-all active:bg-red-50 active:text-red-600 active:scale-[0.98] touch-manipulation min-h-[48px]"
                       >
-                        <LogOut className="h-4 w-4" />
+                        <LogOut className="h-5 w-5" />
                         Sign out
                       </button>
                     </div>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Link
                         href="/auth/login"
                         onClick={closeMenu}
-                        className="block rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-center text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg"
+                        className="block rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-center text-base font-semibold text-white shadow-md transition-all duration-200 active:from-blue-700 active:to-blue-800 active:scale-[0.98] touch-manipulation min-h-[48px]"
                       >
                         Sign in
                       </Link>
                       <Link
                         href="/auth/register"
                         onClick={closeMenu}
-                        className="block rounded-lg px-4 py-3 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                        className="block rounded-xl px-4 py-4 text-center text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
                       >
                         Create account
                       </Link>

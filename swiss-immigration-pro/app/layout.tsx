@@ -28,6 +28,28 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: 'cover',
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#1e40af' },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Swiss Immigration Pro',
+  },
+  manifest: '/manifest.json',
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+  },
   openGraph: {
     title: "Become a Swiss Resident in 2026 | 96% Success Rate | Swiss Immigration Pro",
     description: "AI-Powered Swiss immigration platform. 18,500+ successful applications. 96% approval rate. Expert guidance, 30 free AI questions, fast processing.",
@@ -74,17 +96,46 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Simple dark mode prevention - CSS only */}
-        <style dangerouslySetInnerHTML={{
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Swiss Immigration Pro" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `
-            :root { color-scheme: light; }
-            html, body { background-color: #ffffff !important; color: #111827 !important; }
-            html.dark { color-scheme: light; }
-            .dark { display: block !important; }
-          `
-        }} />
+              (function() {
+                try {
+                  const html = document.documentElement;
+                  // Always ensure light mode - remove dark class
+                  html.classList.remove('dark');
+                  html.style.colorScheme = 'light';
+                  localStorage.removeItem('darkMode');
+                  
+                  // Prevent zoom on double tap (iOS)
+                  let lastTouchEnd = 0;
+                  document.addEventListener('touchend', function(event) {
+                    const now = Date.now();
+                    if (now - lastTouchEnd <= 300) {
+                      event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                  }, false);
+                  
+                  // Optimize scrolling performance
+                  if ('scrollBehavior' in document.documentElement.style) {
+                    document.documentElement.style.scrollBehavior = 'smooth';
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className={`${inter.variable} antialiased bg-white`} suppressHydrationWarning>
+      <body className={`${inter.variable} antialiased bg-white text-gray-900 touch-pan-y`} suppressHydrationWarning>
         {/* Skip to main content for accessibility */}
         <a href="#main-content" className="skip-to-main">
           Skip to main content

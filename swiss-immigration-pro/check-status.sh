@@ -18,3 +18,4 @@ echo ""
 echo "=== Testing Nginx ==="
 curl -I http://localhost 2>&1 | head -5
 
+

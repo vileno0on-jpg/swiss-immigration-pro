@@ -65,3 +65,4 @@ echo ""
 echo "=== ✅ Database Setup Complete ==="
 echo "The application can now connect to the database!"
 
+

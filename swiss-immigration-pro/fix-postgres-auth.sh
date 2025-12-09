@@ -26,3 +26,4 @@ PGPASSWORD='Terminateur08a21aaaqqqeee' psql -h localhost -U postgres -d swiss_im
 echo ""
 echo "=== Database is ready for schema creation ==="
 
+

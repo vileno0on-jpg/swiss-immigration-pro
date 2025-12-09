@@ -60,3 +60,4 @@ echo "Deployment complete!"
 echo "Visit: http://83.228.215.185"
 pm2 status
 
+

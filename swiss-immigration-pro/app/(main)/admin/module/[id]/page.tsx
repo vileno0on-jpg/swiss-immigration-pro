@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import EnhancedModuleDisplay from '@/components/modules/EnhancedModuleDisplay'
+import AdminHeader from '@/components/layout/AdminHeader'
 
 export default function AdminModuleView() {
   const router = useRouter()
@@ -245,7 +246,7 @@ export default function AdminModuleView() {
 
   if (!module) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-gray-900">
             Module Not Found
@@ -259,23 +260,26 @@ export default function AdminModuleView() {
   }
 
   // Check if this is an enhanced module with interactive components
-  if (module.enhancedModule) {
+  if (module.enhancedModule && typeof module.enhancedModule === 'object' && module.enhancedModule.title) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Back Button */}
-          <div className="mb-6">
-            <Link
-              href="/admin"
-              className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Admin Dashboard
-            </Link>
+      <div className="min-h-screen bg-white">
+        <AdminHeader />
+        <div className="py-4 sm:py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Back Button */}
+            <div className="mb-4 sm:mb-6">
+              <Link
+                href="/admin"
+                className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Admin Dashboard
+              </Link>
+            </div>
+            
+            {/* Enhanced Module Display */}
+            <EnhancedModuleDisplay module={module.enhancedModule} />
           </div>
-          
-          {/* Enhanced Module Display */}
-          <EnhancedModuleDisplay module={module.enhancedModule} />
         </div>
       </div>
     )
@@ -300,7 +304,7 @@ export default function AdminModuleView() {
   }
 
   return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-white flex">
             {/* Left Sidebar - Table of Contents - Sticky */}
             {showTableOfContents && (
               <motion.div

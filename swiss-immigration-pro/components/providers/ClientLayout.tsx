@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { SessionProvider } from './SessionProvider'
 import { InitialQuizGate } from '@/components/quiz/InitialQuizGate'
 import { TranslationLoader } from '@/components/TranslationLoader'
-import Breadcrumbs from '@/components/layout/Breadcrumbs'
 import ScrollToTop from '@/components/layout/ScrollToTop'
 import { ToastProvider } from '@/components/providers/ToastProvider'
 import dynamic from 'next/dynamic'
@@ -32,9 +31,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       <ToastProvider>
         <TranslationLoader />
         <InitialQuizGate />
-        {pathname && pathname !== '/' && !pathname.startsWith('/eu') && !pathname.startsWith('/us') && !pathname.startsWith('/other') ? (
-          <Breadcrumbs />
-        ) : null}
         <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
           {children}
         </main>

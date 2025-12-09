@@ -59,7 +59,7 @@ export default function OtherPage() {
       <section className="relative overflow-hidden h-[85vh] flex items-center bg-slate-900">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-international.png"
+            src="/images/others/hero-international.png"
             alt="Global Path to Switzerland"
             fill
             className="object-cover opacity-40"
@@ -236,7 +236,7 @@ export default function OtherPage() {
                <div className="absolute inset-0 bg-purple-600 rounded-3xl transform rotate-2 opacity-10"></div>
                <div className="relative rounded-3xl overflow-hidden shadow-xl">
                  <Image
-                  src="/images/integration-language.png"
+                  src="/images/others/integration-language.png"
                   alt="Language Learning"
                   width={600}
                   height={400}

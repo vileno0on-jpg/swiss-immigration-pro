@@ -6,12 +6,32 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const { packId } = await req.json()
+    const { packId, cycle = 'monthly' } = await req.json()
 
     if (!packId) {
       return NextResponse.json(
         { error: 'Pack ID is required' },
         { status: 400 }
+      )
+    }
+
+    // Validate Stripe is configured
+    if (!process.env.STRIPE_SECRET_KEY || 
+        process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder' || 
+        process.env.STRIPE_SECRET_KEY.includes('placeholder')) {
+      console.error('STRIPE_SECRET_KEY is not configured or is placeholder')
+      return NextResponse.json(
+        { error: 'Payment system is not configured. Please set up Stripe API keys in your environment variables.' },
+        { status: 500 }
+      )
+    }
+
+    // Validate Stripe client is initialized
+    if (!stripe || typeof stripe.checkout === 'undefined') {
+      console.error('Stripe client is not properly initialized')
+      return NextResponse.json(
+        { error: 'Payment system initialization failed. Please check your Stripe configuration.' },
+        { status: 500 }
       )
     }
 
@@ -73,6 +93,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Get pack price
+    const packPrice = getPackPrice(packId, cycle)
+    if (packPrice === 0) {
+      return NextResponse.json(
+        { error: 'Invalid pack selected' },
+        { status: 400 }
+      )
+    }
+
     // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -80,14 +109,14 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: 'chf',
+            currency: 'chf', // Stripe accepts lowercase
             product_data: {
-              name: `${packId.toUpperCase()} Pack`,
+              name: getPackName(packId),
               description: `Access to ${packId} features`,
             },
-            unit_amount: getPackPrice(packId) * 100, // Convert to cents
+            unit_amount: packPrice, // Already in cents
             recurring: {
-              interval: 'month',
+              interval: cycle === 'annual' ? 'year' : 'month',
             },
           },
           quantity: 1,
@@ -99,25 +128,71 @@ export async function POST(req: NextRequest) {
       metadata: {
         userId: session.user.id,
         packId,
+        cycle,
       },
     })
 
+    if (!checkoutSession.url) {
+      console.error('Stripe returned no URL for checkout session')
+      return NextResponse.json(
+        { error: 'Failed to generate checkout URL' },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json({ url: checkoutSession.url })
   } catch (error: any) {
-    console.error('Checkout error:', error)
+    console.error('Checkout error details:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode,
+      stack: error.stack
+    })
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to create checkout session'
+    if (error.message) {
+      errorMessage = error.message
+    } else if (error.type === 'StripeInvalidRequestError') {
+      errorMessage = 'Invalid payment configuration. Please contact support.'
+    } else if (error.type === 'StripeAPIError') {
+      errorMessage = 'Payment service temporarily unavailable. Please try again.'
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
 }
 
-function getPackPrice(packId: string): number {
-  const prices: Record<string, number> = {
-    immigration: 9.99,
-    advanced: 29.99,
-    citizenship: 89.99,
+function getPackPrice(packId: string, cycle: 'monthly' | 'annual' = 'monthly'): number {
+  // Prices in CHF (monthly)
+  const monthlyPrices: Record<string, number> = {
+    immigration: 15,
+    advanced: 39,
+    citizenship: 119,
   }
-  return prices[packId] || 0
+
+  const monthlyPrice = monthlyPrices[packId] || 0
+  if (monthlyPrice === 0) return 0
+
+  // For annual, apply 20% discount
+  if (cycle === 'annual') {
+    const annualPrice = Math.round(monthlyPrice * 12 * 0.8) // 20% off
+    return annualPrice * 100 // Convert to cents
+  }
+
+  return monthlyPrice * 100 // Convert to cents
+}
+
+function getPackName(packId: string): string {
+  const names: Record<string, string> = {
+    immigration: 'Immigration Pack',
+    advanced: 'Advanced Pack',
+    citizenship: 'Citizenship Pro Pack',
+  }
+  return names[packId] || `${packId} Pack`
 }
 

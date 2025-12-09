@@ -58,7 +58,7 @@ export default function EUPage() {
       <section className="relative overflow-hidden h-[85vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-eu-freedom.jpeg"
+            src="/images/europeans/hero-eu-freedom.jpeg"
             alt="EU/EFTA Freedom of Movement - Swiss Alps"
             fill
             className="object-cover"
@@ -244,7 +244,7 @@ export default function EUPage() {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
                 <Image
-                  src="/images/success-eu-family.jpeg"
+                  src="/images/europeans/success-eu-family.jpeg"
                   alt="EU Family in Switzerland"
                   fill
                   className="object-cover"

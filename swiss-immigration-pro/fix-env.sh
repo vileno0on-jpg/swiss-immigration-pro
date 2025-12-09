@@ -16,3 +16,4 @@ pm2 restart swiss-immigration-pro
 
 echo "Environment updated and application restarted"
 
+

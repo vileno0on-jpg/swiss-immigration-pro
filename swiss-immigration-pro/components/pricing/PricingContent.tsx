@@ -26,21 +26,28 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
         return
       }
 
+      if (!response.ok) {
+        const errorMessage = data.error || 'Failed to create checkout session. Please try again or contact support.'
+        console.error('Checkout error:', data.error || 'Unknown error')
+        alert(errorMessage)
+        return
+      }
+
       if (data.url) {
         window.location.href = data.url
-      } else if (data.error) {
-        alert(data.error)
+      } else {
+        alert('Failed to initiate checkout. Please try again.')
       }
     } catch (error) {
       console.error('Checkout error:', error)
-      alert('Failed to initiate checkout.')
+      alert('Failed to initiate checkout. Please check your connection and try again.')
     }
   }
 
   return (
-    <div className={`min-h-screen ${layer === 'default' ? 'bg-slate-50' : 'bg-slate-50'} font-sans`}>
+    <div className={`min-h-screen ${layer === 'default' ? 'bg-white dark:bg-gray-950' : 'bg-white dark:bg-gray-950'} font-sans transition-colors duration-300`}>
       {/* Header Section with Dynamic Background */}
-      <div className="relative bg-slate-900 pt-24 pb-32 overflow-hidden">
+      <div className="relative bg-slate-900 dark:bg-gray-900 pt-24 pb-32 overflow-hidden transition-colors duration-300">
         <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-10"></div>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
         
@@ -90,8 +97,8 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className={`relative flex flex-col bg-white rounded-3xl p-6 shadow-xl transition-all duration-300 hover:-translate-y-2 ${
-                  isPopular ? 'ring-4 ring-blue-500/20 scale-105 z-10 border-blue-500' : 'border border-slate-100 hover:border-blue-200'
+                className={`relative flex flex-col bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl transition-all duration-300 hover:-translate-y-2 ${
+                  isPopular ? 'ring-4 ring-blue-500/20 scale-105 z-10 border-blue-500' : 'border border-slate-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-400'
                 }`}
               >
                 {isPopular && (
@@ -101,15 +108,15 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                 )}
 
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{pack.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">{pack.name}</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">
+                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white transition-colors">
                       {pack.price === 0 ? 'Free' : `CHF ${price}`}
                     </span>
-                    {pack.price > 0 && <span className="text-slate-500 font-medium">/mo</span>}
+                    {pack.price > 0 && <span className="text-slate-500 dark:text-gray-400 font-medium transition-colors">/mo</span>}
                   </div>
                   {billingCycle === 'annual' && pack.price > 0 && (
-                    <div className="text-xs text-green-600 font-bold mt-1">
+                    <div className="text-xs text-green-600 dark:text-green-400 font-bold mt-1 transition-colors">
                       Billed CHF {price * 12} yearly
                     </div>
                   )}
@@ -119,12 +126,12 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                   {pack.features.map((feature, fidx) => (
                     <div 
                       key={fidx} 
-                      className="flex items-start gap-3 text-sm text-slate-600 group"
+                      className="flex items-start gap-3 text-sm text-slate-600 dark:text-gray-300 group transition-colors"
                       onMouseEnter={() => setHoveredFeature(feature)}
                       onMouseLeave={() => setHoveredFeature(null)}
                     >
-                      <CheckCircle className={`w-5 h-5 shrink-0 ${isPopular ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-400'}`} />
-                      <span className="group-hover:text-slate-900 transition-colors">{feature}</span>
+                      <CheckCircle className={`w-5 h-5 shrink-0 ${isPopular ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-gray-500 group-hover:text-blue-400 dark:group-hover:text-blue-400'} transition-colors`} />
+                      <span className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -134,7 +141,7 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                   className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-lg ${
                     isPopular 
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/30 hover:scale-[1.02]' 
-                      : 'bg-slate-50 text-slate-900 hover:bg-slate-100 border border-slate-200'
+                      : 'bg-slate-50 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-gray-600 border border-slate-200 dark:border-gray-600 transition-colors'
                   }`}
                 >
                   {pack.price === 0 ? 'Start Free' : 'Get Started'}
@@ -147,8 +154,8 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
         {/* Feature Deep Dive Grid */}
         <div className="mt-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Everything You Need to Succeed</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">We've built the most comprehensive immigration platform in Switzerland.</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 transition-colors">Everything You Need to Succeed</h2>
+            <p className="text-slate-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors">We've built the most comprehensive immigration platform in Switzerland.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -163,13 +170,13 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
               <motion.div
                 key={idx}
                 whileHover={{ y: -5 }}
-                className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all"
+                className="bg-white dark:bg-gray-800 p-8 rounded-3xl border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all"
               >
                 <div className={`w-14 h-14 rounded-2xl ${feature.color} flex items-center justify-center mb-6`}>
                   <feature.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 transition-colors">{feature.title}</h3>
+                <p className="text-slate-600 dark:text-gray-300 leading-relaxed transition-colors">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -177,16 +184,16 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
 
         {/* FAQ Accordion Style - Clean */}
         <div className="mt-32 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Common Questions</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center transition-colors">Common Questions</h2>
           <div className="space-y-4">
             {[
               { q: 'Can I switch plans later?', a: 'Absolutely. You can upgrade or downgrade at any time. Prorated refunds are applied automatically.' },
               { q: 'Is the Citizenship Pro pack a one-time fee?', a: 'Yes! Pay once and get lifetime access to all current and future citizenship resources.' },
               { q: 'Do you offer refunds?', a: 'We offer a 14-day money-back guarantee if you are not satisfied with our premium features.' },
             ].map((item, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                <h4 className="font-bold text-slate-900 mb-2 text-lg">{item.q}</h4>
-                <p className="text-slate-600">{item.a}</p>
+              <div key={idx} className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+                <h4 className="font-bold text-slate-900 dark:text-white mb-2 text-lg transition-colors">{item.q}</h4>
+                <p className="text-slate-600 dark:text-gray-300 transition-colors">{item.a}</p>
               </div>
             ))}
           </div>

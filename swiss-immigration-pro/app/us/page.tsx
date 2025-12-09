@@ -58,7 +58,7 @@ export default function USPage() {
       <section className="relative overflow-hidden h-[85vh] flex items-center bg-slate-950">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-us-switzerland.png"
+            src="/images/americans/hero-us-switzerland.png"
             alt="US to Switzerland Professional Pathway"
             fill
             className="object-cover opacity-60"
@@ -246,7 +246,7 @@ export default function USPage() {
             <div className="relative">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                 <Image
-                  src="/images/success-us-professional.png"
+                  src="/images/americans/success-us-professional.png"
                   alt="Success Story"
                   fill
                   className="object-cover"
