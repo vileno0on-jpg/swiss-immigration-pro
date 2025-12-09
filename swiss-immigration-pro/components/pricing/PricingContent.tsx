@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import LayerHeader from '@/components/layout/LayerHeader'
 import { CheckCircle, Crown, Sparkles, Shield, Star, Zap, MessageSquare, BookOpen, LayoutDashboard, Users, FileText } from 'lucide-react'
 import { PRICING_PACKS } from '@/lib/stripe'
 import { PricingPack } from '@/types'
@@ -10,6 +11,32 @@ import { PricingPack } from '@/types'
 export default function PricingContent({ layer = 'default' }: { layer?: string }) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual')
   const [hoveredFeature, setHoveredFeature] = useState<string | null>(null)
+  
+  // Determine layer from localStorage or use provided layer
+  const [currentLayer, setCurrentLayer] = useState<'eu' | 'us' | 'other'>('other')
+  const [homeHref, setHomeHref] = useState('/')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (layer && layer !== 'default' && (layer === 'eu' || layer === 'us' || layer === 'other')) {
+        setCurrentLayer(layer as 'eu' | 'us' | 'other')
+        setHomeHref(layer === 'eu' ? '/eu' : layer === 'us' ? '/us' : '/other')
+      } else {
+        const stored = localStorage.getItem('userLayer')
+        if (stored) {
+          try {
+            const layerData = JSON.parse(stored)
+            if (layerData?.layer === 'eu' || layerData?.layer === 'us' || layerData?.layer === 'other') {
+              setCurrentLayer(layerData.layer)
+              setHomeHref(layerData.layer === 'eu' ? '/eu' : layerData.layer === 'us' ? '/us' : '/other')
+            }
+          } catch {
+            // Default to other
+          }
+        }
+      }
+    }
+  }, [layer])
 
   const handleCheckout = async (packId: string) => {
     try {
@@ -46,6 +73,8 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
 
   return (
     <div className={`min-h-screen bg-white font-sans transition-colors duration-300`}>
+      <LayerHeader layer={currentLayer} homeHref={homeHref} />
+      
       {/* Header Section with Light Background */}
       <div className="relative bg-gradient-to-b from-white via-blue-50/30 to-white pt-24 pb-32 overflow-hidden transition-colors duration-300">
         <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-5"></div>
