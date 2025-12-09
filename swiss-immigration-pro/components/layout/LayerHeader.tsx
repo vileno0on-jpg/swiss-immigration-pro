@@ -236,6 +236,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                 onClick={toggleMenu}
                 className="ml-1 rounded-lg p-3 transition-colors hover:bg-gray-100 active:bg-gray-200 lg:hidden touch-manipulation"
                 aria-label="Toggle navigation menu"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 {isMenuOpen ? (
                   <X className="h-6 w-6 text-gray-700" />
@@ -258,7 +259,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                     key={item.href}
                     href={item.href}
                     onClick={closeMenu}
-                    className="block rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-blue-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                    className="block rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-blue-100 active:scale-[0.98] touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                   >
                     {item.label}
                   </Link>
@@ -301,7 +303,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/dashboard"
                             onClick={closeMenu}
-                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation"
+                            style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                           >
                             <User className="h-5 w-5" />
                             Dashboard
@@ -309,7 +312,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/profile"
                             onClick={closeMenu}
-                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation"
+                            style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                           >
                             <User className="h-5 w-5" />
                             Profile
@@ -322,7 +326,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/admin"
                             onClick={closeMenu}
-                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-semibold text-purple-600 transition-all active:bg-purple-50 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-semibold text-purple-600 transition-all active:bg-purple-50 active:scale-[0.98] touch-manipulation"
+                            style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                           >
                             <Shield className="h-5 w-5" />
                             Admin
@@ -330,7 +335,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           <Link
                             href="/admin/settings"
                             onClick={closeMenu}
-                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                            className="flex items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation"
+                            style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                           >
                             <Settings className="h-5 w-5" />
                             Settings
@@ -343,7 +349,8 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                           closeMenu()
                           await handleSignOut()
                         }}
-                        className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-600 transition-all active:bg-red-50 active:text-red-600 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-base font-medium text-gray-600 transition-all active:bg-red-50 active:text-red-600 active:scale-[0.98] touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                       >
                         <LogOut className="h-5 w-5" />
                         Sign out
@@ -354,14 +361,16 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                       <Link
                         href="/auth/login"
                         onClick={closeMenu}
-                        className="block rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-center text-base font-semibold text-white shadow-md transition-all duration-200 active:from-blue-700 active:to-blue-800 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                        className="block rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-center text-base font-semibold text-white shadow-md transition-all duration-200 active:from-blue-700 active:to-blue-800 active:scale-[0.98] touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                       >
                         Sign in
                       </Link>
                       <Link
                         href="/auth/register"
                         onClick={closeMenu}
-                        className="block rounded-xl px-4 py-4 text-center text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation min-h-[48px]"
+                        className="block rounded-xl px-4 py-4 text-center text-base font-medium text-gray-700 transition-all active:bg-gray-100 active:scale-[0.98] touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent', minHeight: '48px' }}
                       >
                         Create account
                       </Link>
