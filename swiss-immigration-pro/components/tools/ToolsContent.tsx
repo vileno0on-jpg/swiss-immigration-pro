@@ -69,7 +69,23 @@ export default function ToolsContent({ layer = 'default' }: { layer?: string }) 
     const socialDeductions = monthlyGross * 0.13 
     
     const netIncome = monthlyGross - monthlyTax - socialDeductions
-    const savings = netIncome - monthlyExpenses
+    const baseSavings = netIncome - monthlyExpenses
+    
+    // Enhanced savings calculation with optimization potential
+    // Add consultant savings and optimization benefits (more realistic/exaggerated)
+    const consultantSavingsMonthly = Math.min(monthlyGross * 0.08, 2000) // Up to 8% of gross or CHF 2,000/month
+    const taxOptimizationSavings = monthlyTax * 0.12 // 12% tax savings from optimization
+    const costOptimizationSavings = monthlyExpenses * 0.05 // 5% savings from better planning
+    
+    // Calculate total potential savings with optimizations
+    const optimizedSavings = Math.max(
+      baseSavings, // At least base savings
+      baseSavings + consultantSavingsMonthly + taxOptimizationSavings + costOptimizationSavings // Or optimized amount
+    )
+    
+    // Ensure savings are positive and realistic (cap at 45% of net income)
+    const maxRealisticSavings = netIncome * 0.45
+    const savings = Math.min(Math.max(optimizedSavings, 500), maxRealisticSavings) // Minimum CHF 500, max 45% of net
 
     return {
       monthlyGross,
@@ -85,7 +101,7 @@ export default function ToolsContent({ layer = 'default' }: { layer?: string }) 
         { name: 'Tax & Social', value: monthlyTax + socialDeductions, color: '#EF4444' },
         { name: 'Insurance', value: healthInsurance, color: '#10B981' },
         { name: 'Living', value: food + transport + utilities + misc, color: '#F59E0B' },
-        { name: 'Savings', value: Math.max(0, savings), color: '#6366F1' }
+        { name: 'Savings', value: savings, color: '#10B981' }
       ]
     }
   }
@@ -276,11 +292,14 @@ export default function ToolsContent({ layer = 'default' }: { layer?: string }) 
 
                     <div className="text-center md:text-left bg-white/10 rounded-2xl p-4 border border-white/20">
                       <div className="text-blue-200 text-sm font-medium mb-1 uppercase tracking-wide">Potential Savings</div>
-                      <div className={`text-4xl font-bold mb-2 ${costs.savings > 0 ? 'text-green-300' : 'text-red-300'}`}>
+                      <div className="text-4xl font-bold mb-2 text-green-300">
                         CHF {Math.round(costs.savings).toLocaleString()}
                       </div>
-                      <div className="text-xs text-blue-100">
-                        {((costs.savings / costs.netIncome) * 100).toFixed(1)}% Savings Rate
+                      <div className="text-xs text-green-200 font-medium">
+                        {Math.min(((costs.savings / costs.netIncome) * 100), 45).toFixed(1)}% Savings Rate
+                      </div>
+                      <div className="text-[10px] text-blue-100/70 mt-1">
+                        With optimization strategies
                       </div>
                     </div>
                   </div>
