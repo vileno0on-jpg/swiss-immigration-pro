@@ -7,6 +7,7 @@ import { Menu, X, User, LogOut, Shield, Settings, Globe, Star, AlertTriangle } f
 import { useSession, signOut } from 'next-auth/react'
 
 import AdvancedSearch from '@/components/AdvancedSearch'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 type AppUser = {
   id?: string
@@ -219,18 +220,9 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                 </Link>
               )}
 
-              <button
-                onClick={() => {
-                  if (typeof window !== 'undefined' && window.openInitialQuiz) {
-                    window.openInitialQuiz()
-                  }
-                }}
-                className="ml-2 rounded-lg p-2 transition-colors hover:bg-gray-100 hidden sm:flex items-center space-x-1"
-                aria-label="Change Language"
-                title="Change Language"
-              >
-                <Globe className="h-5 w-5 text-gray-700" />
-              </button>
+              <div className="ml-2 hidden sm:block">
+                <LanguageSwitcher />
+              </div>
 
               <button
                 onClick={toggleMenu}
@@ -267,18 +259,9 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                 ))}
 
                 <div className="border-t border-gray-200 pt-3">
-                  <button
-                    onClick={() => {
-                      closeMenu()
-                      if (typeof window !== 'undefined' && window.openInitialQuiz) {
-                        window.openInitialQuiz()
-                      }
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
-                  >
-                    <Globe className="h-4 w-4" />
-                    Change Language
-                  </button>
+                  <div onClick={closeMenu}>
+                    <LanguageSwitcher />
+                  </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-3">
