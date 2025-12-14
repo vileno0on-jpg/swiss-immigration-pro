@@ -27,3 +27,4 @@ echo "   → Configure firewall in Infomaniak Manager to allow ports 80/443"
 echo "   → Then site will be accessible at: http://83.228.215.185"
 
 
+

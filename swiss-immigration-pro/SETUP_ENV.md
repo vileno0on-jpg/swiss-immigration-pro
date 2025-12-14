@@ -31,6 +31,10 @@ STRIPE_WEBHOOK_SECRET=whsec_placeholder
 GROQ_API_KEY=gsk_placeholder
 OPENAI_API_KEY=sk-placeholder
 
+# DeepL Translation (placeholder - won't work yet)
+# Get your API key from: https://www.deepl.com/pro-api
+DEEPL_API_KEY=placeholder_deepl_key
+
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3001
 NEXT_PUBLIC_ADMIN_EMAIL=admin@swissimmigrationpro.com
@@ -68,6 +72,7 @@ Go to: **http://localhost:3001**
 ❌ **Live Stats** - No database  
 ❌ **Dashboards** - Need auth  
 ❌ **Stripe Checkout** - No payments  
+❌ **Translation** - No DeepL API key  
 
 ---
 
@@ -96,7 +101,8 @@ Manual setup guide.
 | **Supabase** | supabase.com/dashboard → Settings → API | 5 min |
 | **Stripe** | stripe.com/dashboard → Developers → API keys | 10 min |
 | **Groq** | console.groq.com → API Keys | 5 min |
-| **Total** | All three services | ~20 min |
+| **DeepL** | deepl.com/pro-api → Account → API Keys | 5 min |
+| **Total** | All services | ~25 min |
 
 ---
 

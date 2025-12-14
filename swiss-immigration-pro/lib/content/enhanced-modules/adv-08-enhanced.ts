@@ -231,3 +231,4 @@ Understanding total cost of living in Switzerland enables realistic budgeting an
   ]
 }
 
+

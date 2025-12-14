@@ -4,6 +4,11 @@ import { Shield, Users, Award, Clock, Star, CheckCircle, ArrowRight, Zap, MapPin
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import SuccessStories from '@/components/marketing/SuccessStories'
+import TrustIndicators from '@/components/marketing/TrustIndicators'
+import BeforeAfter from '@/components/marketing/BeforeAfter'
+import AchievementBadges from '@/components/marketing/AchievementBadges'
+import ValueProposition from '@/components/marketing/ValueProposition'
 
 // Move static stats inside component as fallback
 export default function Home() {
@@ -211,6 +216,9 @@ export default function Home() {
               </div>
             </motion.div>
 
+            {/* Achievement Badges */}
+            <AchievementBadges />
+
             {/* Enhanced Statistics - Interactive */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -412,6 +420,18 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Value Proposition Section */}
+        <ValueProposition />
+
+        {/* Before/After Comparison Section */}
+        <BeforeAfter />
+
+        {/* Success Stories Section */}
+        <SuccessStories />
+
+        {/* Trust Indicators Section */}
+        <TrustIndicators />
 
         {/* CTA Section - Enhanced with Trust Images */}
         <div className="py-20 bg-gradient-to-r from-blue-600 to-indigo-600 text-white relative overflow-hidden">

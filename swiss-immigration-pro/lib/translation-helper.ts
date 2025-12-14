@@ -1,39 +1,59 @@
 /**
- * Translation Helper
- * Ensures all content including dynamic masterclass content gets translated
+ * Translation Helper for DeepL
+ * Ensures all content including dynamic content gets translated
  */
 
-export const initTranslationObserver = () => {
-  if (typeof window === 'undefined') return
+// Elements that should not be translated
+export const NO_TRANSLATE_SELECTORS = [
+  'script',
+  'style',
+  'noscript',
+  'code',
+  'pre',
+  '.notranslate',
+  '[translate="no"]',
+  'input[type="email"]',
+  'input[type="password"]',
+  'input[type="url"]',
+  'input[type="search"]',
+  'textarea',
+  'select',
+]
 
-  // Simplified observer - only watch for major changes, not every mutation
-  let debounceTimer: NodeJS.Timeout
-  
-  const observer = new MutationObserver((mutations) => {
-    // Debounce to avoid excessive processing
-    clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => {
-      // Only process if there are significant changes
-      const hasSignificantChanges = mutations.some(
-        mutation => mutation.addedNodes.length > 0 && 
-        mutation.addedNodes[0].nodeType === Node.ELEMENT_NODE
-      )
-      
-      if (hasSignificantChanges) {
-        markContentAsTranslatable()
-      }
-    }, 300) // 300ms debounce
-  })
+// Check if element should be translated
+export const shouldTranslate = (element: Element): boolean => {
+  // Skip if element or parent has notranslate class
+  if (element.closest('.notranslate')) {
+    return false
+  }
 
-  // Only observe childList, not subtree (less intensive)
-  observer.observe(document.body, {
-    childList: true,
-    subtree: false, // Don't watch all descendants
-  })
+  // Skip if element matches no-translate selectors
+  for (const selector of NO_TRANSLATE_SELECTORS) {
+    if (element.matches(selector) || element.closest(selector)) {
+      return false
+    }
+  }
 
-  return observer
+  // Skip if element has translate="no" attribute
+  if (element.getAttribute('translate') === 'no') {
+    return false
+  }
+
+  // Skip empty or whitespace-only text
+  const text = element.textContent?.trim()
+  if (!text || text.length === 0) {
+    return false
+  }
+
+  // Skip if it's already translated (has data-deepl attribute)
+  if (element.hasAttribute('data-deepl-translated')) {
+    return false
+  }
+
+  return true
 }
 
+// Mark content as translatable (for future use)
 export const markContentAsTranslatable = (selector: string = 'body') => {
   if (typeof window === 'undefined') return
 
@@ -56,17 +76,7 @@ export const markContentAsTranslatable = (selector: string = 'body') => {
   })
 }
 
-export const forceRetranslate = () => {
-  if (typeof window === 'undefined') return
-
-  // Trigger Google Translate to re-scan the page
-  const event = new Event('DOMContentLoaded', {
-    bubbles: true,
-    cancelable: true,
-  })
-  document.dispatchEvent(event)
-}
-
+// Add no-translate class to specific selectors
 export const addNoTranslateClass = (selectors: string[]) => {
   if (typeof window === 'undefined') return
 
@@ -79,14 +89,22 @@ export const addNoTranslateClass = (selectors: string[]) => {
   })
 }
 
-// Items that should NOT be translated
-export const NO_TRANSLATE_SELECTORS = [
-  'code',
-  'pre',
-  '.notranslate',
-  '[translate="no"]',
-  'input[type="email"]',
-  'input[type="password"]',
-  'input[type="url"]',
-]
+// Reset translation (restore original text)
+export const resetTranslation = () => {
+  if (typeof window === 'undefined') return
 
+  const translatedElements = document.querySelectorAll('[data-deepl-translated]')
+  translatedElements.forEach((el) => {
+    const originalText = el.getAttribute('data-deepl-original')
+    if (originalText !== null && el.textContent) {
+      el.textContent = originalText
+      el.removeAttribute('data-deepl-translated')
+      el.removeAttribute('data-deepl-original')
+    }
+  })
+
+  // Clear translation cache
+  if (typeof window !== 'undefined' && (window as any).translationCache) {
+    (window as any).translationCache.clear()
+  }
+}

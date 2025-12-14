@@ -7,6 +7,7 @@ import { InitialQuizGate } from '@/components/quiz/InitialQuizGate'
 import { TranslationLoader } from '@/components/TranslationLoader'
 import ScrollToTop from '@/components/layout/ScrollToTop'
 import { ToastProvider } from '@/components/providers/ToastProvider'
+import UrgencyBanner from '@/components/marketing/UrgencyBanner'
 import dynamic from 'next/dynamic'
 
 // Dynamically import FloatingChatWidget to avoid SSR issues - completely separate component
@@ -30,6 +31,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <ToastProvider>
         <TranslationLoader />
+        <UrgencyBanner />
         <InitialQuizGate />
         <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
           {children}

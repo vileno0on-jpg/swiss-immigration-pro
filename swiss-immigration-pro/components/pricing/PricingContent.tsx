@@ -7,6 +7,7 @@ import LayerHeader from '@/components/layout/LayerHeader'
 import { CheckCircle, Crown, Sparkles, Shield, Star, Zap, MessageSquare, BookOpen, LayoutDashboard, Users, FileText } from 'lucide-react'
 import { PRICING_PACKS } from '@/lib/stripe'
 import { PricingPack } from '@/types'
+import ROICalculator from '@/components/marketing/ROICalculator'
 
 export default function PricingContent({ layer = 'default' }: { layer?: string }) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual')
@@ -179,6 +180,9 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
             )
           })}
         </div>
+
+        {/* ROI Calculator */}
+        <ROICalculator />
 
         {/* Feature Deep Dive Grid */}
         <div className="mt-32">

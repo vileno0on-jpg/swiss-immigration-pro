@@ -183,3 +183,4 @@ For non-EU/EFTA nationals, the employer must justify the salary in the work perm
   ]
 }
 
+

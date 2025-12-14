@@ -70,3 +70,4 @@ ssh ubuntu@83.228.215.185 "cd swiss-immigration-pro && git pull origin main && n
   - Obtain the private key from whoever created this key pair
 
 
+
