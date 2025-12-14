@@ -84,4 +84,3 @@ The oath ceremony represents the final step in acquiring Swiss citizenship, mark
   ]
 }
 
-

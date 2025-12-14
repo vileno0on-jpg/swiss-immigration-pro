@@ -28,9 +28,5 @@ export const CONFIG = {
     gaId: process.env.NEXT_PUBLIC_GA_ID,
     hotjarId: process.env.NEXT_PUBLIC_HOTJAR_ID,
   },
-  translation: {
-    provider: 'deepl', // DeepL translation service
-    apiKey: process.env.DEEPL_API_KEY,
-  },
 } as const
 

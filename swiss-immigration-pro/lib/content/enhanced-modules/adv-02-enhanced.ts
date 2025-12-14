@@ -122,4 +122,3 @@ Different industries require different approaches in motivation letters. This se
   ]
 }
 
-

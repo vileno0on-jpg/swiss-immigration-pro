@@ -43,25 +43,12 @@ export default function ToolsContent({ layer = 'default' }: { layer?: string }) 
     const selectedCanton = cantons.find(c => c.id === canton) || cantons[0]
     
     // Base multipliers
-    const housingMult = housing === 'house' ? 1.5 : 1.0
-    const lifestyleMult = lifestyle === 'frugal' ? 0.75 : lifestyle === 'expensive' ? 1.3 : 1.0
+    const housingMult = housing === 'house' ? 1.6 : 1.0
+    const lifestyleMult = lifestyle === 'frugal' ? 0.7 : lifestyle === 'expensive' ? 1.4 : 1.0
     const familyMult = 1 + (familySize - 1) * 0.4 // Economies of scale
 
-    // Monthly Costs - More accurate rent calculation based on apartment size needed
-    // Base rent is for 3.5 rooms (2 bedroom) - typical for couples
-    let apartmentSizeMultiplier = 1.0
-    if (familySize === 1) {
-      // Single person: 2.5 rooms (1 bedroom) = ~75% of 3.5 rooms price
-      apartmentSizeMultiplier = 0.75
-    } else if (familySize === 2) {
-      // Couple: 3.5 rooms (2 bedrooms) = base price
-      apartmentSizeMultiplier = 1.0
-    } else {
-      // Family 3+: 4.5+ rooms (3+ bedrooms) = ~120-140% of 3.5 rooms
-      apartmentSizeMultiplier = 1.0 + (familySize - 2) * 0.15
-    }
-    
-    const monthlyRent = selectedCanton.rent * apartmentSizeMultiplier * housingMult * lifestyleMult
+    // Monthly Costs
+    const monthlyRent = selectedCanton.rent * housingMult * (1 + (familySize - 1) * 0.2)
     const healthInsurance = (380 + (familySize - 1) * 300) * lifestyleMult // Kids are cheaper
     const food = 500 * familySize * lifestyleMult
     const transport = (150 + (familySize - 1) * 80) * lifestyleMult

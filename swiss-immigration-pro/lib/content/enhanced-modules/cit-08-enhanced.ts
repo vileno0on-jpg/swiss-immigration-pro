@@ -75,4 +75,3 @@ Some countries require renunciation:
   ]
 }
 
-
