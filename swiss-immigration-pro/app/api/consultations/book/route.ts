@@ -22,7 +22,7 @@ const CONSULTATION_TYPES: Record<string, { name: string; price: number }> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { consultationType, fullName, email, preferredDate, timezone, notes } = body
+    let { consultationType, fullName, email, preferredDate, timezone, notes } = body
 
     if (!consultationType || !fullName || !email || !preferredDate) {
       return NextResponse.json(

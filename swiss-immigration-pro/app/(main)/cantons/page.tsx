@@ -396,7 +396,7 @@ export default function CantonsPage() {
                   <AlertCircle className="w-5 h-5 text-red-600" />
                   <span className="font-semibold text-red-900">Avoid: October-December</span>
                 </div>
-                <p className="text-sm text-red-800">Quotas exhausted, <10% approval rates, wait for next year</p>
+                <p className="text-sm text-red-800">Quotas exhausted, &lt;10% approval rates, wait for next year</p>
               </div>
             </div>
           </motion.div>
@@ -689,7 +689,7 @@ export default function CantonsPage() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
                   <ArrowRight className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">Applying in November: <10% approval rates, quotas exhausted</span>
+                  <span className="text-gray-700">Applying in November: &lt;10% approval rates, quotas exhausted</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ArrowRight className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
