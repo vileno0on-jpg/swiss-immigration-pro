@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,10 +17,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Module ID and Section ID are required' }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get existing progress
-    const { data: existing, error: fetchError } = await supabase
+    const { data: existing, error: fetchError } = await db
       .from('masterclass_progress')
       .select('*')
       .eq('user_id', session.user.id)
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       ...(progressPercent === 100 && { completed_at: new Date().toISOString() })
     }
 
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await db
       .from('masterclass_progress')
       .upsert(upsertData, {
         onConflict: 'user_id,module_id'
@@ -88,8 +88,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Module ID is required' }, { status: 400 })
     }
 
-    const supabase = await createClient()
-    const { data: progress, error } = await supabase
+    const db = await createClient()
+    const { data: progress, error } = await db
       .from('masterclass_progress')
       .select('*')
       .eq('user_id', session.user.id)

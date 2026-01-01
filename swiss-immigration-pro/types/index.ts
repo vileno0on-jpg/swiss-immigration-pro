@@ -6,6 +6,13 @@ export interface PricingPack {
   price: number
   priceId: string | null
   features: readonly string[]
+  // SEO enhancements
+  description?: string
+  shortDescription?: string
+  keywords?: string[]
+  valueProposition?: string
+  badge?: string
+  recommendedFor?: string
 }
 
 export interface User {
@@ -80,3 +87,8 @@ export interface Subscription {
   current_period_end?: string
 }
 
+// Export CV types
+export * from './cv'
+
+// Export Resume types
+export * from './resume'

@@ -18,11 +18,11 @@ export const CONFIG = {
     provider: 'groq', // Primary: Groq (Llama 3.1 70B), fallback: OpenAI, xAI/Grok
     model: 'llama-3.1-70b-versatile', // Groq model (llama-3.1-70b-versatile, mixtral-8x7b-32768)
     maxTokens: 1000,
-    freeDailyLimit: 30,
-    temperature: 0.7,
+    freeDailyLimit: 10, // Increased from 3 to build trust and engagement
+    temperature: 0.8, // Higher temperature for more natural, human-like conversational responses
   },
   discord: {
-    disclaimer: 'General information only (updated Nov 2025). Not legal advice. Book consultation with Dr. Alpine Esq. for your case.',
+    disclaimer: '⚠️ General information only (updated Jan 2025). Not legal advice. Always verify with official sources (SEM.admin.ch). Consult a certified Swiss immigration lawyer for your specific case.',
   },
   analytics: {
     gaId: process.env.NEXT_PUBLIC_GA_ID,

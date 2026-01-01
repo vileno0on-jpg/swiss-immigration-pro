@@ -32,6 +32,9 @@ const config: Config = {
           900: '#1e3a8a',
           950: '#172554',
         },
+        swiss: {
+          red: '#D52B1E',
+        },
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],

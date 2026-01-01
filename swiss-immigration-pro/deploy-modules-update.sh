@@ -32,3 +32,5 @@ echo "✅ Deployment complete!"
 echo "🌐 Your site is live at: http://83.228.215.185"
 pm2 status
 
+
+

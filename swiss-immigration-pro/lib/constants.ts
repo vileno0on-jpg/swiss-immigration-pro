@@ -63,7 +63,7 @@ export const QUIZ_QUESTIONS = [
 
 // Monetization trigger points
 export const MONETIZATION_TRIGGERS = {
-  FREE_MESSAGE_LIMIT: 3,
+  FREE_MESSAGE_LIMIT: 10, // Increased from 3 to build trust and engagement
   CV_PREVIEW_ONLY: true,
   MASTERCLASS_LOCKED: 8, // Lock modules 3-10
   CITIZENSHIP_ROADMAP_LOCKED: true,

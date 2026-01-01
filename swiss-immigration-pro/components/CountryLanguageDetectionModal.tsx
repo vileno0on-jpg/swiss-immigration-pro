@@ -32,11 +32,15 @@ const SUPPORTED_LANGUAGES = [
   { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹' },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
+  { code: 'zh-CN', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
   { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
   { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
   { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷' },
+  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '🇹🇷' },
+  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱' },
+  { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱' },
 ]
 
 const CURRENCIES = [
@@ -194,13 +198,18 @@ export default function CountryLanguageDetectionModal({
     const layer = classifyLayer(selectedData.country)
     const layerRoute = getLayerRoute(layer)
 
-    // Save preferences
+    // Save preferences - use BOTH keys for compatibility
     localStorage.setItem('userCountry', selectedData.country)
     localStorage.setItem('userCountryName', selectedData.countryName)
     localStorage.setItem('userLanguage', selectedData.language)
     localStorage.setItem('userCurrency', selectedData.currency)
     localStorage.setItem('userLayer', layer)
     localStorage.setItem('detectionCompleted', 'true')
+    
+    // CRITICAL: Set the keys that TranslationLoader expects
+    localStorage.setItem('preferredLanguage', selectedData.language)
+    localStorage.setItem('autoTranslateEnabled', 'true')
+    
     // Save redirect destination in case page reloads
     localStorage.setItem('pendingLayerRedirect', layerRoute)
 
@@ -210,6 +219,22 @@ export default function CountryLanguageDetectionModal({
     document.cookie = `userLanguage=${selectedData.language}; path=/; max-age=${oneYear}`
     document.cookie = `userCurrency=${selectedData.currency}; path=/; max-age=${oneYear}`
     document.cookie = `userLayer=${layer}; path=/; max-age=${oneYear}`
+
+    // Normalize language code for Google Translate (use zh-CN for better natural translations)
+    const normalizeLangCode = (code: string): string => {
+      if (code === 'zh') return 'zh-CN'
+      return code
+    }
+    
+    // Set translation cookie BEFORE redirect (critical for translation to work)
+    const targetLang = selectedData.language === 'en' ? 'en' : normalizeLangCode(selectedData.language)
+    const cookieValue = `/en/${targetLang}`
+    document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
+
+    // Update HTML lang attribute
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = selectedData.language
+    }
 
     // Call completion handler
     onComplete({
@@ -222,23 +247,44 @@ export default function CountryLanguageDetectionModal({
 
     setHasApplied(true)
 
-    // Redirect to layer route immediately (before translation to avoid reload issues)
-    onClose()
-    router.push(layerRoute)
-    
-    // Apply translation after redirect starts (non-blocking)
-    applyTranslation(selectedData.language).catch(console.error)
-
-    // Update HTML lang attribute
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = selectedData.language
+    // Apply translation BEFORE redirect to ensure it's ready
+    try {
+      await applyTranslation(selectedData.language)
+    } catch (error) {
+      console.error('Translation error:', error)
+      // Continue with redirect even if translation fails
     }
+
+    // Small delay to ensure translation cookie is set, then redirect
+    setTimeout(() => {
+      onClose()
+      router.push(layerRoute)
+    }, 300)
   }, [selectedData, router, onComplete, onClose])
 
   const applyTranslation = async (languageCode: string) => {
     if (typeof window === 'undefined') return
 
-      // Load Google Translate script if not already loaded
+    // Normalize language code for Google Translate (use zh-CN for better natural translations)
+    const normalizeLangCode = (code: string): string => {
+      if (code === 'zh') return 'zh-CN'
+      return code
+    }
+
+    // Set translation cookie immediately (this is the most important part)
+    const targetLang = languageCode === 'en' ? 'en' : normalizeLangCode(languageCode)
+    const cookieValue = `/en/${targetLang}`
+    document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
+
+    // Check if redirect is pending - if so, just set cookie and return
+    // TranslationLoader on the destination page will handle the rest
+    const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
+    if (pendingRedirect) {
+      // Cookie is set, TranslationLoader will handle initialization on new page
+      return
+    }
+
+    // Load Google Translate script if not already loaded
     const loadGoogleTranslate = (): Promise<void> => {
       return new Promise((resolve, reject) => {
         if (window.google?.translate?.TranslateElement) {
@@ -260,7 +306,7 @@ export default function CountryLanguageDetectionModal({
             if (!window.google?.translate?.TranslateElement) {
               reject(new Error('Google Translate failed to load'))
             }
-          }, 10000)
+          }, 5000) // Reduced timeout since we're about to redirect
           return
         }
 
@@ -282,16 +328,16 @@ export default function CountryLanguageDetectionModal({
         // Initialize Google Translate when script loads
         ;(window as any).googleTranslateElementInit = () => {
           try {
-          if (window.google?.translate?.TranslateElement) {
-            new window.google.translate.TranslateElement(
-              {
-                pageLanguage: 'en',
-                includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
-                autoDisplay: false,
+            if (window.google?.translate?.TranslateElement) {
+              new window.google.translate.TranslateElement(
+                {
+                  pageLanguage: 'en',
+                  includedLanguages: SUPPORTED_LANGUAGES.map(l => l.code).join(','),
+                  autoDisplay: false,
                   layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-              },
-              'google_translate_element'
-            )
+                },
+                'google_translate_element'
+              )
               resolve()
             } else {
               reject(new Error('Google Translate API not available'))
@@ -310,39 +356,25 @@ export default function CountryLanguageDetectionModal({
     }
 
     try {
-      // Load Google Translate
-      await loadGoogleTranslate()
+      // Try to load Google Translate, but don't wait too long
+      await Promise.race([
+        loadGoogleTranslate(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+      ])
 
-      // Set translation cookie
-      const targetLang = languageCode === 'en' ? 'en' : languageCode
-      const cookieValue = `/en/${targetLang}`
-      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
-      
       // Wait a bit for Google Translate to initialize
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 300))
 
-      // Trigger translation (avoid reload if redirect is pending)
-      const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
+      // Trigger translation if widget is ready
       const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
       if (select) {
         select.value = targetLang
         select.dispatchEvent(new Event('change', { bubbles: true }))
-      } else if (!pendingRedirect) {
-        // Only reload if no redirect is pending (avoid interrupting navigation)
-        // If select not found, reload page to apply translation
-        window.location.reload()
       }
     } catch (error) {
-      console.error('Error applying translation:', error)
-      // Fallback: set cookie and reload (only if no redirect pending)
-      const pendingRedirect = localStorage.getItem('pendingLayerRedirect')
-      const targetLang = languageCode === 'en' ? 'en' : languageCode
-      document.cookie = `googtrans=/en/${targetLang}; path=/; max-age=31536000; SameSite=Lax`
-      if (!pendingRedirect) {
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
-      }
+      // Cookie is already set, which is the most important part
+      // TranslationLoader on destination page will handle initialization
+      console.log('Translation initialization skipped (will apply on destination page):', error)
     }
   }
 

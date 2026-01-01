@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, LogOut, Shield, Settings, Globe, Star, AlertTriangle } from 'lucide-react'
+import { Menu, X, User, LogOut, Shield, Settings, Globe, Star, AlertTriangle, Calendar, Mail } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 
 import AdvancedSearch from '@/components/AdvancedSearch'
@@ -33,7 +33,16 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
   const [logoError, setLogoError] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-  
+
+  // Ensure layer is never undefined - fallback to 'other' if needed
+  // Use useMemo to ensure consistent value during SSR and client hydration
+  const safeLayer = useMemo(() => {
+    if (layer && (layer === 'eu' || layer === 'us' || layer === 'other')) {
+      return layer
+    }
+    return 'other'
+  }, [layer])
+
   // Get session safely - SessionProvider should wrap this component
   const { data: session, status } = useSession()
 
@@ -45,7 +54,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
       html.classList.remove('dark')
       html.style.colorScheme = 'light'
       localStorage.removeItem('darkMode')
-      
+
       // Ensure body is light
       document.body.style.removeProperty('background-color')
       document.body.style.removeProperty('color')
@@ -57,7 +66,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
     if (!mounted) {
       return null
     }
-    
+
     try {
       if (status === 'loading' || !session?.user) {
         return null
@@ -81,13 +90,13 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
   const navigationItems = useMemo(() => {
     const base = [
       { href: homeHref, label: 'Home' },
-      { href: `/${layer}/visas`, label: 'Visas' },
-      { href: `/${layer}/citizenship`, label: 'Citizenship' },
-      { href: `/${layer}/tools`, label: 'Tools' },
-      { href: `/${layer}/pricing`, label: 'Pricing' },
+      { href: `/${safeLayer}/visas`, label: 'Visas' },
+      { href: `/${safeLayer}/citizenship`, label: 'Citizenship' },
+      { href: `/${safeLayer}/tools`, label: 'Tools' },
+      { href: `/${safeLayer}/pricing`, label: 'Pricing' },
     ]
     return base
-  }, [layer, homeHref])
+  }, [safeLayer, homeHref])
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), [])
   const toggleMenu = useCallback(() => {
@@ -101,13 +110,13 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
   // Layer-specific badge defaults
   const badge = customBadge || {
-    icon: layer === 'eu' ? <Star className="w-4 h-4" /> : layer === 'us' ? <AlertTriangle className="w-4 h-4" /> : <Globe className="w-4 h-4" />,
-    text: layer === 'eu' 
+    icon: safeLayer === 'eu' ? <Star className="w-4 h-4" /> : safeLayer === 'us' ? <AlertTriangle className="w-4 h-4" /> : <Globe className="w-4 h-4" />,
+    text: safeLayer === 'eu'
       ? 'EU/EFTA Freedom of Movement: No Work Permit Quotas Required'
-      : layer === 'us' 
+      : safeLayer === 'us'
       ? '2025 Quota Alert: ~4,500 B Permits for Third-Country Nationals • Apply Early'
       : 'Serving Citizens from 190+ Countries • Expert Third-Country Immigration Guidance',
-    bgColor: layer === 'eu' ? 'bg-blue-600' : layer === 'us' ? 'bg-black' : 'bg-blue-600',
+    bgColor: safeLayer === 'eu' ? 'bg-blue-600' : safeLayer === 'us' ? 'bg-black' : 'bg-blue-600',
     textColor: 'text-white'
   }
 
@@ -122,12 +131,15 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                   🇨🇭
                 </div>
               ) : (
-                <div className="flex h-11 w-11 items-center justify-center transition-transform duration-200 hover:scale-105 overflow-hidden">
+                <div className="flex h-11 w-11 items-center justify-center transition-transform duration-200 hover:scale-105 overflow-hidden rounded-xl bg-white/50">
                   <img
                     src="/images/logo-removebg.png"
-                    alt="Swiss Immigration Pro"
+                    alt="Swiss Immigration Pro Logo"
+                    width={44}
+                    height={44}
                     className="w-full h-full object-contain"
                     onError={() => setLogoError(true)}
+                    onLoad={() => setLogoError(false)}
                   />
                 </div>
               )}
@@ -156,6 +168,26 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                   {item.label}
                 </Link>
               ))}
+              
+              {/* Book Consultation & Contact Buttons */}
+              <div className="ml-2 flex items-center gap-1 border-l border-gray-200 pl-2">
+                <Link
+                  href="/consultation"
+                  className="flex items-center justify-center rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-2 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:from-indigo-700 hover:to-purple-700 hover:shadow-md min-w-[32px]"
+                  title="Book Consultation"
+                >
+                  <Calendar className="h-3.5 w-3.5 shrink-0" />
+                  <span className="hidden 2xl:inline ml-1.5 whitespace-nowrap">Consultation</span>
+                </Link>
+                <Link
+                  href={`/${safeLayer}/contact`}
+                  className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm min-w-[32px]"
+                  title="Contact Us"
+                >
+                  <Mail className="h-3.5 w-3.5 shrink-0" />
+                  <span className="hidden 2xl:inline ml-1.5 whitespace-nowrap">Contact</span>
+                </Link>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -257,6 +289,28 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                     {item.label}
                   </Link>
                 ))}
+
+                {/* Book Consultation & Contact in Mobile Menu */}
+                <div className="border-t border-gray-200 pt-3 space-y-2">
+                  <Link
+                    href="/consultation"
+                    onClick={closeMenu}
+                    className="flex items-center gap-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-all active:from-indigo-700 active:to-purple-700 active:scale-[0.98] touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent', minHeight: '44px' }}
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Consultation
+                  </Link>
+                  <Link
+                    href={`/${safeLayer}/contact`}
+                    onClick={closeMenu}
+                    className="flex items-center gap-2.5 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-all active:bg-gray-50 active:scale-[0.98] touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent', minHeight: '44px' }}
+                  >
+                    <Mail className="h-4 w-4" />
+                    Contact
+                  </Link>
+                </div>
 
                 <div className="border-t border-gray-200 pt-3">
                   <div onClick={closeMenu}>
@@ -368,10 +422,10 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
 
       {/* Layer-Specific Announcement Bar */}
       {badge && (
-        <div className={`${badge.bgColor} ${badge.textColor} py-2 px-4 border-b-2 border-black`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-sm font-semibold">
-            {badge.icon}
-            <span>{badge.text}</span>
+        <div className={`${badge.bgColor} ${badge.textColor} py-2 sm:py-2.5 px-3 sm:px-4 border-b-2 border-black`}>
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-center px-2">
+            <span className="shrink-0">{badge.icon}</span>
+            <span className="leading-tight">{badge.text}</span>
           </div>
         </div>
       )}

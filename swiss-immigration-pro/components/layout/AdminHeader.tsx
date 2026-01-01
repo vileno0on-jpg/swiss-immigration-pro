@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Shield, Settings, LogOut, User, Home, ArrowLeft } from 'lucide-react'
+import { Menu, X, Shield, Settings, LogOut, User, Home, ArrowLeft, Mail } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useCallback, useMemo, useEffect } from 'react'
 
 export default function AdminHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [logoError, setLogoError] = useState(false)
   const pathname = usePathname()
   const { data: session, status } = useSession()
 
@@ -42,9 +44,22 @@ export default function AdminHeader() {
       <nav className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between sm:h-20">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-lg transition-transform duration-200 hover:scale-105">
-              <Shield className="h-6 w-6" />
-            </div>
+            {logoError ? (
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-lg transition-transform duration-200 hover:scale-105">
+                <Shield className="h-6 w-6" />
+              </div>
+            ) : (
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-200 hover:scale-105 overflow-hidden">
+                <Image
+                  src="/images/logo-removebg.png"
+                  alt="Swiss Immigration Pro Logo"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-contain"
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            )}
             <div className="hidden sm:flex flex-col leading-tight">
               <span className="font-semibold text-gray-900">
                 Admin<span className="text-blue-600">Dashboard</span>
@@ -66,6 +81,16 @@ export default function AdminHeader() {
               }`}
             >
               Overview
+            </Link>
+            <Link
+              href="/admin/newsletter"
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                pathname === '/admin/newsletter'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-700 hover:bg-blue-50/60 hover:text-blue-600'
+              }`}
+            >
+              Newsletter
             </Link>
             <Link
               href="/admin/settings"
@@ -141,6 +166,17 @@ export default function AdminHeader() {
                 }`}
               >
                 Overview
+              </Link>
+              <Link
+                href="/admin/newsletter"
+                onClick={closeMenu}
+                className={`block rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                  pathname === '/admin/newsletter'
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-700 hover:bg-blue-50'
+                }`}
+              >
+                Newsletter
               </Link>
               <Link
                 href="/admin/settings"

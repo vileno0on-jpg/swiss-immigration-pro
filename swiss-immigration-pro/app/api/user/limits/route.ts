@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET() {
   try {
@@ -12,9 +12,9 @@ export async function GET() {
     }
 
     // Get user profile and limits
-    const supabase = await createClient()
+    const db = await createClient()
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await db
       .from('profiles')
       .select('pack_id')
       .eq('id', session.user.id)
@@ -23,7 +23,7 @@ export async function GET() {
     const packId = profile?.pack_id || 'free'
 
     // Get user limits
-    const { data: limitsResult, error: limitsError } = await supabase
+    const { data: limitsResult, error: limitsError } = await db
       .from('user_limits')
       .select('messages_today, last_reset_date')
       .eq('user_id', session.user.id)

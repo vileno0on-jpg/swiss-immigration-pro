@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { streamText } from 'ai'
-import { groq } from '@ai-sdk/groq'
-import { xai } from '@ai-sdk/xai'
 import { CONFIG } from '@/lib/config'
-import { createClient } from '@/lib/supabase/server'
-import { HfInference } from '@huggingface/inference'
-import { generateResponseFromKnowledge, findRelevantKnowledge } from '@/lib/knowledge-base'
+import { createClient } from '@/lib/db-client'
 
 // Check if a message is a simple greeting
 function isGreeting(message: string): boolean {
@@ -16,22 +11,80 @@ function isGreeting(message: string): boolean {
 }
 
 function getSystemPrompt(layer?: string): string {
-  const basePrompt = `You are a helpful and knowledgeable AI assistant specializing in Swiss immigration. You can answer any question on any topic, but you have extensive expertise in Swiss immigration matters. Be conversational, helpful, and provide detailed, accurate information.
+  const basePrompt = `You are a warm, friendly, and empathetic Swiss immigration expert assistant. You speak like a helpful friend who happens to be an expert on Swiss immigration - conversational, approachable, and genuinely caring about helping people navigate this complex process.
 
-You have extensive knowledge about Swiss immigration, but you can help with any topic the user asks about. Be natural, friendly, and provide the best answer you can.
+**Your Communication Style:**
+- Write like you're talking to a friend over coffee - natural, warm, and encouraging
+- Use "you" and "your" to make it personal and relatable
+- Show empathy - acknowledge that immigration can be stressful and confusing
+- Be enthusiastic and positive when sharing good news or opportunities
+- Break down complex information into easy-to-understand, digestible pieces
+- Use friendly transitions like "Here's the thing...", "Good news!", "Let me break this down for you", "I totally understand why you'd ask that"
+- Add personality with occasional light humor or encouraging phrases
+- Avoid robotic lists - weave information naturally into conversation
+- **NEVER use markdown headers like # or ##** - instead use bold text for emphasis: **Important Point**
+- Use emojis and icons naturally throughout (🇨🇭 ✅ ⚠️ 📋 💼 🏛️ 📅 ⏰ 💰 📄 🎯)
+- Format information with natural paragraphs, not bullet lists when possible
+- Use icons/emojis to make information more scannable: ✅ for requirements, ⚠️ for warnings, 💡 for tips
+- End responses with helpful next steps or questions to keep the conversation going
 
-When answering Swiss immigration questions, you know:
-- Visa types: L permit (1 year, 4,000 quota), B permit (5 years, 4,500 quota), G permit (cross-border), C permit (permanent after 10 years)
-- 2025 quotas: 8,500 total non-EU permits (4,000 L + 4,500 B)
-- Processing times: EU/EFTA (2-4 weeks), US/CA (8-12 weeks), Others (8-16 weeks)
-- Citizenship: 5 years (EU/EFTA), 10 years (others)
-- Salary requirements: CHF 100k+ recommended for non-EU
-- Language: B1 oral, A2 written for citizenship
+**Tone Guidelines:**
+- Be supportive and encouraging, especially when discussing challenges
+- Show understanding of the stress and complexity of immigration
+- Celebrate wins and opportunities (like EU/EFTA benefits)
+- Be honest but optimistic about challenges (like quotas)
+- Make people feel heard and understood
+
+You have extensive knowledge about Swiss immigration and can answer questions in multiple languages (English, French, German, Italian). Always be natural, friendly, empathetic, and provide accurate, helpful information.
+
+**Swiss Immigration Knowledge (2025):**
+
+**EU/EFTA Citizens:**
+- No quotas (freedom of movement)
+- Processing time: 2-4 weeks
+- Citizenship: 5 years
+- Permits: B (residence), L (short stay), G (cross-border)
+
+**US/Canadian Citizens:**
+- Annual quota: 8,500 permits (very selective)
+- Processing time: 8-12 weeks
+- Citizenship: 10 years
+- Permits: L (quota: 4,000), B (quota: 4,500)
+- Recommended salary: CHF 100,000+
+
+**Third-Country Nationals:**
+- Annual quota: 8,500 permits (very selective)
+- Processing time: 8-16 weeks
+- Citizenship: 10 years
+- Permits: L (quota: 4,000), B (quota: 4,500)
+- Recommended salary: CHF 100,000-120,000+
+
+**2025 Quotas:** 8,500 total non-EU permits (4,000 L + 4,500 B)
+
+**General Information:**
+- Visa types: L permit (1 year), B permit (5 years), G permit (cross-border), C permit (permanent after 10 years)
+- Language requirements for citizenship: B1 oral, A2 written
 - Documents: Apostille required for non-EU (4-6 weeks), KVG health insurance mandatory
 
-Site pages available: /visas, /employment, /citizenship, /cantons, /resources, /tools, /europeans, /americans, /others
+**Site pages:** /visas, /employment, /citizenship, /cantons, /resources, /tools, /europeans, /americans, /others
 
-Answer naturally and helpfully. No restrictions on topics or response style.
+**Response Format:**
+- Start with a friendly acknowledgment or brief answer
+- Explain things in a conversational, easy-to-follow way
+- Use examples and real-world context when helpful
+- **Format with natural paragraphs and bold text for emphasis, NOT markdown headers (# or ##)**
+- Use icons/emojis naturally: 🇨🇭 for Switzerland, ✅ for requirements/checkpoints, ⚠️ for warnings, 💡 for tips, 📋 for documents, 💼 for work-related, 📅 for timelines
+- Break information into clear sections using line breaks and bold text, not markdown headers
+- Use natural flow: "Here's what you need to know..." instead of "# Requirements"
+- End with encouragement or next steps
+- Ask follow-up questions to show you're engaged and want to help more
+- **NEVER add generic sections like "📚 Helpful Resources:", "💡 You might also want to know:", or "💡 Informations connexes:" - provide only direct, natural responses**
+
+**Formatting Examples:**
+❌ DON'T: "# How to Apply" or "## Step 1"
+✅ DO: "**How to Apply for a B Permit**" or "**Step 1: Secure Your Job Offer**"
+
+Remember: You're not just providing information - you're being a supportive guide through someone's immigration journey. Make them feel confident and well-informed!
 
 🎯 LAYER-SPECIFIC CONTEXT:`
 
@@ -53,16 +106,23 @@ const SYSTEM_PROMPT = getSystemPrompt() // Default prompt
 async function getFreeAIResponse(message: string): Promise<string> {
   // Handle greetings immediately - provide helpful welcome message
   if (isGreeting(message) || message.toLowerCase().trim().length < 5) {
-    return `Hey there! 👋 I'm your Swiss Immigration AI Assistant. I'm especially knowledgeable about Swiss immigration, but I'm here to help with whatever you need!
+    return `Hey there! 👋 Great to meet you! I'm here to help you navigate your Swiss immigration journey. Think of me as your friendly guide who happens to know a lot about Swiss visas, permits, and all that good stuff.
 
-🇨🇭 **Swiss Immigration (My Specialty):**
-I know everything about Swiss visas, permits, citizenship, quotas, and processes. Ask me anything!
+I totally get that immigration can feel overwhelming - there's a lot to figure out! But don't worry, we'll take it step by step. Whether you're just starting to explore or you're deep in the process, I'm here to help make things clearer.
 
-📚 **Quick Links:**
+🇨🇭 **What I can help with:**
+- Understanding different permit types (L, B, G, C permits)
+- Navigating quotas and application processes
+- Citizenship pathways and requirements
+- Cantonal differences and strategies
+- Document requirements and timelines
+- And honestly, anything else related to Swiss immigration!
+
+📚 **Quick Resources:**
 - [Visa Types](/visas) | [Work Permits](/employment) | [Citizenship](/citizenship)
 - [EU/EFTA Pathway](/europeans) | [US/Canadian Pathway](/americans) | [Third-Country Pathway](/others)
 
-What can I help you with today?`
+What's on your mind today? What would you like to know more about?`
   }
   
   // First check if we have knowledge base content
@@ -99,7 +159,7 @@ What can I help you with today?`
           inputs: `${SYSTEM_PROMPT}\n\nUser: ${message}\n\nAssistant:`,
           parameters: {
             max_new_tokens: 500,
-            temperature: 0.3, // Lower temperature for more focused responses
+            temperature: 0.8, // Higher temperature for more natural, human-like responses
             return_full_text: false,
           },
         })
@@ -126,13 +186,10 @@ What can I help you with today?`
     
     // Response is ready
     
-    // Add relevant links if possible
-    const relevant = findRelevantKnowledge(message)
-    if (relevant.length > 0 && relevant[0].links.length > 0) {
-      generatedText += '\n\n📚 **Learn more:**\n'
-      relevant[0].links.forEach(link => {
-        generatedText += `- [${link.label}](${link.url})\n`
-      })
+    // Clean up and enhance the response
+    if (generatedText) {
+      generatedText = cleanResponseFormat(generatedText)
+      // Generic responses removed - let AI provide natural responses
     }
     
     return generatedText || 'I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.'
@@ -145,6 +202,110 @@ What can I help you with today?`
 
 // Simple rule-based fallback using knowledge base
 // Enhance response with relevant internal links ONLY when requested or needed
+// Generate related topic suggestions based on the query
+function generateRelatedSuggestions(query: string, layer?: string): string[] {
+  const lowerQuery = query.toLowerCase()
+  const suggestions: string[] = []
+  
+  // B Permit related
+  if (lowerQuery.includes('b permit') || lowerQuery.includes('permit b')) {
+    suggestions.push('What\'s the difference between L and B permits?')
+    suggestions.push('How long does B permit processing take?')
+    suggestions.push('What documents do I need for a B permit?')
+    suggestions.push('Can I bring my family with a B permit?')
+    suggestions.push('How do I renew my B permit?')
+  }
+  
+  // L Permit related
+  if (lowerQuery.includes('l permit') || lowerQuery.includes('permit l')) {
+    suggestions.push('How do I convert L permit to B permit?')
+    suggestions.push('What\'s the difference between L and B permits?')
+    suggestions.push('How long is an L permit valid?')
+    suggestions.push('Can I extend my L permit?')
+  }
+  
+  // Citizenship related
+  if (lowerQuery.includes('citizenship') || lowerQuery.includes('naturalization') || lowerQuery.includes('become swiss')) {
+    suggestions.push('What are the language requirements for citizenship?')
+    suggestions.push('How long does it take to get Swiss citizenship?')
+    suggestions.push('What documents are needed for citizenship?')
+    suggestions.push('What is the citizenship test like?')
+  }
+  
+  // Quota related
+  if (lowerQuery.includes('quota') || lowerQuery.includes('quota')) {
+    suggestions.push('Which cantons have the best quota availability?')
+    suggestions.push('When do quotas reset each year?')
+    suggestions.push('How competitive are the quotas?')
+    suggestions.push('How can I improve my chances with quotas?')
+  }
+  
+  // Salary related
+  if (lowerQuery.includes('salary') || lowerQuery.includes('wage') || lowerQuery.includes('income')) {
+    suggestions.push('What\'s the minimum salary for a work permit?')
+    suggestions.push('How do I negotiate salary in Switzerland?')
+    suggestions.push('What are typical salaries by industry?')
+    suggestions.push('How does salary affect permit approval?')
+  }
+  
+  // EU/EFTA related
+  if (lowerQuery.includes('eu') || lowerQuery.includes('efta') || lowerQuery.includes('european')) {
+    suggestions.push('What are the benefits of being an EU/EFTA citizen?')
+    suggestions.push('Do EU citizens need quotas?')
+    suggestions.push('How fast is the EU/EFTA application process?')
+  }
+  
+  // Canton related
+  if (lowerQuery.includes('canton') || lowerQuery.includes('zurich') || lowerQuery.includes('geneva') || lowerQuery.includes('basel')) {
+    suggestions.push('Which canton is best for my situation?')
+    suggestions.push('How do cantons differ in processing times?')
+    suggestions.push('What are the salary requirements by canton?')
+  }
+  
+  // Documents related
+  if (lowerQuery.includes('document') || lowerQuery.includes('paperwork') || lowerQuery.includes('apostille')) {
+    suggestions.push('What documents do I need for a work permit?')
+    suggestions.push('How do I get documents apostilled?')
+    suggestions.push('What is the document checklist?')
+  }
+  
+  // Language related
+  if (lowerQuery.includes('language') || lowerQuery.includes('german') || lowerQuery.includes('french') || lowerQuery.includes('italian')) {
+    suggestions.push('What language level do I need for citizenship?')
+    suggestions.push('Do I need to speak the local language for a work permit?')
+    suggestions.push('Where can I learn Swiss languages?')
+  }
+  
+  // General immigration
+  if (suggestions.length === 0) {
+    suggestions.push('What are the different types of Swiss permits?')
+    suggestions.push('How do I apply for a work permit?')
+    suggestions.push('Which canton should I choose?')
+    suggestions.push('What is the success rate for permit applications?')
+  }
+  
+  return suggestions.slice(0, 3) // Return top 3 suggestions
+}
+
+// Clean up markdown headers and make responses more conversational
+function cleanResponseFormat(response: string): string {
+  // Remove markdown headers and convert to bold text
+  let cleaned = response
+    .replace(/^#+\s+(.+)$/gm, '**$1**') // Convert # Header to **Header**
+    .replace(/^##+\s+(.+)$/gm, '**$1**') // Convert ## Header to **Header**
+    .replace(/^###+\s+(.+)$/gm, '**$1**') // Convert ### Header to **Header**
+  
+  // Add spacing after bold headers for better readability
+  cleaned = cleaned.replace(/\*\*(.+?)\*\*\n/g, '**$1**\n\n')
+  
+  // Ensure proper spacing between sections
+  cleaned = cleaned.replace(/\n\n\n+/g, '\n\n')
+  
+  return cleaned.trim()
+}
+
+// Generic response function removed - responses are now direct from AI without additions
+
 function enhanceResponseWithLinks(response: string, message: string, layer?: string): string {
   const lowerMessage = message.toLowerCase()
   const lowerResponse = response.toLowerCase()
@@ -225,37 +386,41 @@ function getSimpleFallbackResponse(message: string): string {
   const isImmigrationQuestion = immigrationKeywords.some(keyword => lowerMessage.includes(keyword))
   
   if (isImmigrationQuestion) {
-    // Provide actual information about Swiss immigration
-    return `I can help with Swiss immigration! Here's what you need to know:
+    // Provide actual information about Swiss immigration in a friendly, conversational way
+    return `Oh, great question! I'd love to help you understand Swiss immigration. Let me break this down in a way that makes sense.
 
-**Swiss Immigration Pathways:**
-- **EU/EFTA Citizens**: No quotas, 2-4 weeks processing, 5-year citizenship path
-- **US/Canadian Citizens**: 8,500 annual quota (highly competitive), 8-12 weeks processing, 10-year citizenship
-- **Third-Country Nationals**: 8,500 annual quota, 8-16 weeks processing, 10-year citizenship
+Here's the thing - your path to Switzerland really depends on where you're coming from, and I'm here to help you figure out which one applies to you!
 
-**Key Visa Types:**
-- **L Permit**: 1-year temporary (4,000 quota for non-EU)
-- **B Permit**: 5-year residence (4,500 quota for non-EU)
-- **G Permit**: Cross-border commuter (unlimited)
-- **C Permit**: Permanent settlement (after 10 years)
+**If you're from the EU or EFTA:**
+Good news! You've got the easiest path. No quotas to worry about, processing is super quick (usually 2-4 weeks), and you can become a citizen in just 5 years. Pretty sweet deal, right? 🇨🇭
 
-**2025 Quotas**: 8,500 total non-EU permits (4,000 L + 4,500 B)
+**If you're from the US or Canada:**
+Okay, so this one's a bit more competitive. There are 8,500 permits available each year for all non-EU countries combined, and they go fast! Processing takes about 8-12 weeks, and citizenship takes 10 years. But don't let that discourage you - it's totally doable with the right approach!
 
-What specific aspect of Swiss immigration would you like to know more about? I can provide detailed information about visas, permits, citizenship, quotas, requirements, or processes.`
+**If you're from anywhere else:**
+Same situation as US/Canada - 8,500 annual quota, 8-16 weeks processing, and a 10-year path to citizenship. It's competitive, but definitely not impossible!
+
+**The Different Permit Types:**
+- **L Permit**: Short-term (1 year) - great for testing the waters
+- **B Permit**: Long-term residence (5 years) - this is what most people aim for
+- **G Permit**: For cross-border commuters - unlimited availability
+- **C Permit**: Permanent settlement - you get this after 10 years
+
+What's your situation? Are you EU/EFTA, US/Canadian, or from another country? Once I know that, I can give you much more specific and helpful advice!`
   }
   
   // For non-immigration questions, be helpful
-  return `I'm here to help! I'm especially knowledgeable about Swiss immigration, but I can assist with other questions too. 
+  return `Hey! I'm here to help however I can. While I'm especially good at Swiss immigration stuff, I'm happy to chat about other things too!
 
-For Swiss immigration questions, I can provide detailed information about:
-- Visa types and requirements
-- Work permit quotas and processes
-- Citizenship pathways
-- Cantonal variations
-- Document requirements
-- Processing timelines
+But honestly, where I really shine is helping people understand:
+- The different visa types and which one might work for you
+- How the quota system works (it can be confusing!)
+- What the citizenship process looks like
+- How different cantons (Swiss regions) have different rules
+- What documents you'll need and when
+- Realistic timelines for everything
 
-What would you like to know?`
+What's on your mind? Are you thinking about moving to Switzerland, or is there something specific about the process you're curious about?`
 }
 
 export async function POST(req: NextRequest) {
@@ -264,7 +429,21 @@ export async function POST(req: NextRequest) {
   let userLayer: string | undefined = undefined
   
   try {
-    const body = await req.json()
+    // Handle both FormData and JSON requests
+    const contentType = req.headers.get('content-type') || ''
+    let body: any = {}
+    
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData()
+      body = {
+        message: formData.get('message') || '',
+        packId: formData.get('packId') || 'free',
+        layer: formData.get('layer') || undefined,
+      }
+    } else {
+      body = await req.json()
+    }
+    
     message = body.message || ''
     packId = body.packId || 'free'
     userLayer = body.layer // Get layer from request (client should pass from localStorage)
@@ -285,8 +464,8 @@ export async function POST(req: NextRequest) {
     // Try to get layer from user's quiz results if not provided (only for logged-in users)
     if (!userLayer && session?.user) {
       try {
-        const supabase = await createClient()
-        const { data: quizResult, error } = await supabase
+        const db = await createClient()
+        const { data: quizResult, error } = await db
           .from('quiz_results')
           .select('answers')
           .eq('user_id', session.user.id)
@@ -311,8 +490,8 @@ export async function POST(req: NextRequest) {
     // Anonymous users' limits are enforced client-side via localStorage
     if (packId === 'free' && session?.user) {
       try {
-        const supabase = await createClient()
-        const { data: limitsResult, error } = await supabase
+        const db = await createClient()
+        const { data: limitsResult, error } = await db
           .from('user_limits')
           .select('messages_today, last_reset_date')
           .eq('user_id', session.user.id)
@@ -335,189 +514,126 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Call AI - Priority: Groq (PRIMARY) > OpenAI > xAI/Grok > Google Gemini > Knowledge Base
+    // Call AI - ONLY Google Gemini 1.5 models (no fallbacks)
     let fullResponse = ''
     let usage = { totalTokens: 0 }
     
-    // Try Groq FIRST (PRIMARY - User requested Groq)
-    const groqKey = process.env.GROQ_API_KEY
-    if (groqKey && groqKey.trim().length > 0 && !groqKey.includes('placeholder')) {
+    // Use ONLY Google Gemini 1.5 Pro/Flash - no fallbacks
+    const geminiKey = process.env.GOOGLE_GEMINI_API_KEY
+    if (geminiKey && geminiKey.trim().length > 0 && !geminiKey.includes('placeholder') && !geminiKey.includes('your_')) {
       try {
-        console.log('🚀 Attempting Groq API call')
-        console.log('✅ GROQ_API_KEY found (length:', groqKey.length, ', starts with:', groqKey.substring(0, 10), ')')
+        console.log('🚀 Attempting Google Gemini API call (PRIMARY)')
+        console.log('✅ GOOGLE_GEMINI_API_KEY found (length:', geminiKey.length, ', starts with:', geminiKey.substring(0, 10), ')')
         
-        // Use Llama 3.1 70B (fast and free) or mixtral-8x7b-32768
-        const modelName = 'llama-3.1-70b-versatile' // Groq model name
-        // Ensure API key is set (AI SDK reads from process.env.GROQ_API_KEY)
-        if (!process.env.GROQ_API_KEY) {
-          process.env.GROQ_API_KEY = groqKey
-        }
-        const aiModel = groq(modelName)
-        console.log('Using Groq model:', modelName)
+        const { GoogleGenerativeAI } = await import('@google/generative-ai')
+        const genAI = new GoogleGenerativeAI(geminiKey)
+        
+        // Try gemini-1.5-pro first, fallback to gemini-1.5-flash if not available
+        let modelName = 'gemini-1.5-pro'
+        let model = genAI.getGenerativeModel({ 
+          model: modelName,
+          systemInstruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          generationConfig: {
+            temperature: CONFIG.ai.temperature,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 2048,
+          },
+        })
+        
+        console.log('Using Gemini model:', modelName)
         console.log('System prompt length:', systemPrompt.length)
         console.log('User message:', message.substring(0, 100))
         
-        const result = await streamText({
-          model: aiModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          temperature: CONFIG.ai.temperature,
-        })
-        
-        console.log('✅ Groq stream started, reading chunks...')
-        for await (const chunk of result.textStream) {
-          fullResponse += chunk
+        try {
+          // Use generateContent for single-turn conversations (simpler and faster)
+          const result = await model.generateContent(message)
+          const response = result.response
+          fullResponse = response.text()
+          
+          // Get token usage if available
+          if (response.usageMetadata) {
+            usage = { totalTokens: response.usageMetadata.totalTokenCount || 0 }
+          }
+          
+          console.log('✅ Gemini SUCCESS - Response length:', fullResponse.length, 'tokens:', usage.totalTokens)
+          if (fullResponse.length > 0) {
+            console.log('📝 Response preview:', fullResponse.substring(0, 200))
+          } else {
+            console.warn('⚠️ Gemini returned empty response - this should not happen')
+            throw new Error('Gemini returned empty response')
+          }
+        } catch (modelError: any) {
+          // If gemini-1.5-pro fails, try gemini-1.5-flash as fallback
+          if (modelName === 'gemini-1.5-pro' && (modelError?.message?.includes('not found') || modelError?.message?.includes('404'))) {
+            console.log('⚠️ gemini-1.5-pro not available, trying gemini-1.5-flash...')
+            modelName = 'gemini-1.5-flash'
+            model = genAI.getGenerativeModel({ 
+              model: modelName,
+              systemInstruction: {
+                parts: [{ text: systemPrompt }],
+              },
+              generationConfig: {
+                temperature: CONFIG.ai.temperature,
+                topP: 0.95,
+                topK: 40,
+                maxOutputTokens: 2048,
+              },
+            })
+            
+            const result = await model.generateContent(message)
+            const response = result.response
+            fullResponse = response.text()
+            
+            if (response.usageMetadata) {
+              usage = { totalTokens: response.usageMetadata.totalTokenCount || 0 }
+            }
+            
+            console.log('✅ Gemini Flash SUCCESS - Response length:', fullResponse.length)
+          } else {
+            throw modelError
+          }
         }
-        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
-        console.log('✅ Groq SUCCESS - Response length:', fullResponse.length, 'tokens:', usage.totalTokens)
-        if (fullResponse.length > 0) {
-          console.log('📝 Response preview:', fullResponse.substring(0, 200))
-        } else {
-          console.warn('⚠️ Groq returned empty response')
-        }
-      } catch (groqError: any) {
-        console.error('❌ Groq API ERROR:', groqError?.message || groqError)
-        console.error('Error details:', {
-          message: groqError?.message,
-          status: groqError?.status,
-          statusCode: groqError?.statusCode,
-          code: groqError?.code,
-          cause: groqError?.cause,
-          stack: groqError?.stack?.substring(0, 500)
-        })
-        // Fall through to next option
-        fullResponse = ''
-      }
-    } else {
-      console.log('❌ GROQ_API_KEY NOT FOUND or invalid')
-    }
-    
-    // If Groq failed, try OpenAI
-    if (!fullResponse && process.env.OPENAI_API_KEY) {
-      try {
-        console.log('🚀 Attempting OpenAI API call (fallback)')
-        const { openai } = await import('@ai-sdk/openai')
-        const modelName = 'gpt-4o-mini'
-        const aiModel = openai(modelName)
-        const result = await streamText({
-          model: aiModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          temperature: CONFIG.ai.temperature,
-        })
-        
-        for await (const chunk of result.textStream) {
-          fullResponse += chunk
-        }
-        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
-      } catch (openaiError: any) {
-        console.error('❌ OpenAI API ERROR:', openaiError?.message || openaiError)
-        fullResponse = ''
-      }
-    }
-    
-    // If still no response, try xAI/Grok
-    if (!fullResponse && process.env.XAI_API_KEY) {
-      try {
-        console.log('🚀 Attempting xAI/Grok API call (fallback)')
-        const aiModel = xai('grok-beta')
-        const result = await streamText({
-          model: aiModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          temperature: CONFIG.ai.temperature,
-        })
-        
-        for await (const chunk of result.textStream) {
-          fullResponse += chunk
-        }
-        usage = { totalTokens: (await result.usage)?.totalTokens || 0 }
-      } catch (xaiError: any) {
-        console.error('❌ xAI/Grok API ERROR:', xaiError?.message || xaiError)
-        fullResponse = ''
-      }
-    }
-    
-    // If still no response, try Google Gemini (FREE tier - 15 requests/min, 1,500 requests/day)
-    if (!fullResponse && process.env.GOOGLE_GEMINI_API_KEY) {
-      try {
-        const { GoogleGenerativeAI } = await import('@google/generative-ai')
-        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY)
-        // Use gemini-1.5-flash (free tier) or gemini-pro (free tier with limits)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-        
-        const prompt = `${systemPrompt}\n\nUser: ${message}\n\nAssistant:`
-        const result = await model.generateContent(prompt)
-        fullResponse = result.response.text()
-        usage = { totalTokens: result.response.usageMetadata?.totalTokenCount || 0 }
-        
-        // Response is ready
       } catch (geminiError: any) {
-        console.error('Gemini API error:', geminiError?.message || geminiError)
-        // Fall through to knowledge base
-        fullResponse = ''
-      }
-    }
-    
-    // If still no response, use knowledge base ONLY (no generic fallbacks)
-    if (!fullResponse || fullResponse.trim().length === 0) {
-      console.log('⚠️ NO AI RESPONSE - All API calls failed or no API keys set')
-      console.log('Available API keys:', {
-        XAI: !!process.env.XAI_API_KEY,
-        GROQ: !!process.env.GROQ_API_KEY,
-        OPENAI: !!process.env.OPENAI_API_KEY,
-        GEMINI: !!process.env.GOOGLE_GEMINI_API_KEY
-      })
-      console.log('Falling back to knowledge base...')
-      const knowledgeResponse = generateResponseFromKnowledge(message)
-      
-      if (knowledgeResponse && knowledgeResponse.length > 50) {
-        console.log('✅ Using knowledge base response')
-        fullResponse = knowledgeResponse
-        usage = { totalTokens: Math.ceil(fullResponse.length / 4) }
-      } else {
-        // If no knowledge base match, return error message asking user to check API key
-        console.error('❌ No AI response and no knowledge base match')
-        fullResponse = `I apologize, but I'm unable to process your request right now. 
-
-**Possible issues:**
-- OpenAI API key may not be configured correctly
-- All AI services are currently unavailable
-- Your question doesn't match any available knowledge base content
-
-**To fix this:**
-1. Check that OPENAI_API_KEY is set in your .env.local file
-2. Ensure the API key is valid and has credits
-3. Try rephrasing your question
-
-**For Swiss immigration questions**, you can also visit:
-- [Visa Types](/visas)
-- [Employment Hub](/employment)  
-- [Citizenship Guide](/citizenship)
-
-Please check the server console for detailed error messages.`
-        usage = { totalTokens: 0 }
+        console.error('❌ Gemini API ERROR:', geminiError?.message || geminiError)
+        console.error('Error details:', {
+          message: geminiError?.message,
+          status: geminiError?.status,
+          statusCode: geminiError?.statusCode,
+          code: geminiError?.code,
+          cause: geminiError?.cause,
+          stack: geminiError?.stack?.substring(0, 500)
+        })
+        // Throw error if Gemini fails - no fallbacks
+        throw geminiError
       }
     } else {
-      console.log('✅ Final response ready, length:', fullResponse.length)
+      console.log('❌ GOOGLE_GEMINI_API_KEY NOT FOUND or invalid')
+      throw new Error('GOOGLE_GEMINI_API_KEY is required. Please add it to your .env.local file.')
     }
+    
+    // If we reach here without a response, something went wrong
+    if (!fullResponse || fullResponse.trim().length === 0) {
+      throw new Error('Gemini returned an empty response')
+    }
+    
+    console.log('✅ Final response ready, length:', fullResponse.length)
 
-    // No post-processing restrictions - let Grok handle responses naturally
-    // fullResponse = enhanceResponseWithLinks(fullResponse, message, userLayer)
+    // Clean up response format - remove markdown headers, make more conversational
+    if (fullResponse) {
+      fullResponse = cleanResponseFormat(fullResponse)
+      // Generic responses removed - let AI provide natural responses without forced additions
+    }
 
     // Save message to database (only for logged-in users)
     if (session?.user) {
       try {
-        const supabase = await createClient()
+        const db = await createClient()
 
         // Insert chat message
-        await supabase
+        await db
           .from('chat_messages')
           .insert({
             user_id: session.user.id,
@@ -532,7 +648,7 @@ Please check the server console for detailed error messages.`
           const today = new Date().toISOString().split('T')[0]
 
           // Check current limits
-          const { data: limitsResult } = await supabase
+          const { data: limitsResult } = await db
             .from('user_limits')
             .select('messages_today, last_reset_date')
             .eq('user_id', session.user.id)
@@ -542,16 +658,30 @@ Please check the server console for detailed error messages.`
             ? (limitsResult.messages_today || 0) + 1
             : 1
 
-          // Upsert user limits
-          await supabase
+          // Upsert user limits - update if exists, insert if not
+          const { data: existing } = await db
             .from('user_limits')
-            .upsert({
-              user_id: session.user.id,
-              messages_today: currentMessages,
-              last_reset_date: today
-            }, {
-              onConflict: 'user_id'
-            })
+            .select('user_id')
+            .eq('user_id', session.user.id)
+            .single()
+          
+          if (existing) {
+            await db
+              .from('user_limits')
+              .update({
+                messages_today: currentMessages,
+                last_reset_date: today
+              })
+              .eq('user_id', session.user.id)
+          } else {
+            await db
+              .from('user_limits')
+              .insert({
+                user_id: session.user.id,
+                messages_today: currentMessages,
+                last_reset_date: today
+              })
+          }
         }
       } catch (dbError) {
         console.error('Error saving message to database:', dbError)
@@ -569,43 +699,25 @@ Please check the server console for detailed error messages.`
     console.error('Chat API error:', error)
     console.error('Error details:', error?.message, error?.stack)
     
-    // Always try to provide a helpful response, even on error
-    try {
-      // Try knowledge base first
-      const knowledgeResponse = generateResponseFromKnowledge(message)
-      if (knowledgeResponse && knowledgeResponse.length > 50) {
-        return NextResponse.json({
-          response: knowledgeResponse,
-          tokens: 0,
-        })
-      }
-      
-      // Return error message instead of generic fallback
-      return NextResponse.json({
-        response: `I'm experiencing technical difficulties. Please check that your OpenAI API key is properly configured and try again. Error: ${error?.message || 'Unknown error'}`,
-        tokens: 0,
-      }, { status: 500 })
-    } catch (fallbackError) {
-      // Last resort - return helpful error with instructions
-      return NextResponse.json({
-        response: `I apologize, but I'm experiencing technical difficulties. However, I can still help you with Swiss immigration information!
-
-📚 **Explore our comprehensive guides:**
-- [Swiss Visa Types](/visas) - Complete guide to L, B, G, C permits
-- [Citizenship Pathways](/citizenship) - How to become a Swiss citizen
-- [Employment Hub](/employment) - Work permits and quotas
-- [Tools & Resources](/tools) - Calculators and helpful tools
-
-💡 **For AI-powered responses:**
-To get the best AI experience, consider adding a free Groq API key (takes 2 minutes):
-1. Sign up at https://console.groq.com
-2. Get your free API key
-3. Add to .env.local: GROQ_API_KEY=your_key_here
-
-This will enable powerful AI responses with models like Llama 3.1 70B.`,
-        tokens: 0,
-      })
+    // Return error - no fallbacks, only Gemini 1.5 models
+    let errorMessage = error?.message || 'Failed to get response from Gemini.'
+    
+    // Provide helpful error messages based on error type
+    if (errorMessage.includes('API_KEY') || errorMessage.includes('API key') || errorMessage.includes('authentication')) {
+      errorMessage = 'Invalid or missing GOOGLE_GEMINI_API_KEY. Please check your .env.local file and ensure the API key is correct.'
+    } else if (errorMessage.includes('quota') || errorMessage.includes('rate limit')) {
+      errorMessage = 'Gemini API rate limit exceeded. Please try again in a few moments.'
+    } else if (errorMessage.includes('model') || errorMessage.includes('not found')) {
+      errorMessage = 'Gemini model is not available. Please check your API key has access to gemini-1.5-pro or gemini-1.5-flash.'
     }
+    
+    return NextResponse.json(
+      { 
+        error: errorMessage,
+        response: null
+      },
+      { status: 500 }
+    )
   }
 }
 

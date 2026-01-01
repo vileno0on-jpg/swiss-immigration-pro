@@ -3,10 +3,11 @@
 import ToolsContent from '@/components/tools/ToolsContent'
 import LayerHeader from '@/components/layout/LayerHeader'
 import { useParams } from 'next/navigation'
+import { use } from 'react'
 import { Globe, Star, AlertTriangle } from 'lucide-react'
 
 export default function LayerToolsPage() {
-  const params = useParams()
+  const params = use(params)
   const layerParam = params?.layer as string
   const layer = (layerParam === 'eu' || layerParam === 'us' || layerParam === 'other') 
     ? layerParam as 'eu' | 'us' | 'other'

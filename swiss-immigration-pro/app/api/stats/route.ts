@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET() {
   try {
     console.log('Fetching stats...')
-    const supabase = await createClient()
+    const db = await createClient()
 
     if (!supabase) {
       console.error('Failed to create Supabase client')
       return NextResponse.json([], { status: 500 })
     }
 
-    const { data: stats, error } = await supabase
+    const { data: stats, error } = await db
       .from('live_stats')
       .select('*')
       .eq('is_active', true)

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
+import { sendPasswordResetEmail } from '@/lib/email'
+import crypto from 'crypto'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,32 +11,55 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Check if user exists
-    const { data: user, error } = await supabase
+    const { data: user, error } = await db
       .from('users')
       .select('id, email')
-      .eq('email', email)
+      .eq('email', email.toLowerCase().trim())
       .single()
 
+    // Don't reveal if user exists or not (security best practice)
     if (error || !user) {
-      // Don't reveal if user exists or not (security best practice)
       return NextResponse.json({ 
         message: 'If an account with that email exists, we\'ve sent a password reset link.' 
       })
     }
 
-    // In a real app, you would:
-    // 1. Generate a secure reset token
-    // 2. Store it in the database with expiration
-    // 3. Send email with reset link
-    // For now, we'll just return success
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    const expiresAt = new Date()
+    expiresAt.setHours(expiresAt.getHours() + 1) // Token expires in 1 hour
 
-    // TODO: Implement email sending with reset token
-    // const resetToken = crypto.randomBytes(32).toString('hex')
-    // await sql`INSERT INTO password_resets (user_id, token, expires_at) VALUES ...`
-    // await sendResetEmail(email, resetToken)
+    // Save reset token to database
+    const { error: tokenError } = await db
+      .from('password_resets')
+      .insert({
+        user_id: user.id,
+        token: resetToken,
+        expires_at: expiresAt.toISOString(),
+        used: false
+      })
+
+    if (tokenError) {
+      console.error('Error saving reset token:', tokenError)
+      // Still return success to not reveal if user exists
+      return NextResponse.json({ 
+        message: 'If an account with that email exists, we\'ve sent a password reset link.' 
+      })
+    }
+
+    // Send password reset email
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const resetLink = `${appUrl}/auth/reset-password?token=${resetToken}`
+
+    try {
+      await sendPasswordResetEmail(email, resetLink)
+    } catch (emailError) {
+      console.error('Error sending password reset email:', emailError)
+      // Still return success to not reveal if user exists
+    }
 
     return NextResponse.json({ 
       message: 'If an account with that email exists, we\'ve sent a password reset link.' 

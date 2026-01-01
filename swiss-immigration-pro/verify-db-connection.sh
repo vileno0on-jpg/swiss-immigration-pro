@@ -39,3 +39,5 @@ sudo grep "local.*postgres" /etc/postgresql/14/main/pg_hba.conf
 
 
 
+
+

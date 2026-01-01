@@ -7,3 +7,5 @@ ssh ubuntu@83.228.215.185 "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo 'ssh-rsa 
 
 
 
+
+

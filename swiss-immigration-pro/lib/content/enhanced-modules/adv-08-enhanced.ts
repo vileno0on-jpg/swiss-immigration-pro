@@ -25,7 +25,7 @@ Finding suitable and affordable housing in Switzerland is one of the most critic
     <div style="font-size: 0.75rem; color: #3b82f6; margin-top: 0.25rem;">Monthly Rent Deposit</div>
   </div>
   <div style="background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
-    <div style="font-size: 2rem; font-weight: 700; color: #1e40af;">CHF 2.5k</div>
+    <div style="font-size: 2rem; font-weight: 700; color: #1e40af;">CHF 2.1k</div>
     <div style="font-size: 0.75rem; color: #3b82f6; margin-top: 0.25rem;">Avg 2-Bed Apartment</div>
   </div>
   <div style="background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
@@ -64,12 +64,12 @@ While federal law establishes general principles, cantons and municipalities may
 - Significant regional cost variations (30-50% differences)
 
 **Average Rental Costs by Canton (2025, 2-bedroom apartment):**
-- Zurich: CHF 2,200-3,500/month
-- Geneva: CHF 2,500-4,000/month
-- Basel-Stadt: CHF 2,000-3,200/month
-- Bern: CHF 1,800-2,800/month
-- Lausanne: CHF 2,000-3,000/month
-- Smaller cantons: CHF 1,200-2,000/month
+- Zurich: CHF 1,800-2,900/month
+- Geneva: CHF 2,000-3,200/month
+- Basel-Stadt: CHF 1,650-2,600/month
+- Bern: CHF 1,500-2,300/month
+- Lausanne: CHF 1,650-2,500/month
+- Smaller cantons: CHF 1,000-1,650/month
 
 **Additional Costs (Nebenkosten / Charges):**
 - Utilities (electricity, water, heating): CHF 150-300/month
@@ -80,7 +80,7 @@ While federal law establishes general principles, cantons and municipalities may
         'Swiss rental law (OR Art. 253-274) establishes comprehensive rights and obligations for landlords and tenants',
         'Standard rule: Rent should not exceed 1/3 of gross monthly income for approval likelihood',
         'Deposit maximum: 3 months\' rent (OR Art. 257), held in separate account with interest',
-        'Average 2-bedroom apartment costs CHF 2,000-3,500/month in major cities, with 30-50% canton variations',
+        'Average 2-bedroom apartment costs CHF 1,650-2,900/month in major cities, with 30-50% canton variations',
         'Additional costs (Nebenkosten) typically add 10-20% to base rent for utilities and maintenance'
       ],
       legalReferences: [
@@ -179,11 +179,11 @@ Understanding total cost of living in Switzerland enables realistic budgeting an
 **Monthly Living Cost Breakdown (Major Cities, Single Person):**
 
 **Housing:**
-- Rent (1-bedroom): CHF 1,200-2,000
-- Rent (2-bedroom): CHF 2,000-3,500
-- Utilities (Nebenkosten): CHF 150-300
+- Rent (1-bedroom): CHF 1,000-1,650
+- Rent (2-bedroom): CHF 1,650-2,900
+- Utilities (Nebenkosten): CHF 120-250
 - Internet/Phone: CHF 50-100
-- **Total Housing: CHF 1,400-3,900/month**
+- **Total Housing: CHF 1,170-3,250/month**
 
 **Food:**
 - Groceries: CHF 400-700/month
@@ -208,20 +208,20 @@ Understanding total cost of living in Switzerland enables realistic budgeting an
 - **Total Other: CHF 500-1,200/month**
 
 **Total Monthly Living Costs (Single Person):**
-- **Minimum (basic lifestyle):** CHF 3,000-4,500/month
-- **Moderate:** CHF 4,500-7,000/month
-- **Comfortable:** CHF 7,000-10,000+/month
+- **Minimum (basic lifestyle):** CHF 2,500-3,800/month
+- **Moderate:** CHF 3,800-5,800/month
+- **Comfortable:** CHF 5,800-8,500+/month
 
 **Family Costs (2 adults, 1 child):**
-- Housing (3-bedroom): CHF 2,500-4,500/month
-- Food: CHF 1,200-2,000/month
-- Childcare/School: CHF 800-2,000/month
-- Health insurance (family): CHF 900-1,500/month
-- **Total Family: CHF 6,000-12,000+/month**`,
+- Housing (3-bedroom): CHF 2,000-3,700/month
+- Food: CHF 1,000-1,700/month
+- Childcare/School: CHF 600-1,600/month
+- Health insurance (family): CHF 800-1,300/month
+- **Total Family: CHF 4,800-9,500+/month**`,
           keyPoints: [
-            'Monthly living costs for single person: CHF 3,000-7,000 depending on lifestyle and location',
+            'Monthly living costs for single person: CHF 2,500-5,800 depending on lifestyle and location',
             'Housing represents largest expense (40-50% of total), followed by food (15-20%) and insurance (10-15%)',
-            'Family costs (2 adults, 1 child): CHF 6,000-12,000+ monthly depending on location and lifestyle',
+            'Family costs (2 adults, 1 child): CHF 4,800-9,500+ monthly depending on location and lifestyle',
             'Significant regional variations: Zurich and Geneva 20-30% higher than smaller cities',
             'Comprehensive budgeting should include all categories: housing, food, transport, insurance, and discretionary spending'
           ]
@@ -230,4 +230,6 @@ Understanding total cost of living in Switzerland enables realistic budgeting an
     }
   ]
 }
+
+
 

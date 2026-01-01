@@ -1064,6 +1064,8 @@ Effective salary negotiation can increase lifetime earnings by hundreds of thous
         'Total compensation negotiation (base, bonus, benefits) yields better outcomes than base salary alone',
         'Professional, collaborative negotiation approach maintains relationships while maximizing outcomes'
       ]
+        }
+      ]
     },
     {
       id: 'experience-level-analysis',
@@ -1322,6 +1324,8 @@ Embassy submission requires meticulously prepared documents meeting exact specif
         'Educational certificates require apostille or embassy authentication depending on country of origin',
         'Criminal record certificates must be recent (3-6 months) and properly authenticated',
         'Document formatting errors result in rejection and resubmission, adding 2-4 weeks to processing'
+      ]
+        }
       ]
     },
     {

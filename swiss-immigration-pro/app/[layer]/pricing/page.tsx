@@ -1,34 +1,39 @@
 'use client'
 
 import PricingContent from '@/components/pricing/PricingContent'
-import LayerHeader from '@/components/layout/LayerHeader'
 import { useParams } from 'next/navigation'
-import { Globe, Star, AlertTriangle } from 'lucide-react'
+import { use } from 'react'
+import LayerHeader from '@/components/layout/LayerHeader'
+import { Star, AlertTriangle, Globe } from 'lucide-react'
 
 export default function LayerPricingPage() {
-  const params = useParams()
+  const params = use(params)
   const layerParam = params?.layer as string
   const layer = (layerParam === 'eu' || layerParam === 'us' || layerParam === 'other') 
     ? layerParam as 'eu' | 'us' | 'other'
     : 'eu' // fallback to eu if invalid
 
+  // Map old layer names to new format
+  const layerForHeader = layerParam === 'europeans' ? 'eu' : layerParam === 'americans' ? 'us' : layerParam === 'others' ? 'other' : layer
+  const homeHref = `/${layerForHeader}`
+
   // Layer-specific badge configuration
   const badge = {
-    icon: layer === 'eu' ? <Star className="w-3.5 h-3.5" /> : layer === 'us' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
-    text: layer === 'eu' 
+    icon: layerForHeader === 'eu' ? <Star className="w-3.5 h-3.5" /> : layerForHeader === 'us' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layerForHeader === 'eu' 
       ? 'EU/EFTA Freedom of Movement'
-      : layer === 'us' 
+      : layerForHeader === 'us' 
       ? '2025 Quota Alert: Apply Early'
       : 'Global Citizens Pathway',
-    bgColor: layer === 'eu' ? 'bg-blue-600' : layer === 'us' ? 'bg-slate-900' : 'bg-purple-600',
+    bgColor: layerForHeader === 'eu' ? 'bg-blue-600' : layerForHeader === 'us' ? 'bg-slate-900' : 'bg-purple-600',
     textColor: 'text-white'
   }
 
   return (
     <div className="min-h-screen bg-white">
       <LayerHeader
-        layer={layer}
-        homeHref={`/${layer}`}
+        layer={layerForHeader as 'eu' | 'us' | 'other'}
+        homeHref={homeHref}
         customBadge={badge}
       />
       <PricingContent layer={layer} />

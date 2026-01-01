@@ -24,21 +24,11 @@ import { adv02Enhanced } from './enhanced-modules/adv-02-enhanced'
 import { adv03Enhanced } from './enhanced-modules/adv-03-enhanced'
 import { adv04Enhanced } from './enhanced-modules/adv-04-enhanced'
 import { adv05Enhanced } from './enhanced-modules/adv-05-enhanced'
-import { adv06Enhanced } from './enhanced-modules/adv-06-enhanced'
-import { adv07Enhanced } from './enhanced-modules/adv-07-enhanced'
-import { adv08Enhanced } from './enhanced-modules/adv-08-enhanced'
-import { adv09Enhanced } from './enhanced-modules/adv-09-enhanced'
-import { adv10Enhanced } from './enhanced-modules/adv-10-enhanced'
 import { cit01Enhanced } from './enhanced-modules/cit-01-enhanced'
 import { cit02Enhanced } from './enhanced-modules/cit-02-enhanced'
 import { cit03Enhanced } from './enhanced-modules/cit-03-enhanced'
 import { cit04Enhanced } from './enhanced-modules/cit-04-enhanced'
 import { cit05Enhanced } from './enhanced-modules/cit-05-enhanced'
-import { cit06Enhanced } from './enhanced-modules/cit-06-enhanced'
-import { cit07Enhanced } from './enhanced-modules/cit-07-enhanced'
-import { cit08Enhanced } from './enhanced-modules/cit-08-enhanced'
-import { cit09Enhanced } from './enhanced-modules/cit-09-enhanced'
-import { cit10Enhanced } from './enhanced-modules/cit-10-enhanced'
 
 export interface PackContent {
   packId: string
@@ -107,7 +97,7 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 
 ## The Swiss Immigration Reality Check
 
-**Welcome to Swiss Immigration Pro** – the most comprehensive, legally-accurate platform for Swiss work permits. Our free content alone saves applicants an average of **CHF 2,500** in consultant fees by giving you insider knowledge that's usually behind paywalls.
+**Welcome to Swiss Immigration Pro** – the most comprehensive, legally-accurate platform for Swiss work permits. Our free content alone saves applicants an average of **<span class="chf-amount" translate="no">CHF</span> 2,500** in consultant fees by giving you insider knowledge that's usually behind paywalls.
 
 **Real Talk**: Swiss immigration isn't just paperwork – it's a strategic game where 73% of applicants fail on their first attempt. We cut through the complexity with battle-tested frameworks.
 
@@ -115,8 +105,8 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 
 ### 1. <span class="notranslate" translate="no">EU/EFTA</span> Freedom of Movement (<span class="notranslate" translate="no">FMPA</span>) - "The Golden Ticket"
 - **Legal basis**: Agreement on the Free Movement of Persons (<span class="notranslate" translate="no">FMPA</span>), <span class="notranslate" translate="no">AuG</span> (<span class="notranslate" translate="no">SR 142.20</span>) <span class="notranslate" translate="no">Art.</span> 2, <span class="notranslate" translate="no">VZAE</span> (<span class="notranslate" translate="no">SR 142.201</span>) <span class="notranslate" translate="no">Art.</span> 7-23  
-- **Turnaround**: 2-4 weeks once documents are ready (vs. 8-12 weeks for non-EU)
-- **Success Rate**: 94% approval rate (based on SEM 2024 data)
+- **Turnaround**: 2-4 weeks once documents are ready (vs. 8-12 weeks for <span class="swiss-term" translate="no">non-EU</span>)
+- **Success Rate**: 94% approval rate (based on <span class="swiss-legal-term" translate="no">SEM</span> 2024 data)
 - **What you need**: Employment contract, health insurance (<span class="notranslate" translate="no">KVG</span>-compliant), commune registration within 14 days
 - **Hidden Advantage**: No labor market test required - you bypass the quota system entirely
 - **Official source**: [<span class="notranslate" translate="no">SEM</span> – <span class="notranslate" translate="no">EU/EFTA</span> Citizens](https://www.sem.admin.ch/sem/en/home/themen/arbeit/eu_efta-angehoerige.html)
@@ -130,36 +120,36 @@ export const PACK_CONTENT: Record<string, PackContent> = {
 - **What we optimise**: Salary benchmarks by canton, employer motivation letters, strategic canton selection, perfect timing
 - **Key Success Factor**: Salary above cantonal minimum + demonstrated unique qualifications
 
-**Reality Check**: 67% of L permit applications fail due to insufficient salary justification. We show you exactly how to calculate and prove market value.
+**Reality Check**: 67% of <span class="permit-code" translate="no">L</span> permit applications fail due to insufficient salary justification. We show you exactly how to calculate and prove market value.
 
 ### 3. Corporate Transfers & Innovation Visas - "The Elite Lane"
-- **Legal basis**: AuG Art. 19, VZAE Art. 28-30 for intra-company transfers; Start-up facilitation per SEM practice notes  
+- **Legal basis**: <span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 19, <span class="swiss-legal-term" translate="no">VZAE</span> <span class="swiss-legal-term" translate="no">Art.</span> 28-30 for intra-company transfers; Start-up facilitation per <span class="swiss-legal-term" translate="no">SEM</span> practice notes  
 - **Why it works**: Cantons desperately need innovation - Tech, Pharma, MedTech, FinTech get priority
 - **Processing**: 4-6 weeks vs. 8-12 weeks standard
 - **Requirements**: Company transfer agreement OR innovative business plan with growth potential
 - **Our support**: Employer compliance pack, innovation evidence checklist, cantonal liaison brief
 
-**Insider Info**: Zug and Basel-Stadt approved 40% more innovation visas in 2024. We know exactly which cantons are innovation-hungry.
+**Insider Info**: <span class="canton-code" translate="no">Zug</span> and <span class="canton-code" translate="no">Basel-Stadt</span> approved 40% more innovation visas in 2024. We know exactly which cantons are innovation-hungry.
 
 ---
 
 ## The 7 Deadly Mistakes That Kill 73% of Applications
 
-Based on SEM's 2024 rejection analysis, here are the most common fatal errors:
+Based on <span class="swiss-legal-term" translate="no">SEM</span>'s 2024 rejection analysis, here are the most common fatal errors:
 
 ### 1. Missing Legal Citations (28% of rejections)
 **The Problem**: Cantonal case officers expect explicit references to Swiss law. Generic applications get rejected.
-**The Solution**: Every document must cite the correct article (AuG Art. 23, VZAE Art. 15, etc.)
+**The Solution**: Every document must cite the correct article (<span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 23, <span class="swiss-legal-term" translate="no">VZAE</span> <span class="swiss-legal-term" translate="no">Art.</span> 15, etc.)
 **Impact**: Missing citations = automatic rejection
 
 ### 2. Wrong Canton Selection (19% of rejections)
-**The Problem**: Picking Zurich first reduces non-EU success to 15%. Wrong canton = wrong salary expectations.
-**Our Data**: Basel-Stadt success rate: 42%, Zug: 38%, Zurich: 15%, Geneva: 28%
+**The Problem**: Picking <span class="canton-code" translate="no">Zurich</span> first reduces <span class="swiss-term" translate="no">non-EU</span> success to 15%. Wrong canton = wrong salary expectations.
+**Our Data**: <span class="canton-code" translate="no">Basel-Stadt</span> success rate: 42%, <span class="canton-code" translate="no">Zug</span>: 38%, <span class="canton-code" translate="no">Zurich</span>: 15%, <span class="canton-code" translate="no">Geneva</span>: 28%
 **The Solution**: Strategic canton matching based on industry and salary requirements
 
 ### 3. Late Quota Submission (16% of rejections)
 **The Problem**: November filings see <10% approval rates. Quotas fill fast.
-**Reality**: 2024 L permits exhausted by September in competitive cantons
+**Reality**: 2024 <span class="permit-code" translate="no">L</span> permits exhausted by September in competitive cantons
 **The Solution**: Submit 3-6 months before quota exhaustion (we track this for you)
 
 ### 4. Insufficient Salary Justification (12% of rejections)
@@ -167,7 +157,7 @@ Based on SEM's 2024 rejection analysis, here are the most common fatal errors:
 **The Solution**: SECO salary database cross-referencing + industry benchmarking
 
 ### 5. Incomplete Health Insurance (9% of rejections)
-**The Problem**: Non-KVG compliant insurance gets rejected immediately
+**The Problem**: Non-<span class="swiss-legal-term" translate="no">KVG</span> compliant insurance gets rejected immediately
 **The Solution**: Swiss-compliant health insurance verification checklist
 
 ### 6. Weak Employer Commitment (8% of rejections)
@@ -190,8 +180,8 @@ Based on SEM's 2024 rejection analysis, here are the most common fatal errors:
 
 ### Permit Probability Engine™
 Our calculators blend:
-- Live SEM quota data (updated weekly)
-- SECO salary contribution databases
+- Live <span class="swiss-legal-term" translate="no">SEM</span> quota data (updated weekly)
+- <span class="swiss-legal-term" translate="no">SECO</span> salary contribution databases
 - Historical approval rates by canton/industry
 - Risk assessment algorithms
 
@@ -199,12 +189,12 @@ Our calculators blend:
 
 ### Integration Milestones Mapping™
 We map your complete 10-year journey:
-- **Year 1-2**: L permit acquisition
-- **Year 3-5**: B permit conversion
-- **Year 6-8**: C permit eligibility
+- **Year 1-2**: <span class="permit-code" translate="no">L</span> permit acquisition
+- **Year 3-5**: <span class="permit-code" translate="no">B</span> permit conversion
+- **Year 6-8**: <span class="permit-code" translate="no">C</span> permit eligibility
 - **Year 9-10**: Citizenship application
 
-References: StAG Art. 12, OLN Art. 6, AuG Art. 34
+References: <span class="swiss-legal-term" translate="no">StAG</span> <span class="swiss-legal-term" translate="no">Art.</span> 12, <span class="swiss-legal-term" translate="no">OLN</span> <span class="swiss-legal-term" translate="no">Art.</span> 6, <span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 34
 
 ---
 
@@ -212,16 +202,16 @@ References: StAG Art. 12, OLN Art. 6, AuG Art. 34
 
 ### ✓ Official Legal References in Every Module
 No generic advice. Every recommendation cites the exact ordinance:
-- AuG (Foreign Nationals Act)
-- VZAE (Implementation Ordinance)
-- StAG (Citizenship Act)
-- KVG (Health Insurance Act)
-- SEM circulars and practice notes
+- <span class="swiss-legal-term" translate="no">AuG</span> (Foreign Nationals Act)
+- <span class="swiss-legal-term" translate="no">VZAE</span> (Implementation Ordinance)
+- <span class="swiss-legal-term" translate="no">StAG</span> (Citizenship Act)
+- <span class="swiss-legal-term" translate="no">KVG</span> (Health Insurance Act)
+- <span class="swiss-legal-term" translate="no">SEM</span> circulars and practice notes
 
 ### ✓ Success Playbooks Audited Quarterly
-We update after each SEM bulletin:
+We update after each <span class="swiss-legal-term" translate="no">SEM</span> bulletin:
 - 2024 Q4: Integration requirements tightened
-- 2025 Q1: Salary thresholds increased in Zurich (+8%)
+- 2025 Q1: Salary thresholds increased in <span class="canton-code" translate="no">Zurich</span> (+8%)
 - 2025 Q2: New AI/tech sector quotas announced
 
 ### ✓ Real Specialists with Swiss Law Degrees
@@ -237,10 +227,10 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 ## Your 15-Minute Action Plan
 
 **Immediate Actions (Today):**
-- [ ] Download SEM nationality guide ([link provided])
+- [ ] Download <span class="swiss-legal-term" translate="no">SEM</span> nationality guide ([link provided])
 - [ ] Calculate your canton salary requirements ([use our free calculator])
 - [ ] Check current quota status for your canton
-- [ ] Verify health insurance KVG compliance
+- [ ] Verify health insurance <span class="swiss-legal-term" translate="no">KVG</span> compliance
 
 **Week 1 Actions:**
 - [ ] Prepare employment contract template
@@ -261,9 +251,9 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 
 **Immigration Pack unlocks**:
 - Complete cantonal strategy playbook (26 cantons detailed)
-- Salary negotiation scripts (save CHF 15,000+ annually)
+- Salary negotiation scripts (save <span class="chf-amount" translate="no">CHF</span> 15,000+ annually)
 - Embassy-ready document kits (no rejections for formatting)
-- AI tutor for motivation letters (AuG Art. 23 compliant)
+- AI tutor for motivation letters (<span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 23 compliant)
 - Priority support with permit specialists
 
 **Don't let another year pass** with uncertain immigration status. Swiss work permits are your gateway to Europe's strongest economy, best work-life balance, and highest salaries.
@@ -285,7 +275,7 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 
 ## The 41% Rejection Reality
 
-**SEM's 2024 Rejection Report** revealed that 41% of applications fail due to missing or incorrect documents. Most applicants think they have everything ready, but the devil is in the details.
+**<span class="swiss-legal-term" translate="no">SEM</span>'s 2024 Rejection Report** revealed that 41% of applications fail due to missing or incorrect documents. Most applicants think they have everything ready, but the devil is in the details.
 
 **Our audit checklist** has helped **2,847 applicants** catch fatal errors before submission, increasing their approval odds by 3.2x.
 
@@ -297,20 +287,20 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 **These documents must be perfect - no exceptions:**
 
 - [ ] **Passport**: Valid minimum 15 months beyond intended permit period
-- [ ] **Criminal Record**: Clean extract, issued within 3 months (AuG Art. 62)
-- [ ] **Diploma Verification**: Apostilled translations for non-EU/EFTA qualifications
-- [ ] **Health Insurance**: KVG-compliant plan drafted (not just "any" insurance)
+- [ ] **Criminal Record**: Clean extract, issued within 3 months (<span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 62)
+- [ ] **Diploma Verification**: Apostilled translations for <span class="swiss-term" translate="no">non-EU/EFTA</span> qualifications
+- [ ] **Health Insurance**: <span class="swiss-legal-term" translate="no">KVG</span>-compliant plan drafted (not just "any" insurance)
 - [ ] **Language Certificates**: B2 level proof if required by canton
 
-**Pro Tip**: Basel requires German B2 for all non-EU applicants. Zurich accepts English alternatives.
+**Pro Tip**: <span class="canton-code" translate="no">Basel</span> requires German B2 for all <span class="swiss-term" translate="no">non-EU</span> applicants. <span class="canton-code" translate="no">Zurich</span> accepts English alternatives.
 
 ### Stage 2: Employment Documentation (30 minutes)
 **This is where 67% of applications fail:**
 
 - [ ] **Employment Contract**: Swiss labour law compliant (OR Art. 319-362)
 - [ ] **Salary Justification**: SECO benchmark + 10% premium for your role
-- [ ] **Employer Motivation Letter**: Explicitly cites AuG Art. 23 para. 1
-- [ ] **Job Advertising Proof**: Minimum 14 days on job-room.ch (SECO requirement)
+- [ ] **Employer Motivation Letter**: Explicitly cites <span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 23 para. 1
+- [ ] **Job Advertising Proof**: Minimum 14 days on job-room.ch (<span class="swiss-legal-term" translate="no">SECO</span> requirement)
 - [ ] **Employer Financials**: 2 years of audited accounts or tax returns
 
 **Reality Check**: Generic contracts get rejected. We have canton-specific templates.
@@ -318,15 +308,15 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 ### Stage 3: Cantonal Strategy (20 minutes)
 **Wrong canton = 85% failure rate:**
 
-- [ ] **Quota Timing**: Submit before saturation (Zurich: March, Basel: June)
-- [ ] **Cantonal Fees**: CHF 100-250 prepared (varies by canton)
-- [ ] **Commune Registration**: Appointment booked for arrival (AuG Art. 27)
+- [ ] **Quota Timing**: Submit before saturation (<span class="canton-code" translate="no">Zurich</span>: March, <span class="canton-code" translate="no">Basel</span>: June)
+- [ ] **Cantonal Fees**: <span class="chf-amount" translate="no">CHF</span> 100-250 prepared (varies by canton)
+- [ ] **Commune Registration**: Appointment booked for arrival (<span class="swiss-legal-term" translate="no">AuG</span> <span class="swiss-legal-term" translate="no">Art.</span> 27)
 - [ ] **Industry Alignment**: Job matches cantonal priority sectors
 
-**Data Insight**: Zug approved 40% more tech roles in 2024 than Zurich.
+**Data Insight**: <span class="canton-code" translate="no">Zug</span> approved 40% more tech roles in 2024 than <span class="canton-code" translate="no">Zurich</span>.
 
 ### Stage 4: Integration Readiness (10 minutes)
-**Required for B permits and citizenship:**
+**Required for <span class="permit-code" translate="no">B</span> permits and citizenship:**
 
 - [ ] **Language Proficiency**: B2 certificate or equivalent
 - [ ] **Integration Course**: Completion certificate if required
@@ -350,7 +340,7 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 - Officer-ready formatting
 
 **Salary Benchmark Database**
-- Live SECO data integration
+- Live <span class="swiss-legal-term" translate="no">SECO</span> data integration
 - Canton-by-canton breakdowns
 - Industry-specific medians
 - Negotiation leverage points
@@ -363,7 +353,7 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 
 **Immigration Pack ($197)**: Everything above PLUS
 - **26 Canton Strategy Playbooks** (detailed tactics for each canton)
-- **Salary Negotiation Scripts** (save CHF 15,000+ annually)
+- **Salary Negotiation Scripts** (save <span class="chf-amount" translate="no">CHF</span> 15,000+ annually)
 - **Embassy-Ready Document Kits** (perfect formatting, no rejections)
 - **AI Motivation Letter Tutor** (generates officer-approved content)
 - **Priority Expert Support** (48-hour response time)
@@ -375,7 +365,7 @@ Every checklist cites enforceable law. Not opinions - court-tested legal framewo
 - **Integration Timeline Planner** (10-year citizenship roadmap)
 
 **Citizenship Pro ($597)**: Everything above PLUS
-- **StAG Citizenship Application** (complete filing package)
+- **<span class="swiss-legal-term" translate="no">StAG</span> Citizenship Application** (complete filing package)
 - **Language Exam Preparation** (B2/C1 level coaching)
 - **Citizenship Interview Training** (with former examiners)
 - **Family Application Bundles** (spouse + children included)
@@ -1359,56 +1349,6 @@ Use this checklist to track your progress:
         order: 5,
         enhancedModule: adv05Enhanced,
         completed: false
-      },
-      {
-        id: 'adv-06',
-        title: adv06Enhanced.title,
-        description: adv06Enhanced.description,
-        type: 'interactive',
-        duration: adv06Enhanced.estimatedReadTime,
-        order: 6,
-        enhancedModule: adv06Enhanced,
-        completed: false
-      },
-      {
-        id: 'adv-07',
-        title: adv07Enhanced.title,
-        description: adv07Enhanced.description,
-        type: 'interactive',
-        duration: adv07Enhanced.estimatedReadTime,
-        order: 7,
-        enhancedModule: adv07Enhanced,
-        completed: false
-      },
-      {
-        id: 'adv-08',
-        title: adv08Enhanced.title,
-        description: adv08Enhanced.description,
-        type: 'interactive',
-        duration: adv08Enhanced.estimatedReadTime,
-        order: 8,
-        enhancedModule: adv08Enhanced,
-        completed: false
-      },
-      {
-        id: 'adv-09',
-        title: adv09Enhanced.title,
-        description: adv09Enhanced.description,
-        type: 'interactive',
-        duration: adv09Enhanced.estimatedReadTime,
-        order: 9,
-        enhancedModule: adv09Enhanced,
-        completed: false
-      },
-      {
-        id: 'adv-10',
-        title: adv10Enhanced.title,
-        description: adv10Enhanced.description,
-        type: 'interactive',
-        duration: adv10Enhanced.estimatedReadTime,
-        order: 10,
-        enhancedModule: adv10Enhanced,
-        completed: false
       }
     ],
     resources: [
@@ -1476,56 +1416,6 @@ Use this checklist to track your progress:
         duration: cit05Enhanced.estimatedReadTime,
         order: 5,
         enhancedModule: cit05Enhanced,
-        completed: false
-      },
-      {
-        id: 'cit-06',
-        title: cit06Enhanced.title,
-        description: cit06Enhanced.description,
-        type: 'interactive',
-        duration: cit06Enhanced.estimatedReadTime,
-        order: 6,
-        enhancedModule: cit06Enhanced,
-        completed: false
-      },
-      {
-        id: 'cit-07',
-        title: cit07Enhanced.title,
-        description: cit07Enhanced.description,
-        type: 'interactive',
-        duration: cit07Enhanced.estimatedReadTime,
-        order: 7,
-        enhancedModule: cit07Enhanced,
-        completed: false
-      },
-      {
-        id: 'cit-08',
-        title: cit08Enhanced.title,
-        description: cit08Enhanced.description,
-        type: 'interactive',
-        duration: cit08Enhanced.estimatedReadTime,
-        order: 8,
-        enhancedModule: cit08Enhanced,
-        completed: false
-      },
-      {
-        id: 'cit-09',
-        title: cit09Enhanced.title,
-        description: cit09Enhanced.description,
-        type: 'interactive',
-        duration: cit09Enhanced.estimatedReadTime,
-        order: 9,
-        enhancedModule: cit09Enhanced,
-        completed: false
-      },
-      {
-        id: 'cit-10',
-        title: cit10Enhanced.title,
-        description: cit10Enhanced.description,
-        type: 'interactive',
-        duration: cit10Enhanced.estimatedReadTime,
-        order: 10,
-        enhancedModule: cit10Enhanced,
         completed: false
       }
     ],

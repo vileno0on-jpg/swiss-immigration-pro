@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET() {
   try {
@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get basic stats that work with current Supabase setup
     const [
@@ -19,9 +19,9 @@ export async function GET() {
       messagesResult,
       paymentsResult
     ] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('chat_messages').select('*', { count: 'exact', head: true }),
-      supabase.from('payments').select('*', { count: 'exact', head: true })
+      db.from('profiles').select('*', { count: 'exact', head: true }),
+      db.from('chat_messages').select('*', { count: 'exact', head: true }),
+      db.from('payments').select('*', { count: 'exact', head: true })
     ])
 
     // Handle both Supabase and local DB responses
@@ -30,7 +30,7 @@ export async function GET() {
     const totalPayments = (paymentsResult as any).count || 0
 
     // Revenue by pack (simplified)
-    const paymentsQueryResult = await supabase
+    const paymentsQueryResult = await db
       .from('payments')
       .select('pack_id, amount, status')
       .eq('status', 'succeeded')
@@ -57,7 +57,7 @@ export async function GET() {
     }, {})
 
     // Add userGrowth: new users per month
-    const usersQueryResult = await supabase
+    const usersQueryResult = await db
       .from('profiles')
       .select('created_at')
 
@@ -72,7 +72,7 @@ export async function GET() {
     }, {})
 
     // Add dailyActiveUsers: unique users with messages per day
-    const messagesQueryResult = await supabase
+    const messagesQueryResult = await db
       .from('chat_messages')
       .select('user_id, created_at')
 
@@ -99,7 +99,7 @@ export async function GET() {
       .slice(0, 10)
 
     // Module completion stats (simplified)
-    const progressResult = await supabase
+    const progressResult = await db
       .from('masterclass_progress')
       .select('module_id, progress_percent')
     

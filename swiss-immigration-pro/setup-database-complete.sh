@@ -67,3 +67,5 @@ echo "The application can now connect to the database!"
 
 
 
+
+

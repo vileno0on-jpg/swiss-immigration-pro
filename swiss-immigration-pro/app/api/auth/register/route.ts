@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 import bcrypt from 'bcryptjs'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +21,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Check if user already exists
-    const { data: existingUsers, error: checkError } = await supabase
+    const { data: existingUsers, error: checkError } = await db
       .from('users')
       .select('id')
       .eq('email', email)
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     // Create user
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await db
       .from('users')
       .insert({
         email,
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create profile
-    const profileResult = await supabase
+    const profileResult = await db
       .from('profiles')
       .insert({
         id: user.id,
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create user limits
-    const limitsResult = await supabase
+    const limitsResult = await db
       .from('user_limits')
       .insert({
         user_id: user.id,
@@ -87,6 +88,14 @@ export async function POST(req: NextRequest) {
     const limitsError = (limitsResult as any).error
     if (limitsError) {
       console.error('Limits creation error:', limitsError)
+    }
+
+    // Send welcome email
+    try {
+      await sendWelcomeEmail(user.email, fullName || undefined)
+    } catch (emailError) {
+      console.error('Error sending welcome email:', emailError)
+      // Don't fail registration if email fails
     }
 
     return NextResponse.json({ 

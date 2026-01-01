@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, use } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import {
   ArrowLeft, BookOpen, CheckCircle, Clock, Play, FileText, Download,
-  Award, HelpCircle, BarChart3, Menu, X, MessageCircle, ChevronRight,
+  Award, HelpCircle, BarChart3, Menu, X, ChevronRight,
   Bookmark, Share2, Maximize2, Minimize2, Book, Video, CheckSquare,
   Sparkles, Layers
 } from 'lucide-react'
@@ -15,12 +15,12 @@ import { getAllModules, getAllModulesForAdmin, getModulePack } from '@/lib/conte
 import { PRICING_PACKS } from '@/lib/stripe'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import ChatWidget from '@/components/chat/ChatWidget'
 import EnhancedModuleDisplay from '@/components/modules/EnhancedModuleDisplay'
+import AITutorBot from '@/components/modules/AITutorBot'
 
 export default function ModuleView() {
   const router = useRouter()
-  const params = useParams()
+  const params = use(params)
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(true)
   const [module, setModule] = useState<any>(null)
@@ -168,7 +168,7 @@ export default function ModuleView() {
     }
 
     setLoading(false)
-  }, [session, status, router, params.id])
+  }, [session, status, router, params])
 
   const loadProgress = async (moduleId: string) => {
     if (isLocked) return
@@ -437,194 +437,107 @@ export default function ModuleView() {
   const sections = module.content ? extractSections(module.content) : []
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Sidebar - Table of Contents */}
-      {showTableOfContents && (
-        <motion.div
-          initial={{ x: -300 }}
-          animate={{ x: 0 }}
-          className="w-80 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 overflow-y-auto"
-        >
-          {/* Sidebar Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <Link
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {/* Title */}
+            <div className="flex items-center gap-4">
+              <Link 
                 href={isAdmin ? "/admin" : "/dashboard"}
-                className="flex items-center text-blue-600 hover:text-blue-700"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                <span className="text-sm font-medium">Back</span>
+                <ChevronRight className="w-5 h-5 rotate-180" />
               </Link>
-              <button
-                onClick={() => setShowTableOfContents(false)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
-                {packInfo?.name || 'Module'}
-              </span>
-              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">
-                {module.type}
-              </span>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900">
-              {module.title}
-            </h2>
-            {module.duration && (
-              <div className="flex items-center space-x-1 text-sm text-gray-600 mt-2">
-                <Clock className="w-4 h-4" />
-                <span>{module.duration}</span>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">{module.title}</h1>
+                {module.description && (
+                  <p className="text-sm text-gray-500 mt-1">{module.description}</p>
+                )}
               </div>
-            )}
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Table of Contents - Organized by Categories */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-              Table of Contents
-            </h3>
-            <nav className="space-y-4">
-              {categories.map((category, catIdx) => (
-                <div key={catIdx} className="space-y-2">
-                  {/* Category Header */}
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="flex-1 h-px bg-gray-200"></div>
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-2">
-                      {category.title}
-                    </h4>
-                    <div className="flex-1 h-px bg-gray-200"></div>
-                  </div>
-                  
-                  {/* Category Sections */}
-                  {category.sections.map((section, idx) => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Table of Contents - Desktop */}
+          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+            <div className="sticky top-24">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-gray-900">Table of Contents</h3>
+                </div>
+                <nav className="space-y-2">
+                  {sections.map((section) => (
                     <button
-                      key={`${catIdx}-${idx}`}
+                      key={section.id}
                       onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group ${
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${
                         activeSection === section.id
-                          ? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      } ${
-                        completedSections[section.id]
-                          ? 'border-l-[3px] border-green-500'
-                          : ''
+                          ? 'bg-blue-50 text-blue-700 font-medium border border-blue-200'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                       style={{ paddingLeft: `${(section.level - 1) * 12 + 12}px` }}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="flex-1">{section.title}</span>
-                        {completedSections[section.id] && (
-                          <CheckCircle className="w-4 h-4 text-green-500 ml-2 flex-shrink-0" />
-                        )}
-                      </div>
+                      {section.title}
                     </button>
                   ))}
-                </div>
-              ))}
-            </nav>
-
-            {/* Completion Summary */}
-            {Object.keys(completedSections).length > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                  <span>Sections Completed</span>
-                  <span className="font-semibold text-green-600">
-                    {Object.values(completedSections).filter(Boolean).length} / {sections.length}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div
-                    className="bg-gradient-to-r from-green-500 to-green-600 h-1.5 rounded-full transition-all duration-500"
-                    style={{ width: `${(Object.values(completedSections).filter(Boolean).length / sections.length) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-
-            {/* Quick Actions */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                Quick Actions
-              </h3>
-              <div className="space-y-2">
-                <button className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                  <Bookmark className="w-4 h-4" />
-                  <span>Bookmark</span>
-                </button>
-                <button className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                  <Share2 className="w-4 h-4" />
-                  <span>Share</span>
-                </button>
-                <button
-                  onClick={toggleFullscreen}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                  <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
-                </button>
+                </nav>
               </div>
             </div>
+          </aside>
 
-            {/* Progress */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Progress</span>
-                <span className="text-sm font-bold text-blue-600">{progress}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center space-x-4">
-            {!showTableOfContents && (
-              <button
-                onClick={() => setShowTableOfContents(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-            )}
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">
-                {module.title}
-              </h1>
-              <p className="text-sm text-gray-600">
-                {module.description}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setChatOpen(!chatOpen)}
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <MessageCircle className="w-5 h-5 text-gray-600" />
-              {chatOpen && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Content + Chat Layout */}
-        <div className="flex-1 flex overflow-hidden">
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto" ref={contentRef}>
-            <div className="max-w-4xl mx-auto px-6 py-8">
+          <main className="flex-1 min-w-0">
+            {/* Mobile TOC Toggle */}
+            <button
+              onClick={() => setShowTableOfContents(!showTableOfContents)}
+              className="lg:hidden mb-6 w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">Table of Contents</span>
+              </div>
+              <ChevronRight className={`w-5 h-5 transition-transform ${showTableOfContents ? 'rotate-90' : ''}`} />
+            </button>
+
+            {/* Mobile TOC */}
+            <AnimatePresence>
+              {showTableOfContents && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="lg:hidden mb-6 overflow-hidden"
+                >
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <nav className="space-y-2">
+                      {sections.map((section) => (
+                        <button
+                          key={section.id}
+                          onClick={() => scrollToSection(section.id)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${
+                            activeSection === section.id
+                              ? 'bg-blue-50 text-blue-700 font-medium border border-blue-200'
+                              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          }`}
+                          style={{ paddingLeft: `${(section.level - 1) * 12 + 12}px` }}
+                        >
+                          {section.title}
+                        </button>
+                      ))}
+                    </nav>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Content Area */}
+            <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-ul:text-gray-700 prose-li:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900" ref={contentRef}>
               {/* Module Header with Categories */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -762,14 +675,9 @@ export default function ModuleView() {
 
               {/* Module Content */}
               {module.content && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="prose prose-lg max-w-none mb-8 text-gray-900"
-                >
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
                       h1: ({ node, ...props }) => {
                         const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-') || ''
                         const isCompleted = completedSections[id]
@@ -887,7 +795,6 @@ export default function ModuleView() {
                   >
                     {module.content}
                   </ReactMarkdown>
-                </motion.div>
               )}
 
               {/* Interactive Quiz */}
@@ -1053,59 +960,9 @@ export default function ModuleView() {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Right Sidebar - AI Chat */}
-          {chatOpen && (
-            <motion.div
-              initial={{ x: 400 }}
-              animate={{ x: 0 }}
-              className="w-96 bg-white border-l border-gray-200 flex flex-col h-screen"
-            >
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
-                  <MessageCircle className="w-5 h-5 text-blue-600" />
-                  <span>AI Study Assistant</span>
-                </h3>
-                <button
-                  onClick={() => setChatOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="space-y-4">
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-700">
-                      👋 Hi! I'm here to help you understand this module. Ask me anything about:
-                    </p>
-                    <ul className="mt-2 space-y-1 text-xs text-gray-600">
-                      <li>• Key concepts and definitions</li>
-                      <li>• Step-by-step processes</li>
-                      <li>• Real-world examples</li>
-                      <li>• Clarification on confusing parts</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 border-t border-gray-200">
-                <ChatWidget />
-              </div>
-            </motion.div>
-          )}
+          </main>
         </div>
       </div>
-
-      {/* Mobile TOC Toggle */}
-      {!showTableOfContents && (
-        <button
-          onClick={() => setShowTableOfContents(true)}
-          className="fixed bottom-6 left-6 lg:hidden bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors z-50"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      )}
     </div>
   )
 }

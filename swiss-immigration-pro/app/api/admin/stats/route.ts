@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET() {
   try {
@@ -14,7 +14,7 @@ export async function GET() {
       )
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get all stats concurrently
     const [
@@ -24,11 +24,11 @@ export async function GET() {
       purchasesResult,
       recentResult
     ] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).execute(),
-      supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active').execute(),
-      supabase.from('chat_messages').select('*', { count: 'exact', head: true }).execute(),
-      supabase.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'succeeded').execute(),
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).execute()
+      db.from('profiles').select('*', { count: 'exact', head: true }).execute(),
+      db.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active').execute(),
+      db.from('chat_messages').select('*', { count: 'exact', head: true }).execute(),
+      db.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'succeeded').execute(),
+      db.from('profiles').select('*', { count: 'exact', head: true }).gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).execute()
     ])
 
     const userCount = userResult.count || 0
@@ -38,7 +38,7 @@ export async function GET() {
     const recentSignups = recentResult.count || 0
 
     // Get users by pack
-    const packResult = await supabase
+    const packResult = await db
       .from('profiles')
       .select('pack_id')
       .execute()
@@ -54,7 +54,7 @@ export async function GET() {
     }, {}) : {}
 
     // Get total revenue
-    const revenueResult = await supabase
+    const revenueResult = await db
       .from('payments')
       .select('amount')
       .eq('status', 'succeeded')
@@ -68,7 +68,7 @@ export async function GET() {
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
-    const monthlyRevenueResult = await supabase
+    const monthlyRevenueResult = await db
       .from('payments')
       .select('amount')
       .eq('status', 'succeeded')

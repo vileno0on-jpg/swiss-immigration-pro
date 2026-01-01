@@ -150,6 +150,60 @@ CREATE TABLE public.admin_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Email leads table (for marketing/lead generation)
+CREATE TABLE IF NOT EXISTS public.email_leads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email VARCHAR(255) NOT NULL,
+  lead_magnet VARCHAR(255),
+  source VARCHAR(100) DEFAULT 'website',
+  subscribed BOOLEAN DEFAULT true,
+  unsubscribed_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(email)
+);
+
+-- Consultations table (for booking consultation calls)
+CREATE TABLE IF NOT EXISTS public.consultations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  email TEXT NOT NULL,
+  full_name TEXT,
+  consultation_type TEXT NOT NULL, -- 'quick' (30min CHF 200), 'full' (60min CHF 500), 'support' (package CHF 1500)
+  preferred_date TIMESTAMP WITH TIME ZONE,
+  timezone TEXT DEFAULT 'UTC',
+  status TEXT DEFAULT 'pending', -- pending, confirmed, completed, canceled
+  amount INTEGER NOT NULL, -- in cents (CHF 200 = 20000)
+  stripe_payment_intent_id TEXT,
+  notes TEXT,
+  meeting_link TEXT, -- Zoom/Google Meet link
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_consultations_user_id ON public.consultations(user_id);
+CREATE INDEX IF NOT EXISTS idx_consultations_status ON public.consultations(status);
+CREATE INDEX IF NOT EXISTS idx_consultations_created_at ON public.consultations(created_at);
+
+-- Email sequences tracking table
+CREATE TABLE IF NOT EXISTS public.email_sequences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  sequence_type TEXT NOT NULL, -- 'welcome', 'value', 'upgrade', 'consultation_followup'
+  step_index INTEGER NOT NULL,
+  sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, sequence_type, step_index)
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_sequences_email ON public.email_sequences(email);
+CREATE INDEX IF NOT EXISTS idx_email_sequences_user_id ON public.email_sequences(user_id);
+CREATE INDEX IF NOT EXISTS idx_email_sequences_type ON public.email_sequences(sequence_type);
+
+CREATE INDEX IF NOT EXISTS idx_email_leads_email ON public.email_leads(email);
+CREATE INDEX IF NOT EXISTS idx_email_leads_created_at ON public.email_leads(created_at);
+CREATE INDEX IF NOT EXISTS idx_email_leads_subscribed ON public.email_leads(subscribed) WHERE subscribed = true;
+
 -- RLS Policies (disabled for custom auth)
 -- ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;

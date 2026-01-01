@@ -2,6 +2,7 @@
 
 import { FileText, Clock, MapPin, CheckCircle, Euro, Users, Building, TrendingUp, Shield, Badge, Award, FileCheck } from 'lucide-react'
 import Link from 'next/link'
+import MainHeader from '@/components/layout/MainHeader'
 
 // Disable static generation for this client component - must be server-side rendered
 export const dynamic = 'force-dynamic'
@@ -9,7 +10,9 @@ export const fetchCache = 'force-no-store'
 
 export default function VisasPage() {
   return (
-    <div className="min-h-screen bg-white py-24">
+    <div className="min-h-screen bg-white">
+      <MainHeader />
+      <div className="py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -337,6 +340,7 @@ export default function VisasPage() {
           </Link>
         </div>
       </div>
+    </div>
     </div>
   )
 }

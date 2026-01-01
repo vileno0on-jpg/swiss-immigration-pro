@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Search, X, FileText, Calculator, Users, MapPin, Sparkles, TrendingUp, Globe } from 'lucide-react'
+import { Search, X, FileText, Calculator, Users, MapPin, Sparkles, TrendingUp, Globe, Brain, Zap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
@@ -56,6 +56,10 @@ export default function AdvancedSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
+  const [directAnswer, setDirectAnswer] = useState<string | null>(null)
+  const [isSearching, setIsSearching] = useState(false)
+  const [hasAI, setHasAI] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -76,24 +80,62 @@ export default function AdvancedSearch() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Search logic
+  // AI-powered search logic
   useEffect(() => {
     if (query.length < 2) {
       setResults([])
+      setAiSuggestion(null)
+      setDirectAnswer(null)
       return
     }
 
-    const searchTerm = query.toLowerCase()
-    const filtered = SEARCH_INDEX.filter((item) => {
-      return (
-        item.title.toLowerCase().includes(searchTerm) ||
-        item.description.toLowerCase().includes(searchTerm) ||
-        item.keywords.some((keyword) => keyword.includes(searchTerm))
-      )
-    })
+    // Debounce search
+    const timeoutId = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const response = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        })
 
-    setResults(filtered.slice(0, 8)) // Show max 8 results
-    setSelectedIndex(0)
+        if (response.ok) {
+          const data = await response.json()
+          setResults(data.results || [])
+          setAiSuggestion(data.aiSuggestion || null)
+          setDirectAnswer(data.directAnswer || null)
+          setHasAI(data.hasAI || false)
+        } else {
+          // Fallback to keyword search
+          const searchTerm = query.toLowerCase()
+          const filtered = SEARCH_INDEX.filter((item) => {
+            return (
+              item.title.toLowerCase().includes(searchTerm) ||
+              item.description.toLowerCase().includes(searchTerm) ||
+              item.keywords.some((keyword) => keyword.includes(searchTerm))
+            )
+          })
+          setResults(filtered.slice(0, 8))
+        }
+      } catch (error) {
+        console.error('Search error:', error)
+        // Fallback to keyword search
+        const searchTerm = query.toLowerCase()
+        const filtered = SEARCH_INDEX.filter((item) => {
+          return (
+            item.title.toLowerCase().includes(searchTerm) ||
+            item.description.toLowerCase().includes(searchTerm) ||
+            item.keywords.some((keyword) => keyword.includes(searchTerm))
+          )
+        })
+        setResults(filtered.slice(0, 8))
+      } finally {
+        setIsSearching(false)
+        setSelectedIndex(0)
+      }
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(timeoutId)
   }, [query])
 
   // Handle navigation with arrow keys
@@ -185,32 +227,79 @@ export default function AdvancedSearch() {
             >
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
                 {/* Search Input */}
-                <div className="flex items-center border-b border-gray-200 p-4">
-                  <Search className="w-6 h-6 text-gray-400 mr-3" />
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search visas, tools, guides, resources..."
-                    className="flex-1 bg-transparent outline-none text-lg text-gray-900 placeholder-gray-400"
-                  />
-                  {query && (
-                    <button
-                      onClick={() => setQuery('')}
-                      className="p-1 hover:bg-gray-100 rounded"
-                    >
-                      <X className="w-5 h-5 text-gray-400" />
-                    </button>
-                  )}
-                  <kbd className="ml-2 px-2 py-1 text-xs bg-gray-100 rounded border border-gray-300">
+                <div className="flex items-center border-b border-gray-200 p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                  <div className="relative flex-1 flex items-center">
+                    {hasAI && (
+                      <Brain className="w-5 h-5 text-blue-600 mr-2 animate-pulse" />
+                    )}
+                    <Search className={`w-6 h-6 text-gray-400 mr-3 ${isSearching ? 'animate-spin' : ''}`} />
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={hasAI ? "Ask anything about Swiss immigration..." : "Search visas, tools, guides, resources..."}
+                      className="flex-1 bg-transparent outline-none text-lg text-gray-900 placeholder-gray-400"
+                    />
+                    {query && (
+                      <button
+                        onClick={() => setQuery('')}
+                        className="p-1 hover:bg-gray-100 rounded ml-2"
+                      >
+                        <X className="w-5 h-5 text-gray-400" />
+                      </button>
+                    )}
+                  </div>
+                  <kbd className="ml-2 px-2 py-1 text-xs bg-white rounded border border-gray-300 shadow-sm">
                     ESC
                   </kbd>
                 </div>
 
                 {/* Search Results */}
                 <div className="max-h-96 overflow-y-auto">
-                  {results.length === 0 && query.length >= 2 && (
+                  {/* AI Direct Answer */}
+                  {directAnswer && (
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Zap className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">AI Answer</span>
+                          </div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{directAnswer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Suggestion */}
+                  {aiSuggestion && (
+                    <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-600" />
+                        <span className="text-xs text-gray-600">Try searching for:</span>
+                        <button
+                          onClick={() => setQuery(aiSuggestion)}
+                          className="text-sm font-semibold text-purple-700 hover:text-purple-800 underline"
+                        >
+                          {aiSuggestion}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {isSearching && query.length >= 2 && (
+                    <div className="p-8 text-center text-gray-500">
+                      <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                        <Brain className="w-12 h-12 text-blue-500 animate-pulse" />
+                      </div>
+                      <p className="text-sm">AI is searching...</p>
+                    </div>
+                  )}
+
+                  {!isSearching && results.length === 0 && query.length >= 2 && (
                     <div className="p-8 text-center text-gray-500">
                       <Search className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p>No results found for "{query}"</p>
@@ -271,19 +360,25 @@ export default function AdvancedSearch() {
                 </div>
 
                 {/* Footer */}
-                {results.length > 0 && (
-                  <div className="flex items-center justify-between p-3 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
+                {(results.length > 0 || directAnswer) && (
+                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-blue-50/30 text-xs text-gray-500 border-t border-gray-200">
                     <div className="flex items-center space-x-4">
                       <span className="flex items-center">
-                        <kbd className="px-2 py-1 bg-white rounded border">↑↓</kbd>
+                        <kbd className="px-2 py-1 bg-white rounded border shadow-sm">↑↓</kbd>
                         <span className="ml-2">Navigate</span>
                       </span>
                       <span className="flex items-center">
-                        <kbd className="px-2 py-1 bg-white rounded border">↵</kbd>
+                        <kbd className="px-2 py-1 bg-white rounded border shadow-sm">↵</kbd>
                         <span className="ml-2">Open</span>
                       </span>
+                      {hasAI && (
+                        <span className="flex items-center gap-1 text-blue-600">
+                          <Brain className="w-3 h-3" />
+                          <span>AI Powered</span>
+                        </span>
+                      )}
                     </div>
-                    <span>{results.length} results</span>
+                    <span className="font-medium">{results.length} {results.length === 1 ? 'result' : 'results'}</span>
                   </div>
                 )}
               </div>

@@ -31,8 +31,14 @@ export function TranslationLoader() {
         return
       }
 
+      // Normalize language code for Google Translate (use zh-CN for better natural translations)
+      const normalizeLangCode = (code: string): string => {
+        if (code === 'zh') return 'zh-CN'
+        return code
+      }
+      
       // Set translation cookie
-      const targetLang = preferredLanguage
+      const targetLang = normalizeLangCode(preferredLanguage)
       const cookieValue = `/en/${targetLang}`
       document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`
 
@@ -107,11 +113,12 @@ export function TranslationLoader() {
             document.body.appendChild(container)
           }
 
-          // Initialize widget
+          // Initialize widget with all 15 languages optimized for natural translations
+          // Using zh-CN for Simplified Chinese (more natural), zh-TW for Traditional if needed
           new window.google.translate.TranslateElement(
             {
               pageLanguage: 'en',
-              includedLanguages: 'en,de,fr,it,es,pt,zh,ar,ru,ja,ko',
+              includedLanguages: 'en,de,fr,it,es,pt,zh-CN,ar,hi,ru,ja,ko,tr,pl,nl',
               autoDisplay: false,
               layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
             },
@@ -129,8 +136,15 @@ export function TranslationLoader() {
 
       // Trigger the translation
       const triggerTranslation = (lang: string) => {
+        // Normalize language code for Google Translate
+        const normalizeLangCode = (code: string): string => {
+          if (code === 'zh') return 'zh-CN'
+          return code
+        }
+        const normalizedLang = normalizeLangCode(lang)
+        
         // Ensure cookie is set
-        document.cookie = `googtrans=/en/${lang}; path=/; max-age=31536000; SameSite=Lax`
+        document.cookie = `googtrans=/en/${normalizedLang}; path=/; max-age=31536000; SameSite=Lax`
         
         // Try multiple methods to trigger translation
         const tryTranslate = (attempt = 0) => {
@@ -141,8 +155,8 @@ export function TranslationLoader() {
 
           const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
           if (select) {
-            // Method 1: Set value and trigger change
-            select.value = lang
+            // Method 1: Set value and trigger change (use normalized code)
+            select.value = normalizedLang
             const changeEvent = new Event('change', { bubbles: true, cancelable: true })
             select.dispatchEvent(changeEvent)
             
@@ -195,7 +209,7 @@ export function TranslationLoader() {
             
             // Check if it worked
             setTimeout(() => {
-              if (select.value === lang) {
+              if (select.value === normalizedLang || select.value === lang) {
                 console.log('Translation applied successfully')
                 // Force re-translation of dynamically loaded content
                 forceRetranslate()
@@ -215,7 +229,7 @@ export function TranslationLoader() {
           // Wait a bit for React to render, then trigger translation again
           setTimeout(() => {
             const select = document.querySelector('.goog-te-combo') as HTMLSelectElement
-            if (select && select.value === lang) {
+            if (select && (select.value === normalizedLang || select.value === lang)) {
               // Trigger change again to translate new content
               select.dispatchEvent(new Event('change', { bubbles: true }))
             }

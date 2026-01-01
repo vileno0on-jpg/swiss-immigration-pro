@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, use } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
 export default function LayerPage() {
-  const params = useParams()
+  const params = use(params)
   const router = useRouter()
   const layerParam = params?.layer as string
   

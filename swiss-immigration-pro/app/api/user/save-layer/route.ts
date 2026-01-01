@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     const session = await getServerSession(authOptions)
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get IP address
     const forwarded = req.headers.get('x-forwarded-for')
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if (session?.user?.id) {
       // Save by account in metadata JSONB field
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('metadata')
         .eq('id', session.user.id)
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         layer_selected_ip: ipHash,
       }
 
-      await supabase
+      await db
         .from('profiles')
         .update({ 
           metadata: updatedMetadata,

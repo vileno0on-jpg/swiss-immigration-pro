@@ -1,14 +1,15 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { CheckCircle, ArrowLeft, ArrowRight, Shield, Award, Home, Briefcase, Plane, CreditCard } from 'lucide-react'
+import { motion, use } from 'react'
+import { CheckCircle, ArrowLeft, ArrowRight, Shield, Award, Home, Briefcase, Plane, CreditCard, Star, AlertTriangle, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
+import LayerHeader from '@/components/layout/LayerHeader'
 
 export default function VisasPage() {
-  const params = useParams()
+  const params = use(params)
   const layerParam = params?.layer as string
   const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
     ? layerParam 
@@ -17,8 +18,29 @@ export default function VisasPage() {
   const content = LAYER_CONTENT[layer]
   const visas = content.visas.types.filter(v => v.applicable)
 
+  // Map layer names to LayerHeader format
+  const layerForHeader = layer === 'europeans' ? 'eu' : layer === 'americans' ? 'us' : 'other'
+  const homeHref = `/${layerForHeader}`
+
+  // Layer-specific badge configuration
+  const badge = {
+    icon: layer === 'europeans' ? <Star className="w-3.5 h-3.5" /> : layer === 'americans' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layer === 'europeans' 
+      ? 'EU/EFTA Freedom of Movement'
+      : layer === 'americans' 
+      ? '2025 Quota Alert: Apply Early'
+      : 'Global Citizens Pathway',
+    bgColor: layer === 'europeans' ? 'bg-blue-600' : layer === 'americans' ? 'bg-slate-900' : 'bg-purple-600',
+    textColor: 'text-white'
+  }
+
   return (
     <div className="bg-white min-h-screen">
+      <LayerHeader
+        layer={layerForHeader as 'eu' | 'us' | 'other'}
+        homeHref={homeHref}
+        customBadge={badge}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}

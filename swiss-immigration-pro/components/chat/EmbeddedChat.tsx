@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, X, MessageCircle, Minimize2, Maximize2, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { MessageContent } from './MessageContent'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -15,6 +16,77 @@ interface EmbeddedChatProps {
   moduleId?: string
 }
 
+// Typing animation component with slower, more fluid typing
+function TypingMessage({ content, isActive }: { content: string; isActive: boolean }) {
+  const [displayedText, setDisplayedText] = useState('')
+
+  useEffect(() => {
+    if (!isActive || !content) {
+      setDisplayedText(content || '')
+      return
+    }
+
+    setDisplayedText('')
+    let currentIndex = 0
+    
+    // Fluid, slow typing speed - varies by character type for natural feel
+    const getTypingSpeed = (char: string, index: number, prevChar?: string) => {
+      // Spaces - slight pause for word boundaries
+      if (char === ' ') return 50 + (Math.random() * 30) // 50-80ms
+      
+      // Punctuation - longer, more dramatic pause for natural reading rhythm
+      if (['.', '!', '?'].includes(char)) return 400 + (Math.random() * 200) // 400-600ms
+      if ([':', ';'].includes(char)) return 300 + (Math.random() * 150) // 300-450ms
+      
+      // Commas - medium pause for natural flow
+      if (char === ',') return 200 + (Math.random() * 100) // 200-300ms
+      
+      // Newlines - pause for paragraph breaks
+      if (char === '\n') return 250 + (Math.random() * 100) // 250-350ms
+      
+      // Word boundaries - slight extra pause after longer words
+      if (prevChar === ' ' && index > 5) {
+        const wordLength = content.slice(Math.max(0, index - 10), index).split(' ').pop()?.length || 0
+        if (wordLength > 6) {
+          return 80 + (Math.random() * 40) // 80-120ms for longer words
+        }
+      }
+      
+      // Base speed - slower and more varied for fluid, natural typing
+      const baseSpeed = 50 + (Math.random() * 40) // 50-90ms per character
+      return baseSpeed
+    }
+
+    const typeNextChar = () => {
+      if (currentIndex < content.length) {
+        const char = content[currentIndex]
+        const prevChar = currentIndex > 0 ? content[currentIndex - 1] : undefined
+        setDisplayedText(content.slice(0, currentIndex + 1))
+        currentIndex++
+        
+        const speed = getTypingSpeed(char, currentIndex, prevChar)
+        setTimeout(typeNextChar, speed)
+      }
+    }
+
+    // Start typing after a brief delay for smoother start
+    const startTimer = setTimeout(typeNextChar, 200)
+
+    return () => {
+      clearTimeout(startTimer)
+    }
+  }, [content, isActive])
+
+  return (
+    <>
+      {displayedText}
+      {isActive && displayedText.length < content.length && (
+        <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse" />
+      )}
+    </>
+  )
+}
+
 export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -24,6 +96,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
   const [isDark, setIsDark] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [typingMessageId, setTypingMessageId] = useState<number | null>(null)
 
   // Detect desktop screen size
   useEffect(() => {
@@ -132,11 +205,15 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
 
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: data.response || data.message || 'Sorry, I could not process your request.',
+        content: data.response || data.message || '',
         timestamp: new Date(),
       }
 
-      setMessages(prev => [...prev, assistantMessage])
+      setMessages(prev => {
+        const newMessages = [...prev, assistantMessage]
+        setTypingMessageId(newMessages.length - 1)
+        return newMessages
+      })
     } catch (error: any) {
       console.error('Chat error:', error)
       const errorMessage: ChatMessage = {
@@ -198,26 +275,97 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
             </p>
           </div>
         )}
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+        {messages.map((msg, idx) => {
+          const isTyping = typingMessageId === idx && msg.role === 'assistant'
+          
+          return (
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
-                msg.role === 'user'
-                  ? isDark
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-blue-600 text-white'
-                  : isDark
-                  ? 'bg-gray-700 text-gray-100'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
+              key={idx}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              onAnimationEnd={() => {
+                if (isTyping) {
+                  setTimeout(() => setTypingMessageId(null), 100)
+                }
+              }}
             >
-              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+              <div
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  msg.role === 'user'
+                    ? isDark
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-600 text-white'
+                    : isDark
+                    ? 'bg-gray-700 text-gray-100'
+                    : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                <div className="text-sm whitespace-pre-wrap">
+                  {msg.role === 'assistant' && isTyping ? (
+                    <TypingMessage content={msg.content} isActive={true} />
+                  ) : (
+                    <MessageContent 
+                      content={msg.content} 
+                      onSuggestionClick={async (suggestion) => {
+                        setInput(suggestion)
+                        await new Promise(resolve => setTimeout(resolve, 50))
+                        if (!isLoading) {
+                          const userMessage: ChatMessage = {
+                            role: 'user',
+                            content: suggestion,
+                            timestamp: new Date(),
+                          }
+                          setMessages(prev => [...prev, userMessage])
+                          setInput('')
+                          setIsLoading(true)
+                          
+                          try {
+                            const formData = new FormData()
+                            formData.append('message', suggestion)
+                            formData.append('packId', 'free')
+                            if (moduleId) {
+                              formData.append('moduleId', moduleId)
+                            }
+                            
+                            const response = await fetch('/api/chat', {
+                              method: 'POST',
+                              body: formData,
+                            })
+                            
+                            if (!response.ok) throw new Error('Failed to get response')
+                            
+                            const data = await response.json()
+                            
+                            const assistantMessage: ChatMessage = {
+                              role: 'assistant',
+                              content: data.response || data.message || '',
+                              timestamp: new Date(),
+                            }
+                            
+                            setMessages(prev => {
+                              const newMessages = [...prev, assistantMessage]
+                              setTypingMessageId(newMessages.length - 1)
+                              return newMessages
+                            })
+                          } catch (error: any) {
+                            console.error('Chat error:', error)
+                            const errorMessage: ChatMessage = {
+                              role: 'assistant',
+                              content: `Sorry, an error occurred: ${error?.message || 'Unknown error'}. Please try again.`,
+                              timestamp: new Date(),
+                            }
+                            setMessages(prev => [...prev, errorMessage])
+                          } finally {
+                            setIsLoading(false)
+                          }
+                        }
+                      }} 
+                    />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         {isLoading && (
           <div className="flex justify-start">
             <div className={`rounded-lg p-3 ${
@@ -272,7 +420,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
       )
   }
 
-  // On mobile, render with floating animation
+  // On mobile, render with floating animation - Mobile optimized
   return (
     <AnimatePresence>
       {isOpen && (
@@ -280,26 +428,27 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
           initial={{ opacity: 0, x: 400 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 400 }}
-          className={`fixed right-6 bottom-6 w-[calc(100vw-3rem)] max-w-96 h-[600px] ${
+          className={`fixed right-4 bottom-4 sm:right-6 sm:bottom-6 w-[calc(100vw-2rem)] sm:w-[calc(100vw-3rem)] max-w-sm sm:max-w-96 h-[calc(100vh-6rem)] sm:h-[600px] ${
             isDark ? 'bg-gray-800' : 'bg-white'
           } rounded-lg shadow-2xl border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
           } flex flex-col z-40`}
+          style={{ maxHeight: 'calc(100vh - 2rem)' }}
         >
-          {/* Header */}
-          <div className={`flex items-center justify-between p-4 border-b ${
+          {/* Header - Mobile optimized */}
+          <div className={`flex items-center justify-between p-3 sm:p-4 border-b ${
             isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
           }`}>
-            <div className="flex items-center space-x-2">
-              <MessageCircle className={`w-5 h-5 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
-              <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <MessageCircle className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+              <h3 className={`font-semibold text-sm sm:text-base truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 AI Learning Assistant
               </h3>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
               <button
                 onClick={() => setIsMinimized(true)}
-                className={`p-1 rounded hover:bg-opacity-20 ${
+                className={`p-1.5 sm:p-1 rounded hover:bg-opacity-20 touch-manipulation ${
                   isDark ? 'hover:bg-white' : 'hover:bg-gray-200'
                 } transition-colors`}
                 aria-label="Minimize"
@@ -308,7 +457,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className={`p-1 rounded hover:bg-opacity-20 ${
+                className={`p-1.5 sm:p-1 rounded hover:bg-opacity-20 touch-manipulation ${
                   isDark ? 'hover:bg-white' : 'hover:bg-gray-200'
                 } transition-colors`}
                 aria-label="Close"
@@ -318,12 +467,12 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Messages - Mobile optimized */}
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {messages.length === 0 && (
-              <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">
+              <div className={`text-center py-6 sm:py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-50" />
+                <p className="text-xs sm:text-sm px-2">
                   Ask me questions about this module! I'm here to help you learn.
                 </p>
               </div>
@@ -334,7 +483,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2.5 sm:p-3 ${
                     msg.role === 'user'
                       ? isDark
                         ? 'bg-blue-600 text-white'
@@ -344,7 +493,69 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
                       : 'bg-gray-100 text-gray-900'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  <div className="text-xs sm:text-sm whitespace-pre-wrap break-words">
+                    {msg.role === 'assistant' && typingMessageId === idx ? (
+                      <TypingMessage content={msg.content} isActive={true} />
+                    ) : (
+                      <MessageContent 
+                        content={msg.content} 
+                        onSuggestionClick={async (suggestion) => {
+                          setInput(suggestion)
+                          await new Promise(resolve => setTimeout(resolve, 50))
+                          if (!isLoading) {
+                            const userMessage: ChatMessage = {
+                              role: 'user',
+                              content: suggestion,
+                              timestamp: new Date(),
+                            }
+                            setMessages(prev => [...prev, userMessage])
+                            setInput('')
+                            setIsLoading(true)
+                            
+                            try {
+                              const formData = new FormData()
+                              formData.append('message', suggestion)
+                              formData.append('packId', 'free')
+                              if (moduleId) {
+                                formData.append('moduleId', moduleId)
+                              }
+                              
+                              const response = await fetch('/api/chat', {
+                                method: 'POST',
+                                body: formData,
+                              })
+                              
+                              if (!response.ok) throw new Error('Failed to get response')
+                              
+                              const data = await response.json()
+                              
+                              const assistantMessage: ChatMessage = {
+                                role: 'assistant',
+                                content: data.response || data.message || '',
+                                timestamp: new Date(),
+                              }
+                              
+                              setMessages(prev => {
+                                const newMessages = [...prev, assistantMessage]
+                                setTypingMessageId(newMessages.length - 1)
+                                return newMessages
+                              })
+                            } catch (error: any) {
+                              console.error('Chat error:', error)
+                              const errorMessage: ChatMessage = {
+                                role: 'assistant',
+                                content: `Sorry, an error occurred: ${error?.message || 'Unknown error'}. Please try again.`,
+                                timestamp: new Date(),
+                              }
+                              setMessages(prev => [...prev, errorMessage])
+                            } finally {
+                              setIsLoading(false)
+                            }
+                          }
+                        }} 
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -362,8 +573,8 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <form onSubmit={handleSend} className={`p-4 border-t ${
+          {/* Input - Mobile optimized */}
+          <form onSubmit={handleSend} className={`p-3 sm:p-4 border-t ${
             isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
           }`}>
             <div className="flex space-x-2">
@@ -372,7 +583,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask a question about this module..."
-                className={`flex-1 px-4 py-2 rounded-lg border ${
+                className={`flex-1 px-3 sm:px-4 py-2 rounded-lg border text-base ${
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -382,7 +593,7 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg transition-colors touch-manipulation flex-shrink-0 ${
                   input.trim() && !isLoading
                     ? 'bg-green-600 hover:bg-green-700 text-white'
                     : isDark
@@ -391,9 +602,9 @@ export default function EmbeddedChat({ moduleTitle, moduleId }: EmbeddedChatProp
                 }`}
               >
                 {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                 ) : (
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </button>
             </div>

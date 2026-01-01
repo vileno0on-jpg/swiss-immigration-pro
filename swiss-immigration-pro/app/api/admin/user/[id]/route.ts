@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET(
   req: NextRequest,
@@ -14,11 +14,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
     const { id: userId } = await params
 
     // Get user profile
-    const profileResult = await supabase
+    const profileResult = await db
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -32,7 +32,7 @@ export async function GET(
     }
 
     // Get user's subscriptions
-    const subscriptionsResult = await supabase
+    const subscriptionsResult = await db
       .from('subscriptions')
       .select('*')
       .eq('user_id', userId)
@@ -41,7 +41,7 @@ export async function GET(
     const subscriptions = subscriptionsResult.data || []
 
     // Get user's payments
-    const paymentsResult = await supabase
+    const paymentsResult = await db
       .from('payments')
       .select('*')
       .eq('user_id', userId)
@@ -51,7 +51,7 @@ export async function GET(
     const payments = paymentsResult.data || []
 
     // Get user's chat messages count
-    const messageCountResult = await supabase
+    const messageCountResult = await db
       .from('chat_messages')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
@@ -59,7 +59,7 @@ export async function GET(
     const messageCount = messageCountResult.count || 0
 
     // Get user limits
-    const limitsResult = await supabase
+    const limitsResult = await db
       .from('user_limits')
       .select('*')
       .eq('user_id', userId)
@@ -90,7 +90,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
     const { id: userId } = await params
     const { packId, isAdmin, fullName, packExpiresAt } = await req.json()
 
@@ -107,7 +107,7 @@ export async function PUT(
 
     // Update profile fields
     if (Object.keys(updates).length > 1) { // More than just updated_at
-      const updateResult = await supabase
+      const updateResult = await db
         .from('profiles')
         .update(updates)
         .eq('id', userId)
@@ -122,7 +122,7 @@ export async function PUT(
 
     // Update admin status separately if provided
     if (isAdmin !== undefined) {
-      const adminResult = await supabase
+      const adminResult = await db
         .from('profiles')
         .update({
           is_admin: isAdmin,
@@ -140,7 +140,7 @@ export async function PUT(
 
     // Update full name separately if provided
     if (fullName !== undefined) {
-      const nameResult = await supabase
+      const nameResult = await db
         .from('profiles')
         .update({
           full_name: fullName,

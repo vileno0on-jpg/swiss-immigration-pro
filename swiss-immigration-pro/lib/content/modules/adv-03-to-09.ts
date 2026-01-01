@@ -371,11 +371,11 @@ Switzerland has the **most complex and advantageous** tax system for high earner
 
 | Canton | Total Tax | Effective Rate |
 |--------|-----------|----------------|
-| Zug | CHF 15k | 15% |
-| Schwyz | CHF 16k | 16% |
-| Geneva | CHF 28k | 28% |
-| Vaud | CHF 24k | 24% |
-| Zurich | CHF 23k | 23% |
+| Zug | CHF 12k | 12% |
+| Schwyz | CHF 13k | 13% |
+| Geneva | CHF 22k | 22% |
+| Vaud | CHF 19k | 19% |
+| Zurich | CHF 18k | 18% |
 
 ## The Third Pillar (Pillar 3a) - Swiss Retirement
 
@@ -389,9 +389,9 @@ Switzerland has the **most complex and advantageous** tax system for high earner
 
 **Savings Example:**
 - CHF 100k salary, Zurich
-- Without Pillar 3a: CHF 23k tax
-- With Pillar 3a (CHF 7k contribution): CHF 21k tax
-- **Annual savings: CHF 2,000**
+- Without Pillar 3a: CHF 18k tax
+- With Pillar 3a (CHF 7k contribution): CHF 16.5k tax
+- **Annual savings: CHF 1,500**
 
 ### Pillar 3a Strategy
 
@@ -520,9 +520,9 @@ Switzerland has the **most complex and advantageous** tax system for high earner
 
 ### Mandatory Contributions
 
-**Employee:** 5.3% of gross salary
-**Employer:** 5.3% of gross salary
-**Self-employed:** 10.6%
+**Employee:** 3.5% of gross salary
+**Employer:** 3.5% of gross salary
+**Self-employed:** 7.0%
 
 **Max Annual Contribution:** CHF 60,672 (2025)
 

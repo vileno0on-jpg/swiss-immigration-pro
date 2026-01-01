@@ -2,10 +2,18 @@
 
 import { motion } from 'framer-motion'
 import { Calendar, Globe, BookOpen, CheckCircle } from 'lucide-react'
+import MainHeader from '@/components/layout/MainHeader'
+
+// Video configuration - Replace with your sketch video URL
+// For YouTube: Use format "https://www.youtube.com/embed/VIDEO_ID"
+// For Vimeo: Use format "https://player.vimeo.com/video/VIDEO_ID"
+const SKETCH_VIDEO_URL = 'https://www.youtube.com/embed/YOUR_VIDEO_ID'
 
 export default function CitizenshipPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-24">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <MainHeader />
+      <div className="py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -18,6 +26,32 @@ export default function CitizenshipPage() {
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Your roadmap to Swiss citizenship - timelines, requirements, and shortcuts
           </p>
+        </motion.div>
+
+        {/* Sketch Video Explanation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-16"
+        >
+          <div className="card p-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+              📹 Understanding Swiss Citizenship
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 text-center max-w-2xl mx-auto">
+              Watch this sketch video for a clear, visual explanation of the Swiss citizenship process
+            </p>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                src={SKETCH_VIDEO_URL}
+                title="Swiss Citizenship Explained - Sketch Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
         </motion.div>
 
         {/* Citizenship Paths Table */}
@@ -135,6 +169,7 @@ export default function CitizenshipPage() {
           </div>
         </motion.div>
       </div>
+    </div>
     </div>
   )
 }

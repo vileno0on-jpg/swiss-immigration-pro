@@ -131,88 +131,142 @@ export default function LanguageDetectionModal({ isOpen, onClose }: LanguageDete
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
         onClick={handleSkipTranslation}
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingLeft: '1rem',
-          paddingRight: '1rem',
-          paddingTop: '1rem',
-          paddingBottom: '1rem'
-        }}
       >
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-xl lg:max-w-2xl max-h-[60vh] overflow-y-auto modal-hide-scrollbar"
-          onClick={(e) => e.stopPropagation()}
-          style={{ 
-            width: '100%',
-            maxWidth: '42rem',
-            position: 'relative'
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            duration: 0.3
           }}
+          className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-xl lg:max-w-2xl max-h-[85vh] overflow-hidden flex flex-col border border-gray-200/50 dark:border-gray-700/50"
+          onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <div className="px-6 py-5 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20">
             <div className="flex items-center space-x-3">
-              <Globe className="w-6 h-6 text-blue-600" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </motion.div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Language Detected
               </h2>
             </div>
-            <button
+            <motion.button
               onClick={handleSkipTranslation}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-all duration-200"
             >
               <X className="w-5 h-5" />
-            </button>
+            </motion.button>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-6">
+          <div className="px-6 py-8 overflow-y-auto custom-scrollbar flex-1">
             <AnimatePresence mode="wait">
               {hasConfirmed ? (
                 <motion.div
                   key="confirmed"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center space-y-4"
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
+                  className="text-center space-y-6"
                 >
-                  <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 200,
+                      damping: 15,
+                      delay: 0.2
+                    }}
+                  >
+                    <CheckCircle className="w-20 h-20 text-green-500 mx-auto drop-shadow-lg" />
+                  </motion.div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <motion.h3 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-2xl font-bold text-gray-900 dark:text-white mb-3 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"
+                    >
                       Translation Activated!
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    </motion.h3>
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-gray-600 dark:text-gray-400 mb-6"
+                    >
                       The site is now translating to {detectedLanguage?.nativeName}
-                    </p>
-                    <div className="inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      <span>Applying translation...</span>
-                    </div>
+                    </motion.p>
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className="inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-full"
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                      />
+                      <span className="text-sm font-medium">Applying translation...</span>
+                    </motion.div>
                   </div>
                 </motion.div>
               ) : isTranslating ? (
                 <motion.div
                   key="translating"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center space-y-4"
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
+                  className="text-center space-y-6"
                 >
-                  <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto">
-                    <Globe className="w-8 h-8 text-blue-600 animate-spin" />
-                  </div>
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 360]
+                    }}
+                    transition={{ 
+                      scale: {
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      },
+                      rotate: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }
+                    }}
+                    className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto shadow-lg"
+                  >
+                    <Globe className="w-10 h-10 text-white" />
+                  </motion.div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                       Activating Translation
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400">
@@ -225,62 +279,125 @@ export default function LanguageDetectionModal({ isOpen, onClose }: LanguageDete
                   key="detection"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
                   className="space-y-6"
                 >
                   {/* Detected Language */}
                   {detectedLanguage && (
-                    <div className="text-center">
-                      <div className="inline-flex items-center space-x-3 bg-blue-50 dark:bg-blue-900/20 px-6 py-4 rounded-xl mb-4">
-                        <span className="text-4xl">{detectedLanguage.flag}</span>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-center"
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="inline-flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 px-8 py-5 rounded-2xl mb-6 border border-blue-200/50 dark:border-blue-800/50 shadow-lg"
+                      >
+                        <motion.span 
+                          className="text-5xl"
+                          animate={{ 
+                            y: [0, -10, 0],
+                          }}
+                          transition={{ 
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          {detectedLanguage.flag}
+                        </motion.span>
                         <div className="text-left">
-                          <div className="font-semibold text-gray-900 dark:text-white">
+                          <div className="font-bold text-lg text-gray-900 dark:text-white">
                             {detectedLanguage.nativeName}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {detectedLanguage.name} • {detectedLanguage.confidence}% confidence
+                          <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
+                            <span>{detectedLanguage.name}</span>
+                            <span>•</span>
+                            <span className="font-semibold text-blue-600 dark:text-blue-400">{detectedLanguage.confidence}% confidence</span>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
 
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                         Would you like to translate this site?
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-8 max-w-md mx-auto leading-relaxed">
                         We detected you're accessing from a {detectedLanguage.name}-speaking region.
                         Enable automatic translation for a better experience.
                       </p>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Action Buttons */}
                   <div className="space-y-3">
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handleConfirmTranslation}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center space-x-2"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 relative overflow-hidden group"
                     >
-                      <CheckCircle className="w-5 h-5" />
-                      <span>Yes, translate to {detectedLanguage?.nativeName}</span>
-                    </button>
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                        animate={{
+                          x: ['-100%', '100%'],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
+                      <CheckCircle className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">Yes, translate to {detectedLanguage?.nativeName}</span>
+                    </motion.button>
 
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handleSkipTranslation}
-                      className="w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-xl transition-colors"
+                      className="w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                     >
                       No thanks, continue in English
-                    </button>
+                    </motion.button>
                   </div>
 
                   {/* Features */}
-                  <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-                    <p className="mb-2">✨ Powered by Google Translate</p>
-                    <p>🔒 Your language preference will be saved</p>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-center text-xs text-gray-500 dark:text-gray-400 space-y-1 pt-4 border-t border-gray-200/50 dark:border-gray-700/50"
+                  >
+                    <p className="flex items-center justify-center gap-2">✨ Powered by Google Translate</p>
+                    <p className="flex items-center justify-center gap-2">🔒 Your language preference will be saved</p>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </motion.div>
       </motion.div>
+      
+      <style jsx global>{`
+        /* Custom scrollbar for modal */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+      `}</style>
     </AnimatePresence>
   )
 }

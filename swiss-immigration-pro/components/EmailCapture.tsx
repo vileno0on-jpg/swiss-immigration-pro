@@ -12,12 +12,27 @@ export default function EmailCapture() {
     e.preventDefault()
     setStatus('loading')
 
-    // Simulate API call - replace with actual implementation
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to subscribe')
+      }
+
       setStatus('success')
       setEmail('')
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error)
+      setStatus('error')
       setTimeout(() => setStatus('idle'), 3000)
-    }, 1000)
+    }
   }
 
   return (

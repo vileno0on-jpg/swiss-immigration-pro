@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import { CONFIG } from '@/lib/config'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { MessageContent } from './MessageContent'
 
 type UserPack = 'free' | 'immigration' | 'masterclass' | 'citizenship'
 
@@ -35,8 +36,95 @@ interface SessionUserMetadata {
 
 const DAILY_FREE_LIMIT = CONFIG.ai.freeDailyLimit
 
+// Typing animation component with professional, fluid typing effect
+function TypingMessage({ content, isActive }: { content: string; isActive: boolean }) {
+  const [displayedText, setDisplayedText] = useState('')
+
+  useEffect(() => {
+    if (!isActive || !content) {
+      setDisplayedText(content || '')
+      return
+    }
+
+    setDisplayedText('')
+    let currentIndex = 0
+    let timeoutId: NodeJS.Timeout | null = null
+    
+    // Professional typing speed - varies by character type for natural feel
+    const getTypingSpeed = (char: string, index: number, prevChar?: string) => {
+      // Spaces - slight pause for word boundaries
+      if (char === ' ') return 40 + (Math.random() * 25) // 40-65ms
+      
+      // Sentence endings - longer pause for natural reading rhythm
+      if (['.', '!', '?'].includes(char)) return 350 + (Math.random() * 150) // 350-500ms
+      if ([':', ';'].includes(char)) return 250 + (Math.random() * 100) // 250-350ms
+      
+      // Commas - medium pause for natural flow
+      if (char === ',') return 150 + (Math.random() * 80) // 150-230ms
+      
+      // Newlines - pause for paragraph breaks
+      if (char === '\n') return 200 + (Math.random() * 80) // 200-280ms
+      
+      // Word boundaries - slight extra pause after longer words
+      if (prevChar === ' ' && index > 5) {
+        const wordLength = content.slice(Math.max(0, index - 10), index).split(' ').pop()?.length || 0
+        if (wordLength > 6) {
+          return 70 + (Math.random() * 30) // 70-100ms for longer words
+        }
+      }
+      
+      // Base speed - professional typing speed with natural variation
+      const baseSpeed = 30 + (Math.random() * 25) // 30-55ms per character
+      return baseSpeed
+    }
+
+    const typeNextChar = () => {
+      if (currentIndex < content.length) {
+        const char = content[currentIndex]
+        const prevChar = currentIndex > 0 ? content[currentIndex - 1] : undefined
+        setDisplayedText(content.slice(0, currentIndex + 1))
+        currentIndex++
+        
+        const speed = getTypingSpeed(char, currentIndex, prevChar)
+        timeoutId = setTimeout(typeNextChar, speed)
+      }
+    }
+
+    // Start typing after a brief delay for smoother start
+    const startTimer = setTimeout(typeNextChar, 150)
+
+    return () => {
+      clearTimeout(startTimer)
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [content, isActive])
+
+  const isTyping = isActive && displayedText.length < content.length
+
+  return (
+    <span className="inline-block">
+      {displayedText}
+      {isTyping && (
+        <motion.span 
+          className="inline-block w-0.5 h-4 bg-slate-700 ml-1.5 align-middle rounded-sm"
+          animate={{ 
+            opacity: [1, 1, 0, 0],
+          }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            ease: "easeInOut",
+            times: [0, 0.5, 0.51, 1],
+          }}
+        />
+      )}
+    </span>
+  )
+}
+
 export default function ChatWidget() {
   const { data: session } = useSession()
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
 
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -220,22 +308,28 @@ export default function ChatWidget() {
         body: JSON.stringify(payload),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error('We could not reach the chat assistant. Please try again shortly.')
+        // Extract error message from API response
+        const errorMessage = data?.error || data?.message || 'We could not reach the chat assistant. Please try again shortly.'
+        throw new Error(errorMessage)
       }
 
-      const data: { response?: string } = await response.json()
       const assistantText = data.response?.trim()
 
-      appendMessage({
-        id: createMessageId(),
-        role: 'assistant',
-        content:
-          assistantText && assistantText.length > 0
-            ? assistantText
-            : 'I could not generate a helpful response right now. Please try again.',
-        timestamp: new Date(),
-      })
+      if (assistantText && assistantText.length > 0) {
+        const messageId = createMessageId()
+        appendMessage({
+          id: messageId,
+          role: 'assistant',
+          content: assistantText,
+          timestamp: new Date(),
+        })
+        setTypingMessageId(messageId)
+      } else {
+        throw new Error('Received empty response from the chat assistant.')
+      }
 
       if (userPack === 'free') {
         const newCount = dailyMessages + 1
@@ -251,16 +345,8 @@ export default function ChatWidget() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Something went wrong while sending your message.'
+          : 'Connection error. Please check your internet and try again.'
       setErrorMessage(message)
-
-      appendMessage({
-        id: createMessageId(),
-        role: 'assistant',
-        content:
-          'I’m sorry—I ran into an issue processing that request. Please try again in a moment.',
-        timestamp: new Date(),
-      })
     } finally {
       setIsLoading(false)
       if (uploadedFile) {
@@ -293,31 +379,27 @@ export default function ChatWidget() {
     <>
       <motion.button
         onClick={handleToggle}
-        className="fixed bottom-6 right-6 sm:bottom-6 sm:right-6 z-[99999] p-4 bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 flex items-center space-x-2 transition-all duration-200 pointer-events-auto"
+        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[99999] w-12 h-12 sm:w-14 sm:h-14 bg-slate-800 text-white rounded-full shadow-sm hover:shadow-md hover:bg-slate-700 flex items-center justify-center transition-all duration-200 pointer-events-auto touch-manipulation relative border border-slate-700/50"
         style={{
           transform: 'none',
         }}
         title="Swiss Immigration AI Assistant"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
         <AnimatePresence>
-          {!isOpen && remainingMessages !== null && (
+          {!isOpen && remainingMessages !== null && remainingMessages > 0 && (
             <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className={`text-xs font-bold px-2 py-1 rounded-full ${
-                remainingMessages > 0
-                  ? 'bg-white text-blue-600'
-                  : 'bg-gray-200 text-gray-600'
-              }`}
+              exit={{ opacity: 0, scale: 0 }}
+              className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-blue-600 text-white text-[10px] font-semibold rounded-full flex items-center justify-center px-1 shadow-sm"
             >
-              {remainingMessages > 0 ? `${remainingMessages} free` : '0 free'}
+              {remainingMessages}
             </motion.span>
           )}
         </AnimatePresence>
@@ -332,28 +414,28 @@ export default function ChatWidget() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{ 
               position: 'fixed', 
-              bottom: '96px', 
-              right: '24px', 
+              bottom: typeof window !== 'undefined' && window.innerWidth >= 640 ? '96px' : '80px',
+              right: typeof window !== 'undefined' && window.innerWidth >= 640 ? '24px' : '16px', 
               zIndex: 9998,
               pointerEvents: 'auto'
             }}
-            className="w-full max-w-md h-[600px] bg-white rounded-lg shadow-2xl border border-blue-100 flex flex-col overflow-hidden md:max-w-md sm:max-w-sm sm:right-4 sm:bottom-20"
+            className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-md h-[calc(100vh-6rem)] sm:h-[600px] bg-white rounded-xl shadow-2xl border border-slate-200/50 flex flex-col overflow-hidden"
           >
-          <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+          <div className="flex justify-between items-center px-5 py-4 bg-slate-900 text-white rounded-t-xl border-b border-slate-800">
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
-              <h2 className="text-lg font-semibold">Swiss Immigration AI Assistant</h2>
+              <h2 className="text-base font-semibold tracking-tight">Swiss Immigration AI Assistant</h2>
               <AnimatePresence>
                 {userPack === 'free' && remainingMessages !== null && (
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-xs text-blue-100 mt-1"
+                    className="text-xs text-slate-400 mt-1"
                   >
                     {remainingMessages} of {DAILY_FREE_LIMIT} free prompts remaining
                   </motion.p>
@@ -362,16 +444,17 @@ export default function ChatWidget() {
             </motion.div>
             <motion.button
               onClick={handleToggle}
-              className="text-white hover:bg-white/20 p-1 rounded"
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
+              className="text-slate-400 hover:text-white hover:bg-slate-800 p-2 rounded-lg transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
+              aria-label="Close chat"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" strokeWidth={2} />
             </motion.button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 scroll-smooth">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50 scroll-smooth">
             {messages.length === 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -380,14 +463,14 @@ export default function ChatWidget() {
                 className="text-center py-8"
               >
                 <motion.div
-                  className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <MessageCircle className="w-8 h-8 text-blue-600" />
+                  <MessageCircle className="w-8 h-8 text-slate-700" strokeWidth={1.5} />
                 </motion.div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Swiss Immigration AI Assistant</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2 tracking-tight">Swiss Immigration AI Assistant</h3>
+                <p className="text-sm text-slate-600 mb-4 leading-relaxed max-w-sm mx-auto">
                   I'm here to help! I'm especially knowledgeable about Swiss immigration, but I can assist with other questions too.
                 </p>
                 {userPack === 'free' && remainingMessages !== null && (
@@ -395,11 +478,11 @@ export default function ChatWidget() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="text-xs text-blue-600 font-medium"
+                    className="text-xs text-slate-700 font-medium"
                   >
                     {remainingMessages} of {DAILY_FREE_LIMIT} free prompts available today
                     {!session?.user && remainingMessages > 0 && (
-                      <span className="block mt-1 text-gray-500">
+                      <span className="block mt-1.5 text-slate-500 font-normal">
                         No account needed - ask your questions now!
                       </span>
                     )}
@@ -408,32 +491,110 @@ export default function ChatWidget() {
               </motion.div>
             )}
             
-            {messages.map((message, index) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: index * 0.05 }}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+            {messages.map((message, index) => {
+              const isTyping = typingMessageId === message.id && message.role === 'assistant'
+              
+              return (
                 <motion.div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'bg-white text-gray-800 border border-blue-100 shadow-sm'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  onAnimationComplete={() => {
+                    if (isTyping) {
+                      setTimeout(() => setTypingMessageId(null), 100)
+                    }
+                  }}
                 >
-                  {message.content}
-                  {message.file && (
-                    <div className="mt-2 text-xs opacity-75">
-                      File: {message.file.name}
-                    </div>
-                  )}
+                  <motion.div
+                    className={`max-w-[80%] p-3.5 rounded-xl ${
+                      message.role === 'user'
+                        ? 'bg-slate-900 text-white shadow-md'
+                        : 'bg-white text-slate-800 border border-slate-200 shadow-sm'
+                    }`}
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {message.role === 'assistant' && isTyping ? (
+                      <TypingMessage content={message.content} isActive={true} />
+                    ) : (
+                      <MessageContent 
+                        content={message.content} 
+                        onSuggestionClick={async (suggestion) => {
+                          setInput(suggestion)
+                          await new Promise(resolve => setTimeout(resolve, 50))
+                          if (canSendMessage && !isLoading) {
+                            const userMessage: ChatMessage = {
+                              id: createMessageId(),
+                              role: 'user',
+                              content: suggestion,
+                              timestamp: new Date(),
+                            }
+                            appendMessage(userMessage)
+                            setInput('')
+                            setIsLoading(true)
+                            
+                            let userLayer = sessionMetadata?.layer
+                            if (!userLayer && typeof window !== 'undefined') {
+                              const stored = localStorage.getItem('userLayer')
+                              if (stored) {
+                                try {
+                                  userLayer = JSON.parse(stored)
+                                } catch {}
+                              }
+                            }
+                            
+                            try {
+                              const response = await fetch('/api/chat', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  message: suggestion,
+                                  packId: userPack,
+                                  layer: userLayer,
+                                }),
+                              })
+                              
+                              if (!response.ok) throw new Error('Failed to get response')
+                              
+                              const data: { response?: string } = await response.json()
+                              const assistantText = data.response?.trim()
+                              
+                              if (assistantText) {
+                                const messageId = createMessageId()
+                                appendMessage({
+                                  id: messageId,
+                                  role: 'assistant',
+                                  content: assistantText,
+                                  timestamp: new Date(),
+                                })
+                                setTypingMessageId(messageId)
+                              }
+                            } catch (error) {
+                              appendMessage({
+                                id: createMessageId(),
+                                role: 'assistant',
+                                content: `Sorry, an error occurred. Please try again.`,
+                                timestamp: new Date(),
+                              })
+                            } finally {
+                              setIsLoading(false)
+                            }
+                          }
+                        }} 
+                      />
+                    )}
+                    {message.file && (
+                      <div className="mt-2.5 pt-2.5 border-t border-slate-200/50 text-xs text-slate-500 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" />
+                        <span className="truncate">{message.file.name}</span>
+                      </div>
+                    )}
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              )
+            })}
 
             {isLoading && (
               <motion.div
@@ -442,40 +603,42 @@ export default function ChatWidget() {
                 className="flex justify-start"
               >
                 <motion.div
-                  className="p-3 bg-white border border-blue-100 rounded-lg shadow-sm"
-                  animate={{ y: [0, -5, 0] }}
+                  className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center gap-2"
+                  animate={{ y: [0, -4, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <Sparkles className="w-5 h-5 animate-spin text-blue-600" />
+                  <Sparkles className="w-4 h-4 animate-spin text-slate-600" strokeWidth={2} />
+                  <span className="text-xs text-slate-500 font-medium">Thinking...</span>
                 </motion.div>
               </motion.div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-blue-100 bg-white p-4 rounded-b-lg">
+          <div className="border-t border-slate-200/50 bg-white p-4 rounded-b-xl">
             {uploadedFile && (
-              <div className="mb-3 p-3 bg-blue-50 rounded-lg flex items-center justify-between border border-blue-100">
-                <div className="flex items-center space-x-2 flex-1 min-w-0">
-                  <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                  <span className="text-sm text-blue-900 truncate font-medium">
+              <div className="mb-3 p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-200">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <FileText className="w-4 h-4 text-slate-600 flex-shrink-0" strokeWidth={2} />
+                  <span className="text-sm text-slate-900 truncate font-medium">
                     {uploadedFile.file.name}
                   </span>
-                  <span className="text-xs text-blue-600 flex-shrink-0">
+                  <span className="text-xs text-slate-500 flex-shrink-0 font-medium">
                     {(uploadedFile.file.size / 1024).toFixed(1)} KB
                   </span>
                 </div>
                 <button
                   onClick={handleRemoveFile}
-                  className="ml-2 text-blue-600 hover:text-blue-800 flex-shrink-0 transition-colors"
+                  className="ml-2 text-slate-500 hover:text-slate-700 flex-shrink-0 transition-colors p-1 rounded hover:bg-slate-100"
+                  aria-label="Remove file"
                 >
-                  <XCircle className="w-4 h-4" />
+                  <XCircle className="w-4 h-4" strokeWidth={2} />
                 </button>
               </div>
             )}
 
-            <div className="flex flex-col space-y-2">
-              <div className="flex space-x-2">
+            <div className="flex flex-col space-y-3">
+              <div className="flex gap-2">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -487,13 +650,14 @@ export default function ChatWidget() {
                 />
                 <label
                   htmlFor="chat-file-input"
-                  className={`flex items-center justify-center p-2 rounded-lg transition-colors cursor-pointer border ${
+                  className={`flex items-center justify-center w-11 h-11 rounded-lg transition-all cursor-pointer ${
                     !canSendMessage || isLoading
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-                      : 'bg-white text-blue-600 hover:bg-blue-50 border-blue-200'
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
+                  aria-label="Attach file"
                 >
-                  <Paperclip className="w-5 h-5" />
+                  <Paperclip className="w-5 h-5" strokeWidth={2} />
                 </label>
 
                 <input
@@ -514,30 +678,38 @@ export default function ChatWidget() {
                       : `You've used all ${DAILY_FREE_LIMIT} free prompts today. Sign up for unlimited access!`
                   }
                   disabled={!canSendMessage || isLoading}
-                  className="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300 bg-white text-slate-900 placeholder-slate-400 text-sm transition-all"
                 />
                 <motion.button
                   onClick={handleSend}
                   disabled={!canSendMessage || isLoading || (!input.trim() && !uploadedFile)}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-lg shadow-sm"
+                  className="w-11 h-11 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center"
                   whileHover={{ scale: canSendMessage && !isLoading && (input.trim() || uploadedFile) ? 1.05 : 1 }}
                   whileTap={{ scale: canSendMessage && !isLoading && (input.trim() || uploadedFile) ? 0.95 : 1 }}
                   transition={{ duration: 0.2 }}
+                  aria-label="Send message"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-5 h-5" strokeWidth={2} />
                 </motion.button>
               </div>
 
               {errorMessage && (
-                <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">{errorMessage}</p>
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-red-700 bg-red-50 p-3 rounded-lg border border-red-200 flex items-start gap-2"
+                >
+                  <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                  <span>{errorMessage}</span>
+                </motion.div>
               )}
 
               {userPack === 'free' && remainingMessages !== null && remainingMessages > 0 && (
-                <p className="text-xs text-blue-600 text-center font-medium">
+                <p className="text-xs text-slate-600 text-center font-medium">
                   {remainingMessages} of {DAILY_FREE_LIMIT} free prompts remaining today
                   {!session?.user && (
-                    <span className="block mt-1">
-                      <Link href="/auth/register" className="underline hover:text-blue-700">
+                    <span className="block mt-1.5">
+                      <Link href="/auth/register" className="text-slate-900 hover:text-slate-700 underline underline-offset-2 font-semibold transition-colors">
                         Sign up for unlimited access
                       </Link>
                     </span>
@@ -545,16 +717,16 @@ export default function ChatWidget() {
                 </p>
               )}
               {userPack === 'free' && remainingMessages === 0 && !session?.user && (
-                <p className="text-xs text-blue-600 text-center font-medium">
-                  <Link href="/auth/register" className="underline hover:text-blue-700">
+                <p className="text-xs text-slate-600 text-center font-medium">
+                  <Link href="/auth/register" className="text-slate-900 hover:text-slate-700 underline underline-offset-2 font-semibold transition-colors">
                     Sign up for unlimited access
                   </Link>
                 </p>
               )}
 
               {uploadedFile && (
-                <p className="text-xs text-gray-500 bg-blue-50 p-2 rounded border border-blue-100">
-                  💡 Upload CVs, documents, or images for personalized feedback on Swiss immigration applications.
+                <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">
+                  <span className="font-semibold text-slate-700">Tip:</span> Upload CVs, documents, or images for personalized feedback on Swiss immigration applications.
                 </p>
               )}
             </div>

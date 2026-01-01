@@ -1,15 +1,16 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, Circle, Download, FileText, TrendingUp } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Circle, Download, FileText, TrendingUp, Star, AlertTriangle, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
 import type { LayerType } from '@/lib/layerLogic'
+import LayerHeader from '@/components/layout/LayerHeader'
 
 export default function RequirementsPage() {
-  const params = useParams()
+  const params = use(params)
   const layerParam = params?.layer as string
   const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
     ? layerParam 
@@ -69,8 +70,29 @@ export default function RequirementsPage() {
   const completedCount = Object.values(checked).filter(Boolean).length
   const progress = (completedCount / requirements.length) * 100
 
+  // Map layer names to LayerHeader format
+  const layerForHeader = layer === 'europeans' ? 'eu' : layer === 'americans' ? 'us' : 'other'
+  const homeHref = `/${layerForHeader}`
+
+  // Layer-specific badge configuration
+  const badge = {
+    icon: layer === 'europeans' ? <Star className="w-3.5 h-3.5" /> : layer === 'americans' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layer === 'europeans' 
+      ? 'EU/EFTA Freedom of Movement'
+      : layer === 'americans' 
+      ? '2025 Quota Alert: Apply Early'
+      : 'Global Citizens Pathway',
+    bgColor: layer === 'europeans' ? 'bg-blue-600' : layer === 'americans' ? 'bg-slate-900' : 'bg-purple-600',
+    textColor: 'text-white'
+  }
+
   return (
     <div className="bg-white min-h-screen">
+      <LayerHeader
+        layer={layerForHeader as 'eu' | 'us' | 'other'}
+        homeHref={homeHref}
+        customBadge={badge}
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}

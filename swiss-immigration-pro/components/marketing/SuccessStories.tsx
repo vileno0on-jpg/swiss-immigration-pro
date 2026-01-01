@@ -1,7 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Star, Quote, CheckCircle, ArrowRight } from 'lucide-react'
+import { Star, Quote, CheckCircle, ArrowRight, Heart, Rocket, Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 
 interface Testimonial {
   id: string
@@ -114,101 +116,190 @@ const testimonials: Testimonial[] = [
 
 export default function SuccessStories() {
   return (
-    <section className="py-20 bg-gradient-to-br from-white via-blue-50/30 to-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-5"></div>
+    <section className="py-24 bg-gradient-to-br from-white via-blue-50/50 to-purple-50/30 relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0 opacity-5">
+        <Image
+          src="/images/environment/swiss-landscape-river-stream-houses-breathtaking-rocks-alps-background-sunny-summer-day-39554165.webp"
+          alt="Swiss landscape background"
+          fill
+          className="object-cover"
+        />
+      </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center justify-center mb-4">
-            <Star className="w-6 h-6 text-yellow-400 fill-yellow-400 mr-2" />
-            <span className="text-sm font-bold text-blue-600 uppercase tracking-wider">
-              Real Success Stories
+          <motion.div
+            className="inline-flex items-center justify-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full mb-6 border-2 border-blue-200 shadow-lg"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+            <span className="text-sm font-bold text-blue-700 uppercase tracking-wider">
+              Real Stories, Real People
             </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          </motion.div>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6">
             Join 18,500+ Successful Applicants
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Real people, real results. See how our platform transformed their Swiss immigration journey.
+          <p className="text-2xl text-gray-700 max-w-3xl mx-auto font-medium">
+            Real people who made Switzerland home. See how our platform transformed their immigration journey.
           </p>
         </motion.div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {testimonials.map((testimonial, idx) => (
             <motion.div
               key={testimonial.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border border-gray-100 group"
+              transition={{ duration: 0.6, delay: idx * 0.1, type: 'spring' }}
+              whileHover={{ 
+                y: -12, 
+                scale: 1.03,
+                rotateY: 5
+              }}
+              className="group relative"
             >
-              {/* Before/After Badge */}
-              {testimonial.beforeAfter && (
-                <div className="mb-4 p-3 bg-gradient-to-r from-red-50 to-green-50 rounded-xl border border-gray-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="text-red-600 font-semibold">
-                      <span className="text-xs">Before:</span> {testimonial.beforeAfter.before}
+              <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-gray-100 hover:border-blue-300 h-full backdrop-blur-sm">
+                {/* Before/After Badge */}
+                {testimonial.beforeAfter && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 + 0.2 }}
+                    className="mb-6 p-4 bg-gradient-to-r from-red-50 via-yellow-50 to-green-50 rounded-2xl border-2 border-gray-200 shadow-md"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-red-600 mb-1 flex items-center gap-1">
+                          <span>Before</span>
+                        </div>
+                        <div className="text-sm font-semibold text-red-700">{testimonial.beforeAfter.before}</div>
+                      </div>
+                      <motion.div
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      </motion.div>
+                      <div className="flex-1 text-right">
+                        <div className="text-xs font-bold text-green-600 mb-1 flex items-center justify-end gap-1">
+                          <span>After</span>
+                        </div>
+                        <div className="text-sm font-semibold text-green-700">{testimonial.beforeAfter.after}</div>
+                      </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400" />
-                    <div className="text-green-600 font-semibold">
-                      <span className="text-xs">After:</span> {testimonial.beforeAfter.after}
+                  </motion.div>
+                )}
+
+                {/* Rating */}
+                <motion.div
+                  className="flex items-center mb-4"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 + 0.3 }}
+                >
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, rotate: -180 }}
+                      whileInView={{ scale: 1, rotate: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 + 0.3 + i * 0.1, type: 'spring' }}
+                      whileHover={{ scale: 1.3, rotate: 360 }}
+                    >
+                      <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* Quote */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 + 0.4 }}
+                  className="mb-6"
+                >
+                  <Quote className="w-10 h-10 text-blue-600/30 mb-4" />
+                  <p className="text-gray-700 mb-6 leading-relaxed text-lg italic font-medium">
+                    "{testimonial.text}"
+                  </p>
+                </motion.div>
+
+                {/* Result Badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 + 0.5 }}
+                  className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 shadow-md"
+                >
+                  <div className="flex items-center gap-3 text-green-700">
+                    <CheckCircle className="w-6 h-6 text-green-500" />
+                    <span className="font-extrabold text-base">{testimonial.result}</span>
+                  </div>
+                </motion.div>
+
+                {/* Author */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 + 0.6 }}
+                  className="flex items-center gap-4"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    className="relative"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 p-0.5 shadow-lg">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-white p-0.5">
+                        <Image
+                          src={testimonial.image}
+                          alt={testimonial.name}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-gray-900 text-lg">{testimonial.name}</div>
+                    <div className="text-sm text-gray-600 font-medium">{testimonial.role}</div>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs text-blue-600 font-bold">{testimonial.location}</span>
                     </div>
                   </div>
-                </div>
-              )}
+                </motion.div>
 
-              {/* Rating */}
-              <div className="flex items-center mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-
-              {/* Quote */}
-              <Quote className="w-8 h-8 text-blue-600/30 mb-4" />
-              <p className="text-gray-700 mb-6 leading-relaxed italic">
-                "{testimonial.text}"
-              </p>
-
-              {/* Result Badge */}
-              <div className="mb-6 p-3 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center text-green-700">
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  <span className="font-semibold text-sm">{testimonial.result}</span>
-                </div>
-              </div>
-
-              {/* Author */}
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 mr-4 overflow-hidden border-2 border-white shadow-md">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="font-bold text-gray-900">{testimonial.name}</div>
-                  <div className="text-sm text-gray-600">{testimonial.role}</div>
-                  <div className="text-xs text-blue-600 font-medium mt-1">{testimonial.location}</div>
-                </div>
-              </div>
-
-              {/* Pack Badge */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <span className="text-xs text-gray-500">Used:</span>
-                <span className="ml-2 text-sm font-semibold text-blue-600">{testimonial.pack}</span>
+                {/* Pack Badge */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 + 0.7 }}
+                  className="mt-6 pt-6 border-t-2 border-gray-100"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 font-semibold uppercase">Used:</span>
+                    <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-extrabold rounded-full shadow-md">
+                      {testimonial.pack}
+                    </span>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           ))}
@@ -216,30 +307,55 @@ export default function SuccessStories() {
 
         {/* CTA Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-12 text-white"
+          className="text-center bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden"
         >
-          <h3 className="text-3xl font-bold mb-4">Ready to Write Your Success Story?</h3>
-          <p className="text-xl mb-8 opacity-95">
-            Join thousands who achieved their Swiss dream. Start your journey today.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/pricing"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl"
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/environment/mountains-2982087_1280.jpg"
+              alt="Swiss mountains"
+              fill
+              className="object-cover opacity-20"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/95 via-purple-600/95 to-indigo-600/95" />
+          </div>
+
+          <div className="relative z-10">
+            <motion.h3
+              className="text-4xl md:text-5xl font-extrabold mb-4"
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 3, repeat: Infinity }}
             >
-              View Pricing Plans
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </a>
-            <a
-              href="/auth/register"
-              className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-all"
-            >
-              Start Free Trial
-            </a>
+              Ready to Write Your Success Story?
+            </motion.h3>
+            <p className="text-2xl mb-10 opacity-95 font-medium">
+              Join thousands who achieved their Swiss dream. Your story could be next!
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+              <motion.a
+                href="/pricing"
+                whileHover={{ scale: 1.1, rotate: [0, -2, 2, 0] }}
+                whileTap={{ scale: 0.95 }}
+                className="group inline-flex items-center px-10 py-5 bg-white text-blue-600 font-extrabold text-lg rounded-2xl hover:bg-gray-100 transition-all shadow-2xl hover:shadow-white/50 relative overflow-hidden"
+              >
+                <Sparkles className="w-5 h-5 mr-3" />
+                <span className="relative z-10">View Pricing Plans</span>
+                <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform relative z-10" />
+              </motion.a>
+              <motion.a
+                href="/auth/register"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center px-10 py-5 bg-white/20 backdrop-blur-md border-2 border-white text-white font-extrabold text-lg rounded-2xl hover:bg-white/30 transition-all shadow-xl"
+              >
+                <Rocket className="w-5 h-5 mr-3" />
+                Start Free Trial
+              </motion.a>
+            </div>
           </div>
         </motion.div>
       </div>

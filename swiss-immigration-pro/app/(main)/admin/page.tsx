@@ -8,7 +8,9 @@ import {
   Users, DollarSign, TrendingUp, Settings, Crown, Shield, Activity, 
   Search, Edit, Eye, Package, BarChart3, FileText, Download, 
   Calendar, CreditCard, MessageSquare, UserCheck, UserX, RefreshCw, Clock,
-  ArrowUpDown, Filter, TrendingDown, Sparkles, Zap, Target, ArrowLeft, Home
+  ArrowUpDown, Filter, TrendingDown, Sparkles, Zap, Target, ArrowLeft, Home,
+  Mail, Trash2, CheckSquare, Square, Send, List, AlertCircle, CheckCircle2,
+  XCircle, FileSpreadsheet, UserPlus, Ban, Unlock, History, Bell
 } from 'lucide-react'
 import Link from 'next/link'
 import { getModulesForPack } from '@/lib/content/pack-content'
@@ -42,7 +44,7 @@ export default function AdminDashboard() {
   const { data: session, status } = useSession()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'stats' | 'content'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'stats' | 'content' | 'payments' | 'tools' | 'activity'>('overview')
   const [searchQuery, setSearchQuery] = useState('')
   
   const [stats, setStats] = useState({
@@ -63,6 +65,15 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<any>(null)
   const [sortBy, setSortBy] = useState<'name' | 'email' | 'pack' | 'spent' | 'date'>('date')
   const [filterPack, setFilterPack] = useState<string>('all')
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set())
+  const [payments, setPayments] = useState<any[]>([])
+  const [activityLogs, setActivityLogs] = useState<any[]>([])
+  const [emailModal, setEmailModal] = useState(false)
+  const [emailRecipients, setEmailRecipients] = useState<string[]>([])
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBody, setEmailBody] = useState('')
+  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({ start: '', end: '' })
+  const [paymentFilter, setPaymentFilter] = useState<string>('all')
 
   useEffect(() => {
     if (status === 'loading') return
@@ -96,6 +107,8 @@ export default function AdminDashboard() {
       loadUsers(),
       loadPackStats(),
       loadAnalytics(),
+      loadPayments(),
+      loadActivityLogs(),
     ])
   }
 
@@ -156,6 +169,151 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error loading pack stats:', error)
+    }
+  }
+
+  const loadPayments = async () => {
+    try {
+      const res = await fetch('/api/admin/payments', {
+        cache: 'no-store',
+        credentials: 'include',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setPayments(data.payments || [])
+      }
+    } catch (error) {
+      console.error('Error loading payments:', error)
+    }
+  }
+
+  const loadActivityLogs = async () => {
+    try {
+      const res = await fetch('/api/admin/activity-logs', {
+        cache: 'no-store',
+        credentials: 'include',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setActivityLogs(data.logs || [])
+      }
+    } catch (error) {
+      console.error('Error loading activity logs:', error)
+    }
+  }
+
+  const exportUsersToCSV = () => {
+    const headers = ['Email', 'Full Name', 'Pack', 'Total Spent (CHF)', 'Purchases', 'Join Date', 'Admin']
+    const rows = filteredUsers.map(user => [
+      user.email,
+      user.full_name || '',
+      user.pack_id,
+      (user.total_spent / 100).toFixed(2),
+      user.payment_count || 0,
+      new Date(user.created_at).toLocaleDateString(),
+      user.is_admin ? 'Yes' : 'No'
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `users_export_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleBulkPackChange = async (newPackId: string) => {
+    if (selectedUsers.size === 0) {
+      alert('Please select at least one user')
+      return
+    }
+
+    if (!confirm(`Change pack to ${newPackId} for ${selectedUsers.size} selected users?`)) {
+      return
+    }
+
+    try {
+      const promises = Array.from(selectedUsers).map(userId =>
+        fetch(`/api/admin/user/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ packId: newPackId }),
+        })
+      )
+
+      await Promise.all(promises)
+      setSelectedUsers(new Set())
+      await loadUsers()
+      await loadStats()
+      alert(`Successfully updated ${selectedUsers.size} users`)
+    } catch (error) {
+      console.error('Error updating users:', error)
+      alert('Failed to update users. Please try again.')
+    }
+  }
+
+  const toggleUserSelection = (userId: string) => {
+    const newSelection = new Set(selectedUsers)
+    if (newSelection.has(userId)) {
+      newSelection.delete(userId)
+    } else {
+      newSelection.add(userId)
+    }
+    setSelectedUsers(newSelection)
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedUsers.size === filteredUsers.length) {
+      setSelectedUsers(new Set())
+    } else {
+      setSelectedUsers(new Set(filteredUsers.map(u => u.id)))
+    }
+  }
+
+  const sendEmailToUsers = async () => {
+    if (!emailSubject || !emailBody) {
+      alert('Please fill in both subject and body')
+      return
+    }
+
+    if (emailRecipients.length === 0) {
+      alert('Please select at least one recipient')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/admin/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          recipients: emailRecipients,
+          subject: emailSubject,
+          body: emailBody,
+        }),
+      })
+
+      if (res.ok) {
+        alert(`Email sent to ${emailRecipients.length} users`)
+        setEmailModal(false)
+        setEmailSubject('')
+        setEmailBody('')
+        setEmailRecipients([])
+      } else {
+        throw new Error('Failed to send email')
+      }
+    } catch (error) {
+      console.error('Error sending email:', error)
+      alert('Failed to send email. Please try again.')
     }
   }
 
@@ -273,6 +431,9 @@ export default function AdminDashboard() {
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'users', label: 'Clients', icon: Users },
               { id: 'stats', label: 'Statistics', icon: TrendingUp },
+              { id: 'payments', label: 'Payments', icon: CreditCard },
+              { id: 'activity', label: 'Activity', icon: History },
+              { id: 'tools', label: 'Tools', icon: Settings },
               { id: 'content', label: 'Content', icon: FileText },
             ].map((tab) => {
               const Icon = tab.icon
@@ -432,11 +593,45 @@ export default function AdminDashboard() {
                 <h2 className="text-xl sm:text-2xl font-bold text-black">
                   All Clients ({filteredUsers.length})
                 </h2>
+                {selectedUsers.size > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-700">{selectedUsers.size} selected</span>
+                    <select
+                      onChange={(e) => handleBulkPackChange(e.target.value)}
+                      className="px-3 py-1.5 border border-gray-300 rounded-lg bg-white text-black text-sm"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Bulk Change Pack</option>
+                      <option value="free">Free</option>
+                      <option value="immigration">Immigration</option>
+                      <option value="advanced">Advanced</option>
+                      <option value="citizenship">Citizenship Pro</option>
+                    </select>
+                    <button
+                      onClick={() => setSelectedUsers(new Set())}
+                      className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <table className="w-full text-xs sm:text-sm min-w-[800px]">
                   <thead className="bg-gray-50">
                     <tr>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-gray-700 font-semibold">
+                        <button
+                          onClick={toggleSelectAll}
+                          className="flex items-center"
+                        >
+                          {selectedUsers.size === filteredUsers.length && filteredUsers.length > 0 ? (
+                            <CheckSquare className="w-4 h-4 text-blue-600" />
+                          ) : (
+                            <Square className="w-4 h-4 text-gray-400" />
+                          )}
+                        </button>
+                      </th>
                       <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-gray-700 font-semibold">Email</th>
                       <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-gray-700 font-semibold hidden sm:table-cell">Name</th>
                       <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-gray-700 font-semibold">Pack</th>
@@ -449,6 +644,18 @@ export default function AdminDashboard() {
                   <tbody className="divide-y divide-gray-200">
                     {filteredUsers.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3">
+                          <button
+                            onClick={() => toggleUserSelection(user.id)}
+                            className="flex items-center"
+                          >
+                            {selectedUsers.has(user.id) ? (
+                              <CheckSquare className="w-4 h-4 text-blue-600" />
+                            ) : (
+                              <Square className="w-4 h-4 text-gray-400" />
+                            )}
+                          </button>
+                        </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-black">
                           <div className="flex items-center space-x-2">
                             {user.is_admin && <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" />}
@@ -845,6 +1052,287 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Payments Tab */}
+        {activeTab === 'payments' && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <select
+                    value={paymentFilter}
+                    onChange={(e) => setPaymentFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Payments</option>
+                    <option value="succeeded">Succeeded</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="date"
+                    value={dateRange.start}
+                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
+                    placeholder="Start Date"
+                  />
+                </div>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="date"
+                    value={dateRange.end}
+                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
+                    placeholder="End Date"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Payments Table */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-black mb-4">Payment History</h2>
+              <div className="overflow-x-auto">
+                {payments.length > 0 ? (
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">Date</th>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">User</th>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">Pack</th>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">Amount</th>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">Status</th>
+                        <th className="px-4 py-3 text-left text-gray-700 font-semibold">Payment ID</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {payments
+                        .filter(p => paymentFilter === 'all' || p.status === paymentFilter)
+                        .filter(p => {
+                          if (!dateRange.start && !dateRange.end) return true
+                          const paymentDate = new Date(p.created_at)
+                          if (dateRange.start && paymentDate < new Date(dateRange.start)) return false
+                          if (dateRange.end && paymentDate > new Date(dateRange.end)) return false
+                          return true
+                        })
+                        .map((payment) => (
+                          <tr key={payment.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-gray-700">
+                              {new Date(payment.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 text-black">
+                              {payment.user_email || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 text-gray-700">
+                              {payment.pack_id || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 font-semibold text-black">
+                              CHF {(payment.amount / 100).toFixed(2)}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                payment.status === 'succeeded' ? 'bg-green-100 text-green-700' :
+                                payment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                payment.status === 'failed' ? 'bg-red-100 text-red-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {payment.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-600 font-mono text-xs">
+                              {payment.stripe_payment_id || payment.id}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <p>No payments found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Activity Tab */}
+        {activeTab === 'activity' && (
+          <div className="space-y-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-black mb-4 flex items-center space-x-2">
+                <History className="w-6 h-6 text-blue-600" />
+                <span>Activity Logs</span>
+              </h2>
+              <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                {activityLogs.length > 0 ? (
+                  activityLogs.map((log, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start space-x-3"
+                    >
+                      <div className={`w-2 h-2 rounded-full mt-2 ${
+                        log.type === 'user_action' ? 'bg-blue-500' :
+                        log.type === 'payment' ? 'bg-green-500' :
+                        log.type === 'admin_action' ? 'bg-purple-500' :
+                        'bg-gray-500'
+                      }`} />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold text-black">{log.action}</span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(log.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-700">
+                          {log.description || 'No description'}
+                        </div>
+                        {log.user_email && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            User: {log.user_email}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No activity logs available
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tools Tab */}
+        {activeTab === 'tools' && (
+          <div className="space-y-6">
+            {/* Export Section */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-black mb-4 flex items-center space-x-2">
+                <FileSpreadsheet className="w-6 h-6 text-blue-600" />
+                <span>Export Data</span>
+              </h2>
+              <div className="space-y-4">
+                <button
+                  onClick={exportUsersToCSV}
+                  className="flex items-center space-x-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>Export Users to CSV</span>
+                </button>
+                <p className="text-sm text-gray-600">
+                  Export all user data including email, name, pack, spending, and join date.
+                </p>
+              </div>
+            </div>
+
+            {/* Email Management */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-black mb-4 flex items-center space-x-2">
+                <Mail className="w-6 h-6 text-blue-600" />
+                <span>Email Management</span>
+              </h2>
+              <div className="space-y-4">
+                <button
+                  onClick={() => {
+                    setEmailRecipients(selectedUsers.size > 0 
+                      ? Array.from(selectedUsers).map(id => {
+                          const user = users.find(u => u.id === id)
+                          return user?.email || ''
+                        }).filter(Boolean)
+                      : users.map(u => u.email)
+                    )
+                    setEmailModal(true)
+                  }}
+                  className="flex items-center space-x-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                >
+                  <Send className="w-5 h-5" />
+                  <span>
+                    {selectedUsers.size > 0 
+                      ? `Send Email to ${selectedUsers.size} Selected Users`
+                      : 'Send Email to All Users'
+                    }
+                  </span>
+                </button>
+                <p className="text-sm text-gray-600">
+                  Send emails to selected users or all users. Select users in the Clients tab first.
+                </p>
+              </div>
+            </div>
+
+            {/* Bulk Actions */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-black mb-4 flex items-center space-x-2">
+                <CheckSquare className="w-6 h-6 text-blue-600" />
+                <span>Bulk Actions</span>
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bulk Change Pack
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleBulkPackChange(e.target.value)
+                          e.target.value = ''
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-white text-black"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Select Pack</option>
+                      <option value="free">Free</option>
+                      <option value="immigration">Immigration</option>
+                      <option value="advanced">Advanced</option>
+                      <option value="citizenship">Citizenship Pro</option>
+                    </select>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Select users in the Clients tab, then choose a pack to apply to all selected users.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* System Info */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-black mb-4 flex items-center space-x-2">
+                <Settings className="w-6 h-6 text-blue-600" />
+                <span>System Information</span>
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-600">Total Users</div>
+                  <div className="text-2xl font-bold text-black">{stats.totalUsers}</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-600">Total Revenue</div>
+                  <div className="text-2xl font-bold text-green-600">CHF {stats.totalRevenue.toFixed(2)}</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-600">Active Subscriptions</div>
+                  <div className="text-2xl font-bold text-blue-600">{stats.activeSubscriptions}</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-600">Total Messages</div>
+                  <div className="text-2xl font-bold text-purple-600">{stats.messageCount}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
             {/* Content Tab - Full Access to All Packs */}
         {activeTab === 'content' && (
           <div className="space-y-4 sm:space-y-6">
@@ -931,7 +1419,7 @@ export default function AdminDashboard() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl"
+              className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-black">
@@ -945,26 +1433,148 @@ export default function AdminDashboard() {
                 </button>
               </div>
               
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Email</label>
+                    <div className="text-black mt-1">{selectedUser.email}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Name</label>
+                    <div className="text-black mt-1">{selectedUser.full_name || '—'}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Current Pack</label>
+                    <div className="text-black mt-1">{selectedUser.pack_id.toUpperCase()}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Pack Expires</label>
+                    <div className="text-black mt-1">
+                      {selectedUser.pack_expires_at 
+                        ? new Date(selectedUser.pack_expires_at).toLocaleDateString()
+                        : 'Never'
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Total Spent</label>
+                    <div className="text-black mt-1">CHF {(selectedUser.total_spent / 100).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Purchases</label>
+                    <div className="text-black mt-1">{selectedUser.payment_count}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Subscriptions</label>
+                    <div className="text-black mt-1">{selectedUser.subscription_count || 0}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Join Date</label>
+                    <div className="text-black mt-1">
+                      {new Date(selectedUser.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Admin Status</label>
+                    <div className="mt-1">
+                      {selectedUser.is_admin ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Admin
+                        </span>
+                      ) : (
+                        <span className="text-gray-500">Regular User</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      setSelectedUser(null)
+                      setUpgradeUser(selectedUser)
+                    }}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    Manage User Pack
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Email Modal */}
+        {emailModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-black flex items-center space-x-2">
+                  <Mail className="w-6 h-6 text-blue-600" />
+                  <span>Send Email</span>
+                </h2>
+                <button
+                  onClick={() => setEmailModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+              
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Email</label>
-                  <div className="text-black">{selectedUser.email}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Recipients ({emailRecipients.length} users)
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-lg max-h-32 overflow-y-auto">
+                    <div className="text-sm text-gray-600">
+                      {emailRecipients.slice(0, 5).join(', ')}
+                      {emailRecipients.length > 5 && ` and ${emailRecipients.length - 5} more...`}
+                    </div>
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Name</label>
-                  <div className="text-black">{selectedUser.full_name || '—'}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
+                    placeholder="Email subject"
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Current Pack</label>
-                  <div className="text-black">{selectedUser.pack_id.toUpperCase()}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    rows={8}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
+                    placeholder="Email message body"
+                  />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Total Spent</label>
-                  <div className="text-black">CHF {(selectedUser.total_spent / 100).toFixed(2)}</div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Purchases</label>
-                  <div className="text-black">{selectedUser.payment_count}</div>
+                <div className="flex items-center justify-end space-x-3 pt-4">
+                  <button
+                    onClick={() => setEmailModal(false)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={sendEmailToUsers}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Send Email</span>
+                  </button>
                 </div>
               </div>
             </motion.div>

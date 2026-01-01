@@ -213,7 +213,7 @@ export default function USCitizensPage() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
-                { category: 'Rent (1-bedroom, city center)', amount: 'CHF 1,500-2,500' },
+                { category: 'Rent (1-bedroom, city center)', amount: 'CHF 1,200-2,000' },
                 { category: 'Health Insurance (Mandatory)', amount: 'CHF 300-600' },
                 { category: 'Food & Groceries', amount: 'CHF 400-700' },
                 { category: 'Public Transport', amount: 'CHF 70-150' },
@@ -229,7 +229,7 @@ export default function USCitizensPage() {
             <div className="mt-6 p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold">Total Monthly (Average)</span>
-                <span className="text-3xl font-bold">CHF 3,000-4,500</span>
+                <span className="text-3xl font-bold">CHF 2,500-3,800</span>
               </div>
             </div>
           </div>

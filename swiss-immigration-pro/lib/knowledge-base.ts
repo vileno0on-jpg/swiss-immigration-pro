@@ -308,8 +308,8 @@ Success tips: Higher salary, complete docs, right canton, strong employer suppor
     content: `Switzerland cost of living (approximate monthly):
 
 Housing:
-- 1-bedroom apartment: CHF 1,200-2,500 (varies by city)
-- 2-bedroom: CHF 1,800-3,500
+- 1-bedroom apartment: CHF 1,000-2,000 (varies by city)
+- 2-bedroom: CHF 1,650-2,900
 - Zurich/Geneva: Most expensive
 - Smaller cities: More affordable
 
@@ -318,8 +318,8 @@ Health Insurance: CHF 300-500/month (mandatory)
 Transport: CHF 70-350/month (public transport)
 Utilities: CHF 100-200/month
 
-Total for single person: CHF 2,500-4,000/month minimum
-Total for family: CHF 4,000-7,000/month
+Total for single person: CHF 2,200-3,500/month minimum
+Total for family: CHF 3,500-6,000/month
 
 Important: You must prove sufficient funds to support yourself.`,
     links: [
@@ -357,16 +357,24 @@ Spouse can work immediately with B permit holder's authorization.`,
 
 // Find relevant knowledge entries based on query
 export function findRelevantKnowledge(query: string): KnowledgeEntry[] {
-  const lowerQuery = query.toLowerCase()
+  const lowerQuery = query.toLowerCase().trim()
+  
+  // If query is very short or empty, return overview
+  if (lowerQuery.length < 3) {
+    return [KNOWLEDGE_BASE[0]] // Return overview
+  }
   
   // Score each entry based on keyword matches
   const scored = KNOWLEDGE_BASE.map(entry => {
     let score = 0
     
-    // Check if query contains keywords
+    // Check if query contains keywords (exact match gets higher score)
     entry.keywords.forEach(keyword => {
-      if (lowerQuery.includes(keyword)) {
-        score += 2
+      const keywordLower = keyword.toLowerCase()
+      if (lowerQuery === keywordLower) {
+        score += 5 // Exact match
+      } else if (lowerQuery.includes(keywordLower)) {
+        score += 2 // Partial match
       }
     })
     
@@ -378,37 +386,104 @@ export function findRelevantKnowledge(query: string): KnowledgeEntry[] {
       }
     })
     
+    // Check content for word matches
+    const contentLower = entry.content.toLowerCase()
+    const queryWords = lowerQuery.split(/\s+/).filter(w => w.length > 2)
+    queryWords.forEach(word => {
+      if (contentLower.includes(word)) {
+        score += 0.5
+      }
+    })
+    
     return { entry, score }
   })
   
-  // Sort by score and return top matches
-  return scored
-    .filter(item => item.score > 0)
+  // Sort by score and return top matches (include even low scores for fallback)
+  const sorted = scored
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
     .map(item => item.entry)
+  
+  // Always return at least the overview if no good matches
+  if (sorted.length === 0 || (scored[0]?.score || 0) === 0) {
+    return [KNOWLEDGE_BASE[0]]
+  }
+  
+  return sorted
 }
 
 // Generate response from knowledge base
 export function generateResponseFromKnowledge(query: string): string | null {
+  const lowerQuery = query.toLowerCase().trim()
+  
+  // Handle greetings and very short queries
+  const greetings = ['hi', 'hello', 'hey', 'bonjour', 'salut', 'ciao', 'hallo', 'help', 'aide', '?', '??']
+  if (greetings.some(g => lowerQuery === g || lowerQuery.startsWith(g + ' '))) {
+    return `Bonjour ! 👋 Ravi de vous rencontrer ! Je suis là pour vous aider dans votre parcours d'immigration suisse. Je comprends que tout ça peut sembler compliqué au début, mais ne vous inquiétez pas - on va y aller étape par étape ensemble.
+
+Je peux vous aider avec tout ce qui concerne l'immigration suisse :
+- Les différents types de visas et permis (L, B, G, C) et lequel pourrait vous convenir
+- Comment fonctionnent les quotas et les processus de candidature
+- Le chemin vers la citoyenneté suisse
+- Les exigences linguistiques et comment s'y préparer
+- Les coûts, les salaires, et tout ce qui concerne la vie en Suisse
+
+📚 **Ressources utiles :**
+- [Types de visas](/visas) | [Permis de travail](/employment) | [Citoyenneté](/citizenship)
+- [Chemin EU/EFTA](/europeans) | [Chemin US/Canada](/americans) | [Autres pays](/others)
+
+Qu'est-ce qui vous préoccupe le plus en ce moment ? Par quoi aimeriez-vous commencer ?`
+  }
+  
   const relevant = findRelevantKnowledge(query)
   
   if (relevant.length === 0) {
-    return null // No relevant knowledge found
+    // Return overview as fallback
+    const overview = KNOWLEDGE_BASE[0]
+    let response = overview.content
+    
+    if (overview.links.length > 0) {
+      response += '\n\n📚 **En savoir plus :**\n'
+      overview.links.forEach(link => {
+        response += `- [${link.label}](${link.url})\n`
+      })
+    }
+    
+    response += '\n\n💡 **Astuce :** Posez-moi des questions spécifiques sur les permis, quotas, salaires, ou processus d\'immigration pour des réponses détaillées.'
+    response += '\n\n⚠️ Informations générales uniquement (mise à jour Nov 2025). Pas de conseil juridique. Consultez un avocat certifié en immigration suisse pour votre cas spécifique.'
+    
+    return response
   }
   
   let response = relevant[0].content
   
-  // Add links
+  // Clean up markdown headers - convert to bold text for more natural formatting
+  response = response
+    .replace(/^#+\s+(.+)$/gm, '**$1**') // Convert # Header to **Header**
+    .replace(/^##+\s+(.+)$/gm, '**$1**') // Convert ## Header to **Header**
+    .replace(/^###+\s+(.+)$/gm, '**$1**') // Convert ### Header to **Header**
+  
+  // Add spacing after bold headers
+  response = response.replace(/\*\*(.+?)\*\*\n/g, '**$1**\n\n')
+  
+  // Add links with icons
   if (relevant[0].links.length > 0) {
-    response += '\n\n📚 **Learn more:**\n'
+    response += '\n\n📚 **En savoir plus :**\n'
     relevant[0].links.forEach(link => {
       response += `- [${link.label}](${link.url})\n`
     })
   }
   
+  // Add additional relevant entries if score was high
+  if (relevant.length > 1) {
+    response += '\n\n💡 **Informations connexes :**\n'
+    relevant.slice(1).forEach(entry => {
+      response += `- ${entry.topic}\n`
+    })
+  }
+  
   // Add disclaimer
-  response += '\n\n⚠️ General information only (updated Nov 2025). Not legal advice. Book consultation with a certified Swiss immigration lawyer for your specific case.'
+  response += '\n\n⚠️ Informations générales uniquement (mise à jour Nov 2025). Pas de conseil juridique. Consultez un avocat certifié en immigration suisse pour votre cas spécifique.'
   
   return response
 }

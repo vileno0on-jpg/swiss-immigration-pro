@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { InitialQuizGate } from "@/components/quiz/InitialQuizGate";
+import ChatbotProvider from "@/components/chat/ChatbotProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,8 +14,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Become a Swiss Resident in 2026 | Swiss Immigration Pro - 96% Success Rate",
-  description: "AI-Powered Swiss immigration platform with 96% success rate. Expert guidance for work permits, citizenship, visas. Join 18,500+ successful applicants. 30 free AI questions. Fast 6-8 week processing.",
+  title: "Become a Swiss Resident in 2026 | Swiss Immigration Pro - 87% Success Rate",
+  description: "AI-Powered Swiss immigration platform with 87% success rate. Expert guidance for work permits, citizenship, visas. Join 18,500+ successful applicants. 10 free AI questions daily. Fast 6-8 week processing.",
   keywords: "Swiss immigration, Switzerland visa, Swiss citizenship, work permit Switzerland, L permit, B permit, Swiss work visa, Swiss employment, permanent residence Switzerland, naturalization Swiss, 2025 quota, Swiss immigration lawyer, EU work permit, Swiss visa application, citizenship Switzerland, Swiss residency permit",
   authors: [{ name: "Swiss Immigration Pro" }],
   creator: "Swiss Immigration Pro",
@@ -51,8 +52,8 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-status-bar-style': 'default',
   },
   openGraph: {
-    title: "Become a Swiss Resident in 2026 | 96% Success Rate | Swiss Immigration Pro",
-    description: "AI-Powered Swiss immigration platform. 18,500+ successful applications. 96% approval rate. Expert guidance, 30 free AI questions, fast processing.",
+    title: "Become a Swiss Resident in 2026 | 87% Success Rate | Swiss Immigration Pro",
+    description: "AI-Powered Swiss immigration platform. 18,500+ successful applications. 87% approval rate. Expert guidance, 30 free AI questions, fast processing.",
     url: 'https://swissimmigrationpro.com',
     siteName: 'Swiss Immigration Pro',
     images: [
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Become a Swiss Resident in 2026 | 96% Success Rate",
+    title: "Become a Swiss Resident in 2026 | 87% Success Rate",
     description: "AI-Powered Swiss immigration platform. Join 18,500+ successful applicants. Expert guidance, fast processing.",
     images: ['/og-image.jpg'],
   },
@@ -150,7 +151,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "ProfessionalService",
               "name": "Swiss Immigration Pro",
-              "description": "AI-Powered Swiss immigration platform with expert guidance. Success rate: 96%. Join 18,500+ successful applicants.",
+              "description": "AI-Powered Swiss immigration platform with expert guidance. Success rate: 87%. Join 18,500+ successful applicants.",
               "url": process.env.NEXT_PUBLIC_SITE_URL || "https://swissimmigrationpro.com",
               "logo": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://swissimmigrationpro.com'}/images/logo.png`,
               "image": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://swissimmigrationpro.com'}/images/og-image.jpg`,
@@ -221,6 +222,7 @@ export default function RootLayout({
         <ClientErrorBoundary>
           <InitialQuizGate />
           {children}
+          <ChatbotProvider />
         </ClientErrorBoundary>
       </body>
     </html>

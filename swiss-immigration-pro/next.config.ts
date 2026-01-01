@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-dialog'],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog'],
     // Mobile optimizations
     mobileFirst: true,
     // Optimize server components
@@ -46,10 +46,9 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Turbopack configuration
-  turbopack: {
-    root: __dirname,
-  },
+  // Turbopack configuration - Removed to fix framer-motion HMR issues
+  // Using webpack instead (--webpack flag in dev script)
+  // Note: framer-motion removed from optimizePackageImports to fix HMR issues
 
   // Headers for security and performance
   async headers() {

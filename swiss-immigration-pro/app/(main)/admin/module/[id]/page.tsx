@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState, useEffect, useCallback, useRef, useMemo, use } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -14,9 +14,17 @@ import rehypeRaw from 'rehype-raw'
 import EnhancedModuleDisplay from '@/components/modules/EnhancedModuleDisplay'
 import AdminHeader from '@/components/layout/AdminHeader'
 
-export default function AdminModuleView() {
+export default function AdminModuleView({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> | { id: string } 
+}) {
   const router = useRouter()
-  const params = useParams()
+  // Unwrap params if it's a Promise (Next.js 15+)
+  const resolvedParams = typeof params === 'object' && params !== null && 'then' in params 
+    ? use(params) 
+    : params
+  const moduleId = resolvedParams?.id as string
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(true)
   const [module, setModule] = useState<any>(null)
@@ -110,7 +118,8 @@ export default function AdminModuleView() {
       return
     }
 
-    const moduleId = params.id as string
+    if (!moduleId) return
+
     const modules = getAllModulesForAdmin()
     const matched = modules.find((mod: any) => mod.id === moduleId)
 
@@ -133,7 +142,7 @@ export default function AdminModuleView() {
     }
 
     setLoading(false)
-  }, [session, status, router, params.id, extractSectionsLocal, organizeSectionsIntoCategoriesLocal])
+  }, [session, status, router, moduleId, extractSectionsLocal, organizeSectionsIntoCategoriesLocal])
 
   // Compute sections early (before early returns) to avoid hook order issues
   // Use useMemo to ensure stable reference - use module?.id to avoid reference issues

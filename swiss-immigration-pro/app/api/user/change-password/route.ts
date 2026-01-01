@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
@@ -22,10 +22,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'New password must be at least 8 characters long' }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get current user password
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await db
       .from('users')
       .select('id, password_hash')
       .eq('id', session.user.id)
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
     // Update password
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('users')
       .update({
         password_hash: hashedPassword,

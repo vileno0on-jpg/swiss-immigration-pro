@@ -203,7 +203,7 @@ export default function ProfilePage() {
         new (window as any).google.translate.TranslateElement(
           {
             pageLanguage: 'en',
-            includedLanguages: 'en,de,fr,it,es,pt,zh,ar,hi,ru,ja,ko,tr,pl,nl',
+            includedLanguages: 'en,de,fr,it,es,pt,zh-CN,ar,hi,ru,ja,ko,tr,pl,nl',
             layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE,
             autoDisplay: false,
           },

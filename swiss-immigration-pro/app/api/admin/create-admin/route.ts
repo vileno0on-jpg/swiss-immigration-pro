@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 import bcrypt from 'bcryptjs'
 
 /**
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Check if user already exists
-    const { data: existingUsers, error: checkError } = await supabase
+    const { data: existingUsers, error: checkError } = await db
       .from('users')
       .select('id')
       .eq('email', email)
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       const hashedPassword = await bcrypt.hash(password, 10)
 
       // Update user password
-      const userUpdateResult = await supabase
+      const userUpdateResult = await db
         .from('users')
         .update({
           password_hash: hashedPassword,
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Update profile to admin
-      const profileUpdateResult = await supabase
+      const profileUpdateResult = await db
         .from('profiles')
         .update({
           is_admin: true,
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       // Create new user
       const hashedPassword = await bcrypt.hash(password, 10)
 
-      const newUserResult = await supabase
+      const newUserResult = await db
         .from('users')
         .insert({
           email,
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       userId = newUser.id
 
       // Create admin profile
-      const profileCreateResult = await supabase
+      const profileCreateResult = await db
         .from('profiles')
         .insert({
           id: userId,
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
 
       // Create user limits
       const today = new Date().toISOString().split('T')[0]
-      const limitsResult = await supabase
+      const limitsResult = await db
         .from('user_limits')
         .insert({
           user_id: userId,
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify
-    const verifyResult = await supabase
+    const verifyResult = await db
       .from('profiles')
       .select('id, email, full_name, is_admin, pack_id')
       .eq('id', userId)

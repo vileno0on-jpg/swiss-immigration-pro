@@ -114,3 +114,5 @@ Write-Host "2. If still 502, check PM2 logs: ssh $SshUser@$VpsIp 'pm2 logs swiss
 Write-Host "3. Check nginx logs: ssh $SshUser@$VpsIp 'sudo tail -f /var/log/nginx/error.log'" -ForegroundColor White
 
 
+
+

@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { MessageCircle, X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, MoreVertical, FileQuestion, Lightbulb, Search, Briefcase } from 'lucide-react'
+import { X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, FileQuestion, Lightbulb, Search, Briefcase, Bot, Sparkles, Zap, MessageSquareText } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { CONFIG } from '@/lib/config'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { MessageContent } from './MessageContent'
 
 type UserPack = 'free' | 'immigration' | 'masterclass' | 'citizenship'
 
@@ -35,6 +36,77 @@ interface SessionUserMetadata {
 
 const DAILY_FREE_LIMIT = CONFIG.ai.freeDailyLimit
 
+// Typing animation component with slower, more fluid typing
+function TypingMessage({ content, isActive }: { content: string; isActive: boolean }) {
+  const [displayedText, setDisplayedText] = useState('')
+
+  useEffect(() => {
+    if (!isActive || !content) {
+      setDisplayedText(content || '')
+      return
+    }
+
+    setDisplayedText('')
+    let currentIndex = 0
+    
+    // Fluid, slow typing speed - varies by character type for natural feel
+    const getTypingSpeed = (char: string, index: number, prevChar?: string) => {
+      // Spaces - slight pause for word boundaries
+      if (char === ' ') return 50 + (Math.random() * 30) // 50-80ms
+      
+      // Punctuation - longer, more dramatic pause for natural reading rhythm
+      if (['.', '!', '?'].includes(char)) return 400 + (Math.random() * 200) // 400-600ms
+      if ([':', ';'].includes(char)) return 300 + (Math.random() * 150) // 300-450ms
+      
+      // Commas - medium pause for natural flow
+      if (char === ',') return 200 + (Math.random() * 100) // 200-300ms
+      
+      // Newlines - pause for paragraph breaks
+      if (char === '\n') return 250 + (Math.random() * 100) // 250-350ms
+      
+      // Word boundaries - slight extra pause after longer words
+      if (prevChar === ' ' && index > 5) {
+        const wordLength = content.slice(Math.max(0, index - 10), index).split(' ').pop()?.length || 0
+        if (wordLength > 6) {
+          return 80 + (Math.random() * 40) // 80-120ms for longer words
+        }
+      }
+      
+      // Base speed - slower and more varied for fluid, natural typing
+      const baseSpeed = 50 + (Math.random() * 40) // 50-90ms per character
+      return baseSpeed
+    }
+
+    const typeNextChar = () => {
+      if (currentIndex < content.length) {
+        const char = content[currentIndex]
+        const prevChar = currentIndex > 0 ? content[currentIndex - 1] : undefined
+        setDisplayedText(content.slice(0, currentIndex + 1))
+        currentIndex++
+        
+        const speed = getTypingSpeed(char, currentIndex, prevChar)
+        setTimeout(typeNextChar, speed)
+      }
+    }
+
+    // Start typing after a brief delay for smoother start
+    const startTimer = setTimeout(typeNextChar, 200)
+
+    return () => {
+      clearTimeout(startTimer)
+    }
+  }, [content, isActive])
+
+  return (
+    <>
+      {displayedText}
+      {isActive && displayedText.length < content.length && (
+        <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse" />
+      )}
+    </>
+  )
+}
+
 export default function FloatingChatWidget() {
   const { data: session } = useSession()
 
@@ -48,6 +120,7 @@ export default function FloatingChatWidget() {
   const [dailyMessages, setDailyMessages] = useState(0)
   const [userPack, setUserPack] = useState<UserPack>('free')
   const [mounted, setMounted] = useState(false)
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null)
 
   // Suggested queries based on user's layer or common questions
   const suggestedQueries = useMemo(() => [
@@ -227,6 +300,14 @@ export default function FloatingChatWidget() {
     try {
       const formData = new FormData()
       formData.append('message', userMessage.content)
+      formData.append('packId', userPack)
+      // Get layer from localStorage if available
+      if (typeof window !== 'undefined') {
+        const layer = localStorage.getItem('userLayer')
+        if (layer) {
+          formData.append('layer', layer)
+        }
+      }
       if (uploadedFile) {
         formData.append('file', uploadedFile.file)
       }
@@ -245,11 +326,12 @@ export default function FloatingChatWidget() {
       const assistantMessage: ChatMessage = {
         id: createMessageId(),
         role: 'assistant',
-        content: data.response || 'I could not generate a helpful response right now. Please try again.',
+        content: data.response || '',
         timestamp: new Date(),
       }
 
       setMessages(prev => [...prev, assistantMessage])
+      setTypingMessageId(assistantMessage.id)
 
       if (userPack === 'free') {
         const newCount = dailyMessages + 1
@@ -261,15 +343,8 @@ export default function FloatingChatWidget() {
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Something went wrong while sending your message.'
+      const message = error instanceof Error ? error.message : 'Connection error. Please check your internet and try again.'
       setErrorMessage(message)
-
-      setMessages(prev => [...prev, {
-        id: createMessageId(),
-        role: 'assistant',
-        content: 'I\'m sorry—I ran into an issue processing that request. Please try again in a moment.',
-        timestamp: new Date(),
-      }])
     } finally {
       setIsLoading(false)
       if (uploadedFile) {
@@ -290,10 +365,9 @@ export default function FloatingChatWidget() {
 
   const chatWidgetContent = (
     <>
-      {/* Chat Button - Always visible when closed */}
+      {/* Chat Button - Always visible when closed - Enhanced with animations */}
       {!isOpen && (
-        <motion.button
-          onClick={handleToggle}
+        <motion.div
           style={{
             position: 'fixed',
             bottom: '24px',
@@ -301,32 +375,37 @@ export default function FloatingChatWidget() {
             zIndex: 99999,
             pointerEvents: 'auto',
           }}
-          className="p-4 bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 flex items-center space-x-2 transition-all duration-200"
-          title="Swiss Immigration Assistant"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <MessageCircle className="w-6 h-6" />
-          <AnimatePresence>
-            {remainingMessages !== null && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className={`text-xs font-bold px-2 py-1 rounded-full ${
-                  remainingMessages > 0
-                    ? 'bg-white text-blue-600'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
+          <motion.button
+            onClick={handleToggle}
+            className="relative w-14 h-14 bg-white text-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200"
+            title="Swiss Immigration Assistant"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white" />
+            
+            <div className="relative flex items-center justify-center">
+              <MessageSquareText className="w-6 h-6 text-slate-800" strokeWidth={1.5} />
+              <motion.div 
+                className="absolute -top-1 -right-1"
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                {remainingMessages > 0 ? `${remainingMessages} free` : '0 free'}
-              </motion.span>
+                <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
+              </motion.div>
+            </div>
+            
+            {remainingMessages !== null && remainingMessages > 0 && (
+              <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-slate-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center px-1.5 shadow-sm border-2 border-white z-10">
+                {remainingMessages}
+              </div>
             )}
-          </AnimatePresence>
-        </motion.button>
+          </motion.button>
+        </motion.div>
       )}
 
       {/* Sidebar Chat - ASUS Style - Pushes Content */}
@@ -343,60 +422,81 @@ export default function FloatingChatWidget() {
             transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
               position: 'fixed',
-              top: '0',
-              right: '0',
+              top: isMinimized ? 'auto' : '0',
+              bottom: isMinimized ? '24px' : '0',
+              right: isMinimized ? '24px' : '0',
               zIndex: 1000,
               pointerEvents: 'auto',
               width: isMinimized ? '320px' : '400px',
               maxWidth: '100vw',
-              boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
+              boxShadow: isMinimized 
+                ? '0 10px 40px rgba(0, 0, 0, 0.2)' 
+                : '-4px 0 24px rgba(0, 0, 0, 0.15)',
             }}
-            className="bg-white border-l border-gray-200 flex flex-col overflow-hidden"
+            className={`bg-white border-l border-gray-200 flex flex-col overflow-hidden ${
+              isMinimized ? 'rounded-2xl' : 'rounded-l-3xl'
+            }`}
           >
-            {/* Header - ASUS Style */}
+            {/* Header - ASUS Style - Enhanced with animations */}
             {!isMinimized ? (
               <>
-                <div className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">Swiss Immigration Assistant</h2>
-                  <div className="flex items-center space-x-2">
-                    <button
+                <div className="flex justify-between items-center p-5 bg-white border-b border-slate-100 rounded-tl-3xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 relative">
+                      <MessageSquareText className="w-5 h-5 text-slate-800" strokeWidth={1.5} />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                        Swiss Assistant
+                        <span className="px-1.5 py-0.5 rounded-md bg-blue-50 text-[10px] text-blue-600 font-bold tracking-wider">AI</span>
+                      </h2>
+                      <p className="text-[11px] text-slate-500 font-medium">Online & Ready to help</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <motion.button
                       onClick={handleMinimize}
-                      className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1.5 rounded transition-colors"
+                      className="text-slate-400 hover:text-slate-900 hover:bg-slate-50 p-2 rounded-xl transition-colors"
                       title="Minimize"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <Minimize2 className="w-4 h-4" />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       onClick={handleToggle}
-                      className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1.5 rounded transition-colors"
+                      className="text-slate-400 hover:text-slate-900 hover:bg-slate-50 p-2 rounded-xl transition-colors"
                       title="Close"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
 
                 {/* Greeting Message */}
                 {messages.length === 0 && (
-                  <div className="p-4 bg-white border-b border-gray-100">
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      Hello! I'm the Swiss Immigration Assistant. Ask me for help navigating Swiss immigration processes, understanding permit requirements, and finding the information you need. How can I assist you today?
+                  <div className="p-6 bg-white">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">How can I help you?</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                      Ask me anything about Swiss work permits, residency, or citizenship. I'm trained on official Swiss immigration data.
                     </p>
                   </div>
                 )}
 
-                {/* Suggested Queries - ASUS Style Cards */}
+                {/* Suggested Queries - Professional Cards */}
                 {messages.length === 0 && (
-                  <div className="p-4 bg-gray-50 border-b border-gray-200 space-y-2 max-h-96 overflow-y-auto">
+                  <div className="p-6 pt-0 space-y-2.5">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Suggested Topics</p>
                     {suggestedQueries.map((suggestion, idx) => (
-                      <button
+                      <motion.button
                         key={idx}
                         onClick={async () => {
                           setInput(suggestion.query)
-                          // Wait a moment for state to update, then send
                           await new Promise(resolve => setTimeout(resolve, 50))
                           if (canSendMessage && !isLoading) {
-                            // Create a synthetic event to trigger send
                             const userMessage: ChatMessage = {
                               id: createMessageId(),
                               role: 'user',
@@ -405,124 +505,234 @@ export default function FloatingChatWidget() {
                             }
                             setMessages(prev => [...prev, userMessage])
                             setInput('')
-                            
-                            // Send to API
                             setIsLoading(true)
                             setErrorMessage(null)
                             try {
                               const formData = new FormData()
                               formData.append('message', suggestion.query)
-                              
+                              formData.append('packId', userPack)
+                              if (typeof window !== 'undefined') {
+                                const layer = localStorage.getItem('userLayer')
+                                if (layer) {
+                                  formData.append('layer', layer)
+                                }
+                              }
                               const response = await fetch('/api/chat', {
                                 method: 'POST',
                                 body: formData,
                               })
-                              
-                              if (!response.ok) {
-                                throw new Error('Failed to get response')
-                              }
-                              
+                              if (!response.ok) throw new Error('Failed to get response')
                               const data = await response.json()
-                              
                               const assistantMessage: ChatMessage = {
                                 id: createMessageId(),
                                 role: 'assistant',
-                                content: data.response || 'I could not generate a helpful response right now. Please try again.',
+                                content: data.response || '',
                                 timestamp: new Date(),
                               }
-                              
                               setMessages(prev => [...prev, assistantMessage])
-                              
+                              setTypingMessageId(assistantMessage.id)
                               if (userPack === 'free') {
                                 const newCount = dailyMessages + 1
                                 setDailyMessages(newCount)
-                                
                                 if (!session?.user) {
                                   const today = new Date().toDateString()
                                   localStorage.setItem('anonymousChatData', JSON.stringify({ date: today, count: newCount }))
                                 }
                               }
                             } catch (error) {
-                              const message = error instanceof Error ? error.message : 'Something went wrong while sending your message.'
+                              const message = error instanceof Error ? error.message : 'Connection error.'
                               setErrorMessage(message)
-                              
-                              setMessages(prev => [...prev, {
-                                id: createMessageId(),
-                                role: 'assistant',
-                                content: 'I\'m sorry—I ran into an issue processing that request. Please try again in a moment.',
-                                timestamp: new Date(),
-                              }])
                             } finally {
                               setIsLoading(false)
                             }
                           }
                         }}
                         disabled={!canSendMessage || isLoading}
-                        className="w-full text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all flex items-start space-x-3 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full text-left p-3.5 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-slate-50/50 transition-all flex items-center space-x-3 group disabled:opacity-50 relative overflow-hidden"
+                        whileHover={{ x: 4 }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
                       >
-                        <suggestion.icon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 group-hover:text-blue-700" />
-                        <span className="text-sm text-gray-700 group-hover:text-gray-900 flex-1">{suggestion.text}</span>
-                      </button>
+                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
+                          <suggestion.icon className="w-4 h-4 text-slate-400 group-hover:text-blue-500" />
+                        </div>
+                        <span className="text-sm text-slate-600 font-medium group-hover:text-slate-900 transition-colors flex-1">{suggestion.text}</span>
+                      </motion.button>
                     ))}
                   </div>
                 )}
               </>
             ) : (
-              // Minimized Header
-              <div className="flex justify-between items-center p-4 bg-white border-b border-gray-200 cursor-pointer" onClick={handleMaximize}>
-                <h2 className="text-sm font-semibold text-gray-900">Swiss Immigration Assistant</h2>
+              // Minimized Header - Enhanced with animations
+              <motion.div 
+                className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 cursor-pointer"
+                onClick={handleMaximize}
+                whileHover={{ backgroundColor: "rgba(239, 246, 255, 1)" }}
+                transition={{ duration: 0.2 }}
+              >
                 <div className="flex items-center space-x-2">
-                  <button
+                  <motion.div
+                    animate={{
+                      rotate: [0, 10, -10, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <Bot className="w-5 h-5 text-blue-600" />
+                  </motion.div>
+                  <h2 className="text-sm font-semibold text-gray-900">Swiss Immigration Assistant</h2>
+                  <motion.span
+                    className="text-xs text-blue-500 font-medium"
+                    animate={{
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    AI
+                  </motion.span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleMaximize()
                     }}
                     className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1.5 rounded transition-colors"
                     title="Restore"
+                    whileHover={{ scale: 1.1, rotate: 180 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <Maximize2 className="w-4 h-4" />
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleToggle()
                     }}
                     className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-1.5 rounded transition-colors"
                     title="Close"
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <X className="w-4 h-4" />
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Messages Area - Only show when not minimized */}
             {!isMinimized && (
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white scroll-smooth" ref={messagesEndRef}>
-                {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-900 border border-gray-200'
-                    }`}
+                {messages.map((message) => {
+                const isTyping = typingMessageId === message.id && message.role === 'assistant'
+                
+                return (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    onAnimationComplete={() => {
+                      if (isTyping) {
+                        // Clear typing state after animation completes
+                        setTimeout(() => setTypingMessageId(null), 100)
+                      }
+                    }}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    {message.file && (
-                      <div className="mt-2 flex items-center space-x-2 text-xs opacity-75">
-                        <FileText className="w-4 h-4" />
-                        <span>{message.file.name}</span>
+                    <div
+                      className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${
+                        message.role === 'user'
+                          ? 'bg-slate-900 text-white rounded-br-none shadow-sm'
+                          : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none shadow-sm'
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap font-normal">
+                        {message.role === 'assistant' && isTyping ? (
+                          <TypingMessage content={message.content} isActive={true} />
+                        ) : (
+                          <MessageContent content={message.content} onSuggestionClick={async (suggestion) => {
+                            setInput(suggestion)
+                            // Wait a moment for state to update, then send
+                            await new Promise(resolve => setTimeout(resolve, 50))
+                            if (canSendMessage && !isLoading) {
+                              const userMessage: ChatMessage = {
+                                id: createMessageId(),
+                                role: 'user',
+                                content: suggestion,
+                                timestamp: new Date(),
+                              }
+                              setMessages(prev => [...prev, userMessage])
+                              setInput('')
+                              
+                              setIsLoading(true)
+                              setErrorMessage(null)
+                              
+                              try {
+                                const formData = new FormData()
+                                formData.append('message', suggestion)
+                                formData.append('packId', userPack)
+                                if (typeof window !== 'undefined') {
+                                  const layer = localStorage.getItem('userLayer')
+                                  if (layer) {
+                                    formData.append('layer', layer)
+                                  }
+                                }
+                                
+                                const response = await fetch('/api/chat', {
+                                  method: 'POST',
+                                  body: formData,
+                                })
+                                
+                                if (!response.ok) {
+                                  throw new Error('Failed to get response')
+                                }
+                                
+                                const data = await response.json()
+                                
+                                const assistantMessage: ChatMessage = {
+                                  id: createMessageId(),
+                                  role: 'assistant',
+                                  content: data.response || '',
+                                  timestamp: new Date(),
+                                }
+                                
+                                setMessages(prev => [...prev, assistantMessage])
+                                setTypingMessageId(assistantMessage.id)
+                              } catch (error: any) {
+                                console.error('Chat error:', error)
+                                const errorMessage: ChatMessage = {
+                                  id: createMessageId(),
+                                  role: 'assistant',
+                                  content: `Sorry, an error occurred: ${error?.message || 'Unknown error'}. Please try again.`,
+                                  timestamp: new Date(),
+                                }
+                                setMessages(prev => [...prev, errorMessage])
+                              } finally {
+                                setIsLoading(false)
+                              }
+                            }
+                          }} />
+                        )}
                       </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                      {message.file && (
+                        <div className="mt-2 flex items-center space-x-2 text-xs opacity-75">
+                          <FileText className="w-4 h-4" />
+                          <span>{message.file.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )
+              })}
 
                 {isLoading && (
                   <div className="flex justify-start">
@@ -538,98 +748,88 @@ export default function FloatingChatWidget() {
               </div>
             )}
 
-            {/* Input Area - Only show when not minimized */}
+            {/* Input Area - Modern & Professional */}
             {!isMinimized && (
-              <div className="p-4 bg-white border-t border-gray-200">
-              {uploadedFile && (
-                <div className="mb-2 flex items-center justify-between bg-blue-50 p-2 rounded border border-blue-200">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm text-gray-700">{uploadedFile.file.name}</span>
-                    <span className="text-xs text-gray-500">
-                      {(uploadedFile.file.size / 1024).toFixed(1)} KB
-                    </span>
+              <div className="p-4 bg-white border-t border-slate-100">
+                {uploadedFile && (
+                  <div className="mb-3 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-slate-500" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-slate-700 truncate max-w-[150px]">{uploadedFile.file.name}</span>
+                        <span className="text-[10px] text-slate-400">{(uploadedFile.file.size / 1024).toFixed(1)} KB</span>
+                      </div>
+                    </div>
+                    <button onClick={removeFile} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+                      <XCircle className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button
-                    onClick={removeFile}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+                )}
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  aria-label="Upload file"
-                >
-                  <Paperclip className="w-5 h-5" />
-                </button>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSend()
-                    }
-                  }}
-                  placeholder="Message Swiss Immigration Assistant"
-                  disabled={!canSendMessage || isLoading}
-                  className="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400 disabled:opacity-50"
-                />
-                <motion.button
-                  onClick={handleSend}
-                  disabled={!canSendMessage || isLoading || (!input.trim() && !uploadedFile)}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-lg shadow-sm"
-                  whileHover={{ scale: canSendMessage && !isLoading && (input.trim() || uploadedFile) ? 1.05 : 1 }}
-                  whileTap={{ scale: canSendMessage && !isLoading && (input.trim() || uploadedFile) ? 0.95 : 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Send className="w-5 h-5" />
-                </motion.button>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
+                    aria-label="Upload file"
+                  >
+                    <Paperclip className="w-5 h-5" strokeWidth={1.5} />
+                  </button>
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault()
+                          handleSend()
+                        }
+                      }}
+                      placeholder="Ask a question..."
+                      disabled={!canSendMessage || isLoading}
+                      className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-transparent rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 text-sm text-slate-900 placeholder-slate-400 disabled:opacity-50 transition-all"
+                    />
+                    <motion.button
+                      onClick={handleSend}
+                      disabled={!canSendMessage || isLoading || (!input.trim() && !uploadedFile)}
+                      className="absolute right-1.5 top-1.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 text-white p-2 rounded-xl shadow-sm transition-all"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Send className="w-4 h-4" strokeWidth={2} />
+                    </motion.button>
+                  </div>
+                </div>
 
                 {errorMessage && (
-                  <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200 mt-2">{errorMessage}</p>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 5 }} 
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 p-3 bg-red-50 text-[11px] text-red-600 border border-red-100 rounded-xl flex items-center gap-2"
+                  >
+                    <XCircle className="w-3.5 h-3.5" />
+                    {errorMessage}
+                  </motion.div>
                 )}
 
-                {uploadedFile && (
-                  <p className="text-xs text-gray-500 bg-blue-50 p-2 rounded border border-blue-100 mt-2">
-                    💡 Upload CVs, documents, or images for personalized feedback on Swiss immigration applications.
-                  </p>
-                )}
-
-                {/* Free message counter */}
-                {userPack === 'free' && remainingMessages !== null && remainingMessages > 0 && (
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    {remainingMessages} of {DAILY_FREE_LIMIT} free prompts remaining today
-                    {!session?.user && (
-                      <span className="block mt-1">
-                        <Link href="/auth/register" className="text-blue-600 hover:underline">
-                          Sign up for unlimited access
+                {/* Footer Credits/Limits */}
+                <div className="mt-4 flex flex-col items-center">
+                  {userPack === 'free' && remainingMessages !== null && (
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      {remainingMessages > 0 
+                        ? `${remainingMessages} messages remaining today`
+                        : "Daily limit reached"}
+                      {!session?.user && (
+                        <Link href="/auth/register" className="ml-1 text-slate-900 hover:underline font-bold">
+                          Sign up for more
                         </Link>
-                      </span>
-                    )}
-                  </p>
-                )}
-                {userPack === 'free' && remainingMessages === 0 && !session?.user && (
-                  <p className="text-xs text-blue-600 text-center font-medium mt-2">
-                    <Link href="/auth/register" className="hover:underline">
-                      Sign up for unlimited access
-                    </Link>
-                  </p>
-                )}
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </motion.aside>

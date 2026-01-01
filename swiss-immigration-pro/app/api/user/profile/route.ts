@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function PUT(req: NextRequest) {
   try {
@@ -13,10 +13,10 @@ export async function PUT(req: NextRequest) {
 
     const { fullName, language } = await req.json()
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Update profile
-    const { error } = await supabase
+    const { error } = await db
       .from('profiles')
       .update({
         full_name: fullName || null,
@@ -47,10 +47,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get profile
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await db
       .from('profiles')
       .select('id, email, full_name, pack_id, is_admin, metadata')
       .eq('id', session.user.id)

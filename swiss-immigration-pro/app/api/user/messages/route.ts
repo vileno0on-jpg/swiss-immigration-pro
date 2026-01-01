@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET() {
   try {
@@ -12,8 +12,8 @@ export async function GET() {
     }
 
     // Get recent messages
-    const supabase = await createClient()
-    const { data: messages, error } = await supabase
+    const db = await createClient()
+    const { data: messages, error } = await db
       .from('chat_messages')
       .select('message, response, created_at')
       .eq('user_id', session.user.id)

@@ -1,9 +1,9 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, Tag, BookOpen, CheckCircle, AlertCircle, FileText, ExternalLink, ChevronDown, ChevronUp, Info, Award, TrendingUp, Users, Calendar, Scale, Briefcase, DollarSign, MapPin, Route, Globe } from 'lucide-react'
+import { ArrowLeft, Clock, Tag, BookOpen, CheckCircle, AlertCircle, FileText, ExternalLink, ChevronDown, ChevronUp, Info, Award, TrendingUp, Users, Calendar, Scale, Briefcase, DollarSign, MapPin, Route, Globe, Star, AlertTriangle } from 'lucide-react'
 
 // Icon mapping for resource categories
 const getCategoryIcon = (category: string) => {
@@ -23,10 +23,12 @@ const getCategoryIcon = (category: string) => {
 }
 import Link from 'next/link'
 import { LAYER_CONTENT } from '@/lib/layerContent'
+import { useLayerContent } from '@/lib/i18n/useTranslation'
 import type { LayerType } from '@/lib/layerLogic'
+import LayerHeader from '@/components/layout/LayerHeader'
 
 export default function ResourceDetailPage() {
-  const params = useParams()
+  const params = use(params)
   const layerParam = params?.layer as string
   const slug = params?.slug as string
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
@@ -35,7 +37,7 @@ export default function ResourceDetailPage() {
     ? layerParam
     : 'others') as LayerType
 
-  const content = LAYER_CONTENT[layer]
+  const content = useLayerContent(layer)
 
   // Find the resource by slug
   const getResourceSlug = (title: string) => {
@@ -45,6 +47,22 @@ export default function ResourceDetailPage() {
   const resource = content.resources.posts.find(
     post => getResourceSlug(post.title) === slug
   )
+
+  // Map layer names to LayerHeader format
+  const layerForHeader = layer === 'europeans' ? 'eu' : layer === 'americans' ? 'us' : 'other'
+  const homeHref = `/${layerForHeader}`
+
+  // Layer-specific badge configuration
+  const badge = {
+    icon: layer === 'europeans' ? <Star className="w-3.5 h-3.5" /> : layer === 'americans' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layer === 'europeans' 
+      ? 'EU/EFTA Freedom of Movement'
+      : layer === 'americans' 
+      ? '2025 Quota Alert: Apply Early'
+      : 'Global Citizens Pathway',
+    bgColor: layer === 'europeans' ? 'bg-blue-600' : layer === 'americans' ? 'bg-slate-900' : 'bg-purple-600',
+    textColor: 'text-white'
+  }
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections)
@@ -268,10 +286,15 @@ export default function ResourceDetailPage() {
   if (!resource) {
     return (
       <div className="bg-white min-h-screen">
+        <LayerHeader
+          layer={layerForHeader as 'eu' | 'us' | 'other'}
+          homeHref={homeHref}
+          customBadge={badge}
+        />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Resource Not Found</h1>
           <p className="text-gray-600 mb-6">The resource you're looking for doesn't exist.</p>
-          <Link href={`/${layer}/resources`} className="text-blue-600 hover:underline">
+          <Link href={`/${layerForHeader}/resources`} className="text-blue-600 hover:underline">
             ← Back to Resources
           </Link>
         </div>
@@ -283,10 +306,15 @@ export default function ResourceDetailPage() {
 
   return (
     <div className="bg-white min-h-screen">
+      <LayerHeader
+        layer={layerForHeader as 'eu' | 'us' | 'other'}
+        homeHref={homeHref}
+        customBadge={badge}
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Button */}
         <Link 
-          href={`/${layer}/resources`} 
+          href={`/${layerForHeader}/resources`} 
           className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-6 group"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -459,7 +487,7 @@ export default function ResourceDetailPage() {
                   <TrendingUp className="w-5 h-5 ml-2" />
                 </Link>
                 <Link
-                  href={`/${layer}`}
+                  href={`/${layerForHeader}`}
                   className="bg-white hover:bg-gray-50 text-gray-900 font-semibold px-8 py-3 rounded-lg transition-all border-2 border-blue-300 shadow-sm hover:shadow-md inline-flex items-center justify-center"
                 >
                   Explore {layer === 'europeans' ? 'EU/EFTA' : layer === 'americans' ? 'US/Canadian' : 'International'} Pathway
@@ -490,7 +518,7 @@ export default function ResourceDetailPage() {
                 return (
                   <Link
                     key={idx}
-                    href={`/${layer}/resources/${postSlug}`}
+                    href={`/${layerForHeader}/resources/${postSlug}`}
                     className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-lg transition-all group"
                   >
                     <div className="flex items-center space-x-2 mb-3">

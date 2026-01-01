@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,10 +11,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get pack statistics
-    const profilesResult = await supabase
+    const profilesResult = await db
       .from('profiles')
       .select('pack_id, pack_expires_at')
       .neq('pack_id', 'free')
@@ -36,14 +36,14 @@ export async function GET(req: NextRequest) {
     }, {}) : {}
 
     // Get revenue by pack
-    const paymentsResult = await supabase
+    const paymentsResult = await db
       .from('payments')
       .select('user_id, amount, status')
       .eq('status', 'succeeded')
       .execute()
     const payments = paymentsResult.data || []
 
-    const userPacksResult = await supabase
+    const userPacksResult = await db
       .from('profiles')
       .select('id, pack_id')
       .neq('pack_id', 'free')

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,10 +11,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get all profiles
-    const { data: profiles, error: profilesError } = await supabase
+    const { data: profiles, error: profilesError } = await db
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false })
@@ -25,12 +25,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Get subscription counts
-    const { data: subscriptions } = await supabase
+    const { data: subscriptions } = await db
       .from('subscriptions')
       .select('user_id')
 
     // Get payment data
-    const { data: payments } = await supabase
+    const { data: payments } = await db
       .from('payments')
       .select('user_id, amount, status')
 

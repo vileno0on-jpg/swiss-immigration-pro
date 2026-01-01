@@ -507,12 +507,12 @@ Switzerland has the **highest rents in Europe** and third globally. Finding hous
 
 | City | Average | Range |
 |------|---------|-------|
-| Geneva | 2,800 | 2,200-4,000 |
-| Zurich | 2,500 | 2,000-3,500 |
-| Basel | 2,200 | 1,800-3,000 |
-| Bern | 2,000 | 1,600-2,800 |
-| Lausanne | 2,100 | 1,700-3,000 |
-| Zug | 2,400 | 1,900-3,400 |
+| Geneva | 2,300 | 1,800-3,200 |
+| Zurich | 2,100 | 1,700-2,900 |
+| Basel | 1,800 | 1,500-2,500 |
+| Bern | 1,650 | 1,350-2,300 |
+| Lausanne | 1,750 | 1,450-2,500 |
+| Zug | 2,000 | 1,600-2,800 |
 
 ### Cost of Living Index
 
@@ -833,15 +833,15 @@ Switzerland has the **highest rents in Europe** and third globally. Finding hous
 **Income:** CHF 6,000/month
 
 **Expenses:**
-- Rent: CHF 1,800
+- Rent: CHF 1,500
 - Insurance (health): CHF 380
 - Food: CHF 500
 - Transport: CHF 150
 - Utilities: CHF 200
 - Leisure: CHF 300
-- Savings: CHF 2,070
+- Savings: CHF 2,370
 
-**Reality:** Tighter than this model
+**Reality:** Very achievable with smart planning
 
 ## Tax Implications
 

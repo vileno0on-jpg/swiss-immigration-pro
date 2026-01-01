@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { stripe } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db-client'
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,10 +44,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const db = await createClient()
 
     // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await db
       .from('profiles')
       .select('*')
       .eq('id', session.user.id)
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         stripe_customer_id: customerId,
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('profiles')
         .update({
           metadata: updatedMetadata,
