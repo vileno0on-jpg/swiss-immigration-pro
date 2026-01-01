@@ -20,16 +20,16 @@ if (-not $sshPath) {
 Write-Host "📡 Connecting to server and deploying..." -ForegroundColor Cyan
 
 $deployCommand = @"
-cd swiss-immigration-pro && 
-echo '📥 Pulling latest changes from GitHub...' && 
-git pull origin main && 
-echo '📦 Installing dependencies...' && 
-npm install && 
-echo '🔨 Building application...' && 
-npm run build && 
-echo '🔄 Restarting application with PM2...' && 
-pm2 restart swiss-immigration-pro && 
-echo '✅ Deployment completed successfully!' && 
+cd swiss-immigration-pro ;
+echo '📥 Pulling latest changes from GitHub...' ;
+git pull origin main ;
+echo '📦 Installing dependencies...' ;
+npm install ;
+echo '🔨 Building application...' ;
+npm run build ;
+echo '🔄 Restarting application with PM2...' ;
+pm2 restart swiss-immigration-pro ;
+echo '✅ Deployment completed successfully!' ;
 pm2 status
 "@
 
