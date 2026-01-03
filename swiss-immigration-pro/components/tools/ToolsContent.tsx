@@ -338,6 +338,115 @@ export default function ToolsContent({ layer = 'default' }: { layer?: string }) 
           </Link>
         </motion.div>
 
+        {/* Featured Tools Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+          {/* Apartment Finder Featured Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Link href="/tools/apartment-finder" className="block group h-full">
+              <div className="relative h-full bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl shadow-2xl p-8 md:p-10 text-white overflow-hidden hover:shadow-3xl transition-all duration-500 cursor-pointer">
+                <motion.div
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                  className="absolute inset-0 opacity-50"
+                  style={{
+                    backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)",
+                    backgroundSize: "200% 200%"
+                  }}
+                />
+                
+                <div className="relative z-10">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-start md:items-center space-x-5">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: -5 }}
+                        className="bg-white/20 backdrop-blur-md rounded-2xl p-5 border border-white/30 group-hover:bg-white/30 transition-all duration-300 shadow-lg"
+                      >
+                        <Building className="w-8 h-8 md:w-10 md:h-10" />
+                      </motion.div>
+                      <div className="flex-1">
+                        <h2 className="text-2xl md:text-3xl font-bold mb-2.5">Swiss Apartment Finder</h2>
+                        <p className="text-emerald-50/95 text-sm md:text-base leading-relaxed max-w-2xl">
+                          Aggregated listings from Homegate, ImmoScout24, and more. Find your perfect Swiss home with modern white display.
+                        </p>
+                      </div>
+                    </div>
+                    <motion.div 
+                      whileHover={{ x: 5 }}
+                      className="w-fit flex items-center space-x-3 text-sm md:text-base font-semibold bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 border border-white/30 group-hover:bg-white/30 transition-all duration-300"
+                    >
+                      <span>Find Apartments</span>
+                      <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Dossier Generator Featured Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Link href="/tools/dossier-generator" className="block group h-full">
+              <div className="relative h-full bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 rounded-3xl shadow-2xl p-8 md:p-10 text-white overflow-hidden hover:shadow-3xl transition-all duration-500 cursor-pointer">
+                <motion.div
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                  className="absolute inset-0 opacity-50"
+                  style={{
+                    backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)",
+                    backgroundSize: "200% 200%"
+                  }}
+                />
+                
+                <div className="relative z-10">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-start md:items-center space-x-5">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        className="bg-white/20 backdrop-blur-md rounded-2xl p-5 border border-white/30 group-hover:bg-white/30 transition-all duration-300 shadow-lg"
+                      >
+                        <FileText className="w-8 h-8 md:w-10 md:h-10" />
+                      </motion.div>
+                      <div className="flex-1">
+                        <h2 className="text-2xl md:text-3xl font-bold mb-2.5">Application Dossier</h2>
+                        <p className="text-blue-50/95 text-sm md:text-base leading-relaxed max-w-2xl">
+                          Generate a professional, Swiss-standard application package that increases your response rate by 65%.
+                        </p>
+                      </div>
+                    </div>
+                    <motion.div 
+                      whileHover={{ x: 5 }}
+                      className="w-fit flex items-center space-x-3 text-sm md:text-base font-semibold bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 border border-white/30 group-hover:bg-white/30 transition-all duration-300"
+                    >
+                      <span>Create Dossier</span>
+                      <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
+
         {/* Enhanced Professional Tab Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

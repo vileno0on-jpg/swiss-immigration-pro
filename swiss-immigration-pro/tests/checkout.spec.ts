@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test'
 // In a real checkout flow we would create a Stripe session and follow the redirect.
 // For the MVP we simply navigate to the success page with a dummy session id.
 
-test.describe('Stripe Checkout MVP', () => {
+test.describe('Apartment Finder', () => {
   test('renders thank-you page after successful checkout', async ({ page, baseURL }) => {
     const testSessionId = 'cs_test_dummy'
     await page.goto(`${baseURL}/consultation/success?session_id=${testSessionId}`)

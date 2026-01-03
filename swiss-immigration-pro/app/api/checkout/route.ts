@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { stripe, getSubscriptionPriceId } from '@/lib/stripe'
+import { stripe, getSubscriptionPriceId, ONE_TIME_PRODUCTS } from '@/lib/stripe'
 import { createClient } from '@/lib/db-client'
 
 export async function POST(req: NextRequest) {
   try {
-    const { packId, cycle = 'monthly' } = await req.json()
+    const { packId, cycle = 'monthly', oneTimeProductId } = await req.json()
 
     if (!packId) {
       return NextResponse.json(
@@ -91,6 +91,38 @@ export async function POST(req: NextRequest) {
         console.error('Profile update error:', updateError)
         return NextResponse.json({ error: 'Failed to save customer information' }, { status: 500 })
       }
+    }
+
+        // If one-time product requested, bypass subscription logic
+    if (oneTimeProductId) {
+      const product = ONE_TIME_PRODUCTS[oneTimeProductId as keyof typeof ONE_TIME_PRODUCTS]
+      if (!product) {
+        return NextResponse.json({ error: 'Invalid product' }, { status: 400 })
+      }
+      const checkoutSession = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [
+          {
+            price_data: {
+              currency: 'chf',
+              product_data: {
+                name: product.name,
+                description: product.description,
+              },
+              unit_amount: product.price,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${req.nextUrl.origin}/tools/apartment-finder?session_id={CHECKOUT_SESSION_ID}&success=1`,
+        cancel_url: `${req.nextUrl.origin}/tools/apartment-finder`,
+        metadata: {
+          userId: session.user.id,
+          productId: product.id,
+        },
+      })
+      return NextResponse.json({ url: checkoutSession.url })
     }
 
     // Get pack price

@@ -1,10 +1,11 @@
-// Personal Information Form - Swiss Specific Fields
+// Personal Information Form - Modern High-End Swiss Style
 'use client'
 
 import { useResumeStore } from '@/store/resumeStore'
 import type { SwissPermitType, MaritalStatus } from '@/types/resume'
-import { Upload, X } from 'lucide-react'
+import { Upload, X, User, Camera, Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react'
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const PERMIT_TYPES: SwissPermitType[] = ['Citizen', 'Permit C', 'Permit B', 'Permit L', 'Permit G', 'Non-EU']
 const MARITAL_STATUSES: MaritalStatus[] = ['Single', 'Married', 'Divorced', 'Widowed', 'Partnership']
@@ -37,164 +38,234 @@ export default function PersonalInfoForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900 border-b-2 border-blue-600 pb-2">Personal Information</h2>
-
-      {/* Name & Title */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">First Name *</label>
-          <input
-            type="text"
-            value={personalInfo.firstName}
-            onChange={(e) => handleInputChange('firstName', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
+    <div className="space-y-12">
+      {/* Photo Section - Visual Anchor */}
+      <div className="flex flex-col md:flex-row items-center gap-8 p-8 bg-slate-50/50 rounded-[40px] border border-slate-100">
+        <div className="relative group">
+          {photoPreview ? (
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative w-32 h-32 md:w-40 md:h-40"
+            >
+              <img
+                src={photoPreview}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-[32px] border-4 border-white shadow-2xl"
+              />
+              <button
+                onClick={removePhoto}
+                className="absolute -top-2 -right-2 bg-slate-900 text-white rounded-full p-2 hover:bg-red-500 transition-colors shadow-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ) : (
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-white border-2 border-dashed border-slate-200 rounded-[32px] flex flex-col items-center justify-center gap-2 group-hover:border-blue-400 transition-colors cursor-pointer relative overflow-hidden">
+              <Camera className="w-8 h-8 text-slate-300 group-hover:text-blue-500 transition-colors" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center px-4">Professional Photo Required</span>
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+            </div>
+          )}
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Last Name *</label>
-          <input
-            type="text"
-            value={personalInfo.lastName}
-            onChange={(e) => handleInputChange('lastName', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">Professional Title</label>
-        <input
-          type="text"
-          value={personalInfo.title || ''}
-          onChange={(e) => handleInputChange('title', e.target.value)}
-          placeholder="e.g., Software Engineer, Marketing Manager"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
-
-      {/* Contact Information */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Email *</label>
-          <input
-            type="email"
-            value={personalInfo.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Phone *</label>
-          <input
-            type="tel"
-            value={personalInfo.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
-            placeholder="+41 XX XXX XX XX"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Address */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Address *</label>
-          <input
-            type="text"
-            value={personalInfo.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Postal Code *</label>
-          <input
-            type="text"
-            value={personalInfo.postalCode}
-            onChange={(e) => handleInputChange('postalCode', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">City *</label>
-          <input
-            type="text"
-            value={personalInfo.city}
-            onChange={(e) => handleInputChange('city', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Country *</label>
-          <input
-            type="text"
-            value={personalInfo.country}
-            onChange={(e) => handleInputChange('country', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Swiss-Specific Fields */}
-      <div className="border-t border-gray-200 pt-4">
-        <h3 className="text-sm font-bold text-gray-900 mb-3">Swiss Immigration Information</h3>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Date of Birth *</label>
+        <div className="flex-1 text-center md:text-left">
+          <h3 className="text-xl font-black text-slate-900 mb-2">Professional Portrait</h3>
+          <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-sm mb-4">
+            Swiss employers expect a clean, professional headshot. Use a neutral background and professional attire.
+          </p>
+          {!photoPreview && (
+            <label className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all cursor-pointer shadow-sm">
+              <Upload className="w-4 h-4" />
+              <span>Upload Photo</span>
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+            </label>
+          )}
+        </div>
+      </div>
+
+      {/* Identity Section */}
+      <div className="space-y-8">
+        <div className="flex items-center gap-3 mb-2">
+          <User className="w-5 h-5 text-blue-600" />
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Basic Identity</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">First Name</label>
+            <input
+              type="text"
+              value={personalInfo.firstName}
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Last Name</label>
+            <input
+              type="text"
+              value={personalInfo.lastName}
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Professional Title</label>
+          <input
+            type="text"
+            value={personalInfo.title || ''}
+            onChange={(e) => handleInputChange('title', e.target.value)}
+            placeholder="e.g., Senior Software Engineer"
+            className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900 placeholder:text-slate-300"
+          />
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div className="space-y-8">
+        <div className="flex items-center gap-3 mb-2">
+          <Mail className="w-5 h-5 text-indigo-600" />
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Contact Channels</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2 relative group">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors" />
+              <input
+                type="email"
+                value={personalInfo.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2 relative group">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Phone Number</label>
+            <div className="relative">
+              <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors" />
+              <input
+                type="tel"
+                value={personalInfo.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="+41 00 000 00 00"
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Location Section */}
+      <div className="space-y-8">
+        <div className="flex items-center gap-3 mb-2">
+          <MapPin className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Location</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Street Address</label>
+            <input
+              type="text"
+              value={personalInfo.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Postal Code</label>
+            <input
+              type="text"
+              value={personalInfo.postalCode}
+              onChange={(e) => handleInputChange('postalCode', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">City</label>
+            <input
+              type="text"
+              value={personalInfo.city}
+              onChange={(e) => handleInputChange('city', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">Country</label>
+            <input
+              type="text"
+              value={personalInfo.country}
+              onChange={(e) => handleInputChange('country', e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Swiss Context Section */}
+      <div className="p-8 bg-blue-50/30 rounded-[40px] border border-blue-100/50 space-y-10">
+        <div className="flex items-center gap-3">
+          <Globe className="w-5 h-5 text-blue-600" />
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-blue-900/40">Swiss Residency Context</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-blue-700/50 ml-4">Date of Birth</label>
             <input
               type="date"
               value={personalInfo.dateOfBirth}
               onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-6 py-4 bg-white border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Nationality *</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-blue-700/50 ml-4">Nationality</label>
             <input
               type="text"
               value={personalInfo.nationality}
               onChange={(e) => handleInputChange('nationality', e.target.value)}
-              placeholder="e.g., Swiss, German, American"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g., Swiss / German / EU"
+              className="w-full px-6 py-4 bg-white border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900 placeholder:text-slate-300"
               required
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Marital Status</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-blue-700/50 ml-4">Marital Status</label>
             <select
               value={personalInfo.maritalStatus || ''}
               onChange={(e) => handleInputChange('maritalStatus', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-6 py-4 bg-white border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900 appearance-none"
             >
-              <option value="">Select...</option>
+              <option value="">Select Status...</option>
               {MARITAL_STATUSES.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Permit Type *</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-blue-700/50 ml-4">Swiss Permit Type</label>
             <select
               value={personalInfo.permitType}
               onChange={(e) => handleInputChange('permitType', e.target.value as SwissPermitType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-6 py-4 bg-white border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900 appearance-none"
               required
             >
               {PERMIT_TYPES.map((type) => (
@@ -205,82 +276,42 @@ export default function PersonalInfoForm() {
         </div>
       </div>
 
-      {/* Professional Photo */}
-      <div className="border-t border-gray-200 pt-4">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Professional Photo (Required in Switzerland)</label>
-        <div className="flex items-center gap-4">
-          {photoPreview ? (
-            <div className="relative">
-              <img
-                src={photoPreview}
-                alt="Profile"
-                className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300"
-              />
-              <button
-                onClick={removePhoto}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="w-24 h-24 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-              <span className="text-xs text-gray-500 text-center px-2">No Photo</span>
-            </div>
-          )}
-          <label className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            <span>Upload Photo</span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoUpload}
-              className="hidden"
-            />
-          </label>
+      {/* Socials Section */}
+      <div className="space-y-8 pb-10">
+        <div className="flex items-center gap-3 mb-2">
+          <Globe className="w-5 h-5 text-slate-400" />
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Professional Links</h3>
         </div>
-        <p className="text-xs text-gray-500 mt-2">Professional headshot recommended (square or portrait orientation)</p>
-      </div>
-
-      {/* Additional Links */}
-      <div className="border-t border-gray-200 pt-4">
-        <h3 className="text-sm font-bold text-gray-900 mb-3">Additional Links</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">LinkedIn URL</label>
-            <input
-              type="url"
-              value={personalInfo.linkedinUrl || ''}
-              onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
-              placeholder="https://linkedin.com/in/yourname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2 relative group">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">LinkedIn Profile</label>
+            <div className="relative">
+              <Linkedin className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-[#0077B5] transition-colors" />
+              <input
+                type="url"
+                value={personalInfo.linkedinUrl || ''}
+                onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
+                placeholder="linkedin.com/in/username"
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Website URL</label>
-            <input
-              type="url"
-              value={personalInfo.websiteUrl || ''}
-              onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-              placeholder="https://yourwebsite.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">GitHub URL</label>
-            <input
-              type="url"
-              value={personalInfo.githubUrl || ''}
-              onChange={(e) => handleInputChange('githubUrl', e.target.value)}
-              placeholder="https://github.com/yourname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+          <div className="space-y-2 relative group">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-4">GitHub Profile</label>
+            <div className="relative">
+              <Github className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-black transition-colors" />
+              <input
+                type="url"
+                value={personalInfo.githubUrl || ''}
+                onChange={(e) => handleInputChange('githubUrl', e.target.value)}
+                placeholder="github.com/username"
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-2xl font-bold text-slate-900"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-
-
