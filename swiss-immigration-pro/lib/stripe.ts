@@ -185,7 +185,7 @@ export const ONE_TIME_PRODUCTS = {
       'Email support throughout process',
       'Priority response (24h)'
     ]
-  }
+  },
   apartment_finder_access: {
     id: 'apartment_finder_access',
     name: 'Apartment Finder Access',
