@@ -145,16 +145,18 @@ export default function TemplateSelector() {
 }
 
 // Template component mapper
-import SwissClassic from './templates/SwissClassic'
-import ModernZurich from './templates/ModernZurich'
+// import SwissClassic from './templates/SwissClassic'
+// import ModernZurich from './templates/ModernZurich'
 
 export function getTemplateComponent(componentKey: string) {
-  switch (componentKey) {
-    case 'swiss-classic':
-      return SwissClassic
-    case 'modern-zurich':
-      return ModernZurich
-    default:
-      return SwissClassic
-  }
+  // Temporarily disabled - templates to be added
+  return null
+  // switch (componentKey) {
+  //   case 'swiss-classic':
+  //     return SwissClassic
+  //   case 'modern-zurich':
+  //     return ModernZurich
+  //   default:
+  //     return SwissClassic
+  // }
 }
