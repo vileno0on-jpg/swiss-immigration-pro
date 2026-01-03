@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { stripe } from '@/lib/stripe'
+import { stripe, getSubscriptionPriceId } from '@/lib/stripe'
 import { createClient } from '@/lib/db-client'
 
 export async function POST(req: NextRequest) {
@@ -102,28 +102,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Create checkout session
+    // Create checkout session using predefined Stripe Price IDs
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'chf', // Stripe accepts lowercase
-            product_data: {
-              name: getPackName(packId),
-              description: `Access to ${packId} features`,
-            },
-            unit_amount: packPrice, // Already in cents
-            recurring: {
-              interval: cycle === 'annual' ? 'year' : 'month',
-            },
-          },
+          price: getSubscriptionPriceId(packId as any, cycle),
           quantity: 1,
         },
       ],
       mode: 'subscription',
-      success_url: `${req.nextUrl.origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.nextUrl.origin}/consultation/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.nextUrl.origin}/pricing`,
       metadata: {
         userId: session.user.id,

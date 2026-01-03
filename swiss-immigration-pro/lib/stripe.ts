@@ -7,6 +7,28 @@ export const stripe = process.env.STRIPE_SECRET_KEY
     })
   : ({} as Stripe)
 
+// Stripe Price IDs for subscription packs (test mode by default)
+export const SUBSCRIPTION_PRICE_IDS = {
+  immigration: {
+    monthly: process.env.STRIPE_PRICE_IMMIGRATION_MONTHLY ?? 'price_immigration_monthly_test',
+    annual: process.env.STRIPE_PRICE_IMMIGRATION_ANNUAL ?? 'price_immigration_annual_test',
+  },
+  advanced: {
+    monthly: process.env.STRIPE_PRICE_ADVANCED_MONTHLY ?? 'price_advanced_monthly_test',
+    annual: process.env.STRIPE_PRICE_ADVANCED_ANNUAL ?? 'price_advanced_annual_test',
+  },
+  citizenship: {
+    monthly: process.env.STRIPE_PRICE_CITIZENSHIP_MONTHLY ?? 'price_citizenship_monthly_test',
+    annual: process.env.STRIPE_PRICE_CITIZENSHIP_ANNUAL ?? 'price_citizenship_annual_test',
+  },
+} as const
+
+export type PackCycle = 'monthly' | 'annual'
+
+export function getSubscriptionPriceId(packId: keyof typeof SUBSCRIPTION_PRICE_IDS, cycle: PackCycle = 'monthly') {
+  return SUBSCRIPTION_PRICE_IDS[packId][cycle]
+}
+
 export const PRICING_PACKS = {
   free: {
     id: 'free',
@@ -33,7 +55,7 @@ export const PRICING_PACKS = {
     id: 'immigration',
     name: 'Immigration Pack',
     price: 9,
-    priceId: null, // Will be set with actual Stripe Price ID
+    priceId: SUBSCRIPTION_PRICE_IDS.immigration.monthly,
     description: 'Complete Swiss immigration toolkit with unlimited AI assistance, professional CV templates, employment guides, and comprehensive checklists. Everything you need to navigate work permits, visa applications, and employment in Switzerland.',
     shortDescription: 'Complete Swiss immigration toolkit with AI assistance and CV templates',
     valueProposition: 'All-in-one immigration resource center with AI-powered guidance',
@@ -59,7 +81,7 @@ export const PRICING_PACKS = {
     id: 'advanced',
     name: 'Advanced Pack',
     price: 29,
-    priceId: null,
+    priceId: SUBSCRIPTION_PRICE_IDS.advanced.monthly,
     description: 'Premium Swiss immigration masterclass with comprehensive learning modules, AI tutoring, progress tracking, and expert strategies. Advanced tools for job hunting, cantonal optimization, and long-term immigration success in Switzerland.',
     shortDescription: 'Premium masterclass with comprehensive learning modules and AI tutoring',
     valueProposition: 'Master Swiss immigration with expert guidance and advanced tools',
@@ -88,7 +110,7 @@ export const PRICING_PACKS = {
     id: 'citizenship',
     name: 'Citizenship Pro Pack',
     price: 79,
-    priceId: null,
+    priceId: SUBSCRIPTION_PRICE_IDS.citizenship.monthly,
     description: 'Ultimate Swiss citizenship roadmap with lifetime access, personalized coaching, and expert video content. Complete 10-year pathway guidance including language test preparation, spouse shortcuts, and comprehensive application strategies for Swiss naturalization.',
     shortDescription: 'Ultimate Swiss citizenship roadmap with lifetime access and personalized coaching',
     valueProposition: 'Your complete path to Swiss citizenship with lifetime expert support',
