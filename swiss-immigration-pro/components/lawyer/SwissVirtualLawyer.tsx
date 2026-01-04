@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { 
   Scale, 
   FileText, 
@@ -29,9 +30,11 @@ import {
   Download,
   Trash2,
   Edit,
-  Upload
+  Upload,
+  LogOut
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChatbotIcon } from '@/components/icons/ChatbotIcon'
 
 // Types
 interface Consultation {
@@ -60,6 +63,7 @@ interface Message {
 }
 
 export default function SwissVirtualLawyer() {
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeSidebarTab, setActiveSidebarTab] = useState<'consultations' | 'documents' | 'resources'>('consultations')
   const [searchQuery, setSearchQuery] = useState('')
@@ -212,7 +216,7 @@ export default function SwissVirtualLawyer() {
           </button>
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
-              <Scale className="w-4 h-4 text-blue-600" />
+              <ChatbotIcon className="w-4 h-4 text-blue-600" size={16} />
             </div>
             <span className="font-semibold text-gray-900">Swiss Legal Assistant</span>
             <Award className="w-4 h-4 text-amber-500" />
@@ -223,6 +227,16 @@ export default function SwissVirtualLawyer() {
             <ShieldCheck className="w-4 h-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-900">Expert Legal Guidance</span>
           </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors cursor-pointer"
+            title="Exit Virtual Lawyer"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm font-medium hidden sm:inline">Exit</span>
+          </motion.button>
         </div>
       </div>
 
@@ -595,7 +609,7 @@ export default function SwissVirtualLawyer() {
                       className="flex gap-4"
                     >
                       <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm flex items-center justify-center ring-2 ring-blue-100">
-                        <Scale className="w-4 h-4 text-white" />
+                        <ChatbotIcon className="w-4 h-4 text-white" size={16} />
                       </div>
                       <div className="flex-1 space-y-4">
                         <div className="prose prose-sm max-w-none">
@@ -678,7 +692,7 @@ export default function SwissVirtualLawyer() {
                   className="flex gap-4"
                 >
                   <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm flex items-center justify-center ring-2 ring-blue-100">
-                    <Scale className="w-4 h-4 text-white" />
+                    <ChatbotIcon className="w-4 h-4 text-white" size={16} />
                   </div>
                   <div className="flex gap-1.5 pt-2">
                     <motion.div

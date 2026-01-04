@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, FileQuestion, Lightbulb, Search, Briefcase, Bot, Sparkles, Zap, MessageSquareText } from 'lucide-react'
+import { X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, FileQuestion, Lightbulb, Search, Briefcase, Bot, Sparkles, Zap } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { CONFIG } from '@/lib/config'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { MessageContent } from './MessageContent'
+import { ChatbotIcon } from '@/components/icons/ChatbotIcon'
 
 type UserPack = 'free' | 'immigration' | 'masterclass' | 'citizenship'
 
@@ -389,7 +390,7 @@ export default function FloatingChatWidget() {
             <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white" />
             
             <div className="relative flex items-center justify-center">
-              <MessageSquareText className="w-6 h-6 text-slate-800" strokeWidth={1.5} />
+              <ChatbotIcon className="w-6 h-6 text-slate-800" size={24} />
               <motion.div 
                 className="absolute -top-1 -right-1"
                 animate={{ opacity: [0.4, 1, 0.4] }}
@@ -443,7 +444,7 @@ export default function FloatingChatWidget() {
                 <div className="flex justify-between items-center p-5 bg-white border-b border-slate-100 rounded-tl-3xl">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 relative">
-                      <MessageSquareText className="w-5 h-5 text-slate-800" strokeWidth={1.5} />
+                      <ChatbotIcon className="w-5 h-5 text-slate-800" size={20} />
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
                     </div>
                     <div>
