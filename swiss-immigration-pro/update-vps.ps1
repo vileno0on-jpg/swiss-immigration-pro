@@ -2,7 +2,7 @@
 # Requires SSH access to your VPS
 
 param(
-    [string]$Host = "83.228.215.185",
+    [string]$HostName = "83.228.215.185",
     [string]$User = "ubuntu"
 )
 
@@ -14,19 +14,19 @@ cd ~/swiss-immigration-pro/swiss-immigration-pro && git pull origin main && npm 
 "@
 
 try {
-    Write-Host "📡 Connecting to $User@$Host..." -ForegroundColor Yellow
-    ssh "$User@$Host" $commands
+    Write-Host "📡 Connecting to $User@$HostName..." -ForegroundColor Yellow
+    ssh "$User@$HostName" $commands
     
     Write-Host ""
     Write-Host "✅ VPS update complete!" -ForegroundColor Green
-    Write-Host "🌐 Site: http://$Host" -ForegroundColor Cyan
+    Write-Host "🌐 Site: http://$HostName" -ForegroundColor Cyan
 } catch {
     Write-Host "❌ Error: $_" -ForegroundColor Red
     Write-Host ""
     Write-Host "Please ensure:" -ForegroundColor Yellow
-    Write-Host "1. SSH is configured for $User@$Host" -ForegroundColor Yellow
+    Write-Host "1. SSH is configured for $User@$HostName" -ForegroundColor Yellow
     Write-Host "2. You have SSH keys set up or know the password" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Manual command:" -ForegroundColor Cyan
-    Write-Host "ssh $User@$Host 'cd ~/swiss-immigration-pro/swiss-immigration-pro && git pull origin main && npm run build && pm2 restart swiss-immigration-pro --update-env'" -ForegroundColor White
+    Write-Host "ssh $User@$HostName 'cd ~/swiss-immigration-pro/swiss-immigration-pro && git pull origin main && npm run build && pm2 restart swiss-immigration-pro --update-env'" -ForegroundColor White
 }
