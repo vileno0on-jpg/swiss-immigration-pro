@@ -7,9 +7,9 @@ interface ChatbotIconProps {
 }
 
 /**
- * Custom AI Chatbot Icon - Modern Swiss Legal Assistant
- * Premium design combining chat bubble, technology elements, and intelligence indicators
- * Perfect for law/immigration focused chatbot
+ * Modern AI Chat Assistant Icon
+ * Clean, recognizable design that works great at small sizes
+ * Features a friendly robot face in a chat bubble
  */
 export const ChatbotIcon: React.FC<ChatbotIconProps> = ({ 
   className = '', 
@@ -28,90 +28,58 @@ export const ChatbotIcon: React.FC<ChatbotIconProps> = ({
       className={`${className} ${animatedClass}`}
       aria-label="AI Assistant Icon"
     >
-      <defs>
-        <linearGradient id="chatGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0.05" />
-        </linearGradient>
-      </defs>
-
-      {/* Main chat bubble container - primary shape */}
+      {/* Chat bubble background */}
       <path
-        d="M2.5 10.5C2.5 5.8056 6.35 2 11 2C15.65 2 19.5 5.8056 19.5 10.5C19.5 15.1944 15.65 19 11 19C10.3 19 9.62 18.9277 9 18.7832L5.5 21L6.5 17.3438C4.25 15.5625 2.5 12.9844 2.5 10.5Z"
-        fill="url(#chatGradient)"
+        d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C11.1 20 10.23 19.8687 9.41 19.625L6 21L6.875 17.875C5.10938 16.375 4 14.3125 4 12Z"
+        fill="currentColor"
+        opacity="0.15"
+      />
+      <path
+        d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C11.1 20 10.23 19.8687 9.41 19.625L6 21L6.875 17.875C5.10938 16.375 4 14.3125 4 12Z"
         stroke="currentColor"
-        strokeWidth="1.3"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
-      {/* Center intelligence dot - represents AI brain */}
+      {/* Robot face - eyes */}
       <circle
-        cx="10"
+        cx="9.5"
         cy="11"
-        r="0.8"
+        r="1.25"
         fill="currentColor"
-        opacity="0.6"
       />
-
-      {/* Upper right accent dot - represents spark/idea */}
       <circle
-        cx="15"
-        cy="8"
-        r="0.9"
+        cx="14.5"
+        cy="11"
+        r="1.25"
         fill="currentColor"
-        opacity="0.7"
       />
 
-      {/* Lower accent dot - represents connection */}
-      <circle
-        cx="7"
-        cy="14.5"
-        r="0.6"
-        fill="currentColor"
-        opacity="0.5"
-      />
-
-      {/* Three horizontal lines - text/communication indicator */}
-      <line
-        x1="6"
-        y1="9.5"
-        x2="13"
-        y2="9.5"
-        stroke="currentColor"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-        opacity="0.6"
-      />
-      <line
-        x1="6"
-        y1="12"
-        x2="11"
-        y2="12"
-        stroke="currentColor"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-        opacity="0.6"
-      />
-      <line
-        x1="6"
-        y1="14.5"
-        x2="9"
-        y2="14.5"
-        stroke="currentColor"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-        opacity="0.5"
-      />
-
-      {/* Small corner bracket - suggests precision/accuracy */}
+      {/* Robot face - friendly smile */}
       <path
-        d="M17.5 4.5L17.5 6M17.5 4.5L19 4.5"
+        d="M9.5 14.5C9.5 14.5 10.5 15.5 12 15.5C13.5 15.5 14.5 14.5 14.5 14.5"
         stroke="currentColor"
-        strokeWidth="0.8"
+        strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.4"
+      />
+
+      {/* AI antenna/signal indicator */}
+      <circle
+        cx="12"
+        cy="6.5"
+        r="1"
+        fill="currentColor"
+      />
+      <line
+        x1="12"
+        y1="7.5"
+        x2="12"
+        y2="8.5"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
       />
     </svg>
   )
