@@ -382,27 +382,15 @@ export default function FloatingChatWidget() {
         >
           <motion.button
             onClick={handleToggle}
-            className="relative flex items-center justify-center p-3 bg-white text-slate-900 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200 group"
+            className="relative flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:from-blue-700 hover:to-blue-800 group"
             title="Chat with our AI assistant"
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white rounded-full" />
+            <span className="text-sm font-semibold tracking-wide">Chatbot</span>
             
-            <div className="relative flex items-center justify-center">
-              {/* Icon only */}
-              <ChatbotIcon className="w-6 h-6 text-blue-600" size={24} />
-              <motion.div 
-                className="absolute -top-1 -right-1"
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
-              </motion.div>
-            </div>
-
             {remainingMessages !== null && remainingMessages > 0 && (
-              <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-slate-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center px-1.5 shadow-sm border-2 border-white z-10">
+              <div className="flex items-center justify-center min-w-[20px] h-[20px] bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold rounded-full px-1.5 border border-white/30">
                 {remainingMessages}
               </div>
             )}
