@@ -1,0 +1,32 @@
+# PowerShell script to update VPS remotely via SSH
+# Requires SSH access to your VPS
+
+param(
+    [string]$Host = "83.228.215.185",
+    [string]$User = "ubuntu"
+)
+
+Write-Host "🚀 Updating VPS..." -ForegroundColor Cyan
+Write-Host ""
+
+$commands = @"
+cd ~/swiss-immigration-pro/swiss-immigration-pro && git pull origin main && npm run build && pm2 restart swiss-immigration-pro --update-env && pm2 status
+"@
+
+try {
+    Write-Host "📡 Connecting to $User@$Host..." -ForegroundColor Yellow
+    ssh "$User@$Host" $commands
+    
+    Write-Host ""
+    Write-Host "✅ VPS update complete!" -ForegroundColor Green
+    Write-Host "🌐 Site: http://$Host" -ForegroundColor Cyan
+} catch {
+    Write-Host "❌ Error: $_" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please ensure:" -ForegroundColor Yellow
+    Write-Host "1. SSH is configured for $User@$Host" -ForegroundColor Yellow
+    Write-Host "2. You have SSH keys set up or know the password" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Manual command:" -ForegroundColor Cyan
+    Write-Host "ssh $User@$Host 'cd ~/swiss-immigration-pro/swiss-immigration-pro && git pull origin main && npm run build && pm2 restart swiss-immigration-pro --update-env'" -ForegroundColor White
+}
