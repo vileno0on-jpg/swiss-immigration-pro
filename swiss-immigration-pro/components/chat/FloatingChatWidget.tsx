@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, FileQuestion, Lightbulb, Search, Briefcase, Bot, Sparkles, Zap } from 'lucide-react'
+import { X, Send, Paperclip, FileText, XCircle, Minimize2, Maximize2, FileQuestion, Lightbulb, Search, Briefcase, Sparkles } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { CONFIG } from '@/lib/config'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -366,7 +366,7 @@ export default function FloatingChatWidget() {
 
   const chatWidgetContent = (
     <>
-      {/* Chat Button - Always visible when closed - Enhanced with animations */}
+      {/* Chat Button - "Have a question?" version - Always visible when closed */}
       {!isOpen && (
         <motion.div
           style={{
@@ -382,24 +382,33 @@ export default function FloatingChatWidget() {
         >
           <motion.button
             onClick={handleToggle}
-            className="relative w-14 h-14 bg-white text-slate-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200"
-            title="Swiss Immigration Assistant"
-            whileHover={{ y: -2 }}
+            className="relative flex flex-col items-center justify-center gap-2 p-4 bg-white text-slate-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200 group"
+            title="Chat with our AI assistant"
+            whileHover={{ y: -4 }}
             whileTap={{ scale: 0.96 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white rounded-3xl" />
             
-            <div className="relative flex items-center justify-center">
-              <ChatbotIcon className="w-6 h-6 text-slate-800" size={24} />
-              <motion.div 
-                className="absolute -top-1 -right-1"
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
-              </motion.div>
+            <div className="relative flex flex-col items-center justify-center">
+              {/* Icon */}
+              <div className="flex items-center justify-center">
+                <ChatbotIcon className="w-6 h-6 text-blue-600" size={24} />
+                <motion.div 
+                  className="absolute -top-1 -right-1"
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
+                </motion.div>
+              </div>
+              
+              {/* Text */}
+              <div className="text-center mt-2">
+                <div className="text-xs font-bold text-slate-900 tracking-wider">Have a</div>
+                <div className="text-sm font-bold text-blue-600">Question?</div>
+              </div>
             </div>
-            
+
             {remainingMessages !== null && remainingMessages > 0 && (
               <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-slate-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center px-1.5 shadow-sm border-2 border-white z-10">
                 {remainingMessages}
@@ -444,7 +453,7 @@ export default function FloatingChatWidget() {
                 <div className="flex justify-between items-center p-5 bg-white border-b border-slate-100 rounded-tl-3xl">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 relative">
-                      <ChatbotIcon className="w-5 h-5 text-slate-800" size={20} />
+                      <ChatbotIcon className="w-5 h-5 text-blue-600" size={20} />
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
                     </div>
                     <div>
@@ -584,7 +593,7 @@ export default function FloatingChatWidget() {
                       ease: "easeInOut",
                     }}
                   >
-                    <Bot className="w-5 h-5 text-blue-600" />
+                    <ChatbotIcon className="w-5 h-5 text-blue-600" size={20} />
                   </motion.div>
                   <h2 className="text-sm font-semibold text-gray-900">Swiss Immigration Assistant</h2>
                   <motion.span
@@ -854,6 +863,3 @@ export default function FloatingChatWidget() {
   
   return null
 }
-
-
-
