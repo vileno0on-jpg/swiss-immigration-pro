@@ -72,10 +72,14 @@ const LEAD_MAGNETS: Record<string, {
   }
 }
 
-export default function DownloadPage() {
-  const params = use(params)
+export default function DownloadPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const resolvedParams = use(params)
   const router = useRouter()
-  const slug = params?.slug as string
+  const slug = resolvedParams?.slug as string
   const leadMagnet = slug ? LEAD_MAGNETS[slug] : null
 
   const [email, setEmail] = useState('')

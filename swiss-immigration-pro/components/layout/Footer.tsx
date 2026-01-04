@@ -122,11 +122,10 @@ export default function Footer() {
             <ul className="space-y-2 sm:space-y-3 text-sm">
               {[
                 { href: '/', label: 'Home' },
-                { href: '/visas', label: 'Visas' },
+                { href: '/lawyer', label: '⚖️ Virtual Lawyer' },
                 { href: '/employment', label: 'Employment' },
                 { href: '/citizenship', label: 'Citizenship' },
                 { href: '/pricing', label: 'Pricing' },
-                { href: '/us-citizens', label: '🇺🇸 For Americans' },
                 { href: '/tools', label: '🧮 Tools' },
               ].map((link, idx) => (
                 <li key={idx}>

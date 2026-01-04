@@ -99,6 +99,18 @@ export async function POST(req: NextRequest) {
       if (!product) {
         return NextResponse.json({ error: 'Invalid product' }, { status: 400 })
       }
+      
+      let success_url = `${req.nextUrl.origin}/dashboard?success=1`
+      let cancel_url = `${req.nextUrl.origin}/pricing`
+
+      if (oneTimeProductId === 'masterclass') {
+        success_url = `${req.nextUrl.origin}/masterclass?success=1`
+        cancel_url = `${req.nextUrl.origin}/masterclass`
+      } else if (oneTimeProductId === 'citizenship_roadmap') {
+        success_url = `${req.nextUrl.origin}/citizenship?success=1`
+        cancel_url = `${req.nextUrl.origin}/citizenship`
+      }
+
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
         line_items: [
@@ -115,8 +127,8 @@ export async function POST(req: NextRequest) {
           },
         ],
         mode: 'payment',
-        success_url: `${req.nextUrl.origin}/tools/apartment-finder?session_id={CHECKOUT_SESSION_ID}&success=1`,
-        cancel_url: `${req.nextUrl.origin}/tools/apartment-finder`,
+        success_url,
+        cancel_url,
         metadata: {
           userId: session.user.id,
           productId: product.id,

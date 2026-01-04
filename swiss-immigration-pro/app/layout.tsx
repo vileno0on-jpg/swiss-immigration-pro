@@ -6,6 +6,9 @@ import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { InitialQuizGate } from "@/components/quiz/InitialQuizGate";
 import ChatbotProvider from "@/components/chat/ChatbotProvider";
 
+// Note: For page-specific metadata, use the meta helpers from @/lib/seo/meta-helpers
+// Example: import { generateMetadata as generateMeta } from '@/lib/seo/meta-helpers'
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",

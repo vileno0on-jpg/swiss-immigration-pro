@@ -65,7 +65,7 @@ export default function MainHeader() {
   const navigationItems = useMemo(() => {
     return [
       { href: '/', label: 'Home' },
-      { href: '/lawyer', label: 'Virtual Lawyer' },
+      { href: '/visas', label: 'Visas' },
       { href: '/pricing', label: 'Pricing' },
       { href: '/tools', label: 'Tools' },
     ] as Array<{ href: string; label: string; highlight?: boolean }>

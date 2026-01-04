@@ -11,7 +11,7 @@ const SKETCH_VIDEO_URL = 'https://www.youtube.com/embed/YOUR_VIDEO_ID'
 
 export default function CitizenshipPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white">
       <MainHeader />
       <div className="py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,10 +20,10 @@ export default function CitizenshipPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Swiss Citizenship Paths
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Your roadmap to Swiss citizenship - timelines, requirements, and shortcuts
           </p>
         </motion.div>
@@ -36,10 +36,10 @@ export default function CitizenshipPage() {
           className="mb-16"
         >
           <div className="card p-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
               📹 Understanding Swiss Citizenship
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 text-center max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mb-6 text-center max-w-2xl mx-auto">
               Watch this sketch video for a clear, visual explanation of the Swiss citizenship process
             </p>
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
@@ -63,14 +63,14 @@ export default function CitizenshipPage() {
         >
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left py-4 px-4 text-gray-900 dark:text-white font-semibold">Path</th>
-                <th className="text-left py-4 px-4 text-gray-900 dark:text-white font-semibold">Residency</th>
-                <th className="text-left py-4 px-4 text-gray-900 dark:text-white font-semibold">Language</th>
-                <th className="text-left py-4 px-4 text-gray-900 dark:text-white font-semibold">Other Requirements</th>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-4 px-4 text-gray-900 font-semibold">Path</th>
+                <th className="text-left py-4 px-4 text-gray-900 font-semibold">Residency</th>
+                <th className="text-left py-4 px-4 text-gray-900 font-semibold">Language</th>
+                <th className="text-left py-4 px-4 text-gray-900 font-semibold">Other Requirements</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-200">
               {[
                 {
                   path: 'Ordinary Naturalization',
@@ -91,11 +91,11 @@ export default function CitizenshipPage() {
                   other: 'Good conduct, integration',
                 },
               ].map((row, idx) => (
-                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{row.path}</td>
-                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{row.residency}</td>
-                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{row.language}</td>
-                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{row.other}</td>
+                <tr key={idx} className="hover:bg-gray-50">
+                  <td className="py-4 px-4 text-gray-900 font-medium">{row.path}</td>
+                  <td className="py-4 px-4 text-gray-600">{row.residency}</td>
+                  <td className="py-4 px-4 text-gray-600">{row.language}</td>
+                  <td className="py-4 px-4 text-gray-600">{row.other}</td>
                 </tr>
               ))}
             </tbody>
@@ -133,14 +133,14 @@ export default function CitizenshipPage() {
               transition={{ delay: idx * 0.1 + 0.3 }}
               className="card p-6"
             >
-              <section.icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              <section.icon className="w-10 h-10 text-blue-600 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 {section.title}
               </h3>
               <ul className="space-y-2">
                 {section.items.map((item, iidx) => (
-                  <li key={iidx} className="flex items-start text-sm text-gray-600 dark:text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mr-2 flex-shrink-0 mt-0.5" />
+                  <li key={iidx} className="flex items-start text-sm text-gray-600">
+                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -154,12 +154,12 @@ export default function CitizenshipPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900 dark:to-blue-900 rounded-2xl p-12 border border-purple-200 dark:border-purple-800"
+          className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-12 border border-purple-200"
         >
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             🎯 Get Your Citizenship Roadmap
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 text-center">
+          <p className="text-xl text-gray-600 mb-8 text-center">
             Citizenship Pro Pack includes step-by-step 10-year roadmap, shortcuts, language prep, and personalized timeline
           </p>
           <div className="text-center">
