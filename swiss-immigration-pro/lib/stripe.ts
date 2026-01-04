@@ -185,14 +185,6 @@ export const ONE_TIME_PRODUCTS = {
       'Email support throughout process',
       'Priority response (24h)'
     ]
-  },
-  apartment_finder_access: {
-    id: 'apartment_finder_access',
-    name: 'Apartment Finder Access',
-    price: 1900, // CHF 19 in cents
-    description: 'Unlock apartment search results for 24 hours',
-    type: 'tool',
-    features: ['24h access to Apartment Finder results']
   }
 } as const
 
