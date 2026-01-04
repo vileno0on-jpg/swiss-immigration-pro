@@ -382,31 +382,23 @@ export default function FloatingChatWidget() {
         >
           <motion.button
             onClick={handleToggle}
-            className="relative flex flex-col items-center justify-center gap-2 p-4 bg-white text-slate-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200 group"
+            className="relative flex items-center justify-center p-3 bg-white text-slate-900 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-slate-200 group"
             title="Chat with our AI assistant"
             whileHover={{ y: -4 }}
             whileTap={{ scale: 0.96 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white rounded-full" />
             
-            <div className="relative flex flex-col items-center justify-center">
-              {/* Icon */}
-              <div className="flex items-center justify-center">
-                <ChatbotIcon className="w-6 h-6 text-blue-600" size={24} />
-                <motion.div 
-                  className="absolute -top-1 -right-1"
-                  animate={{ opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
-                </motion.div>
-              </div>
-              
-              {/* Text */}
-              <div className="text-center mt-2">
-                <div className="text-xs font-bold text-slate-900 tracking-wider">Have a</div>
-                <div className="text-sm font-bold text-blue-600">Question?</div>
-              </div>
+            <div className="relative flex items-center justify-center">
+              {/* Icon only */}
+              <ChatbotIcon className="w-6 h-6 text-blue-600" size={24} />
+              <motion.div 
+                className="absolute -top-1 -right-1"
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Sparkles className="w-3 h-3 text-blue-500" fill="currentColor" />
+              </motion.div>
             </div>
 
             {remainingMessages !== null && remainingMessages > 0 && (
