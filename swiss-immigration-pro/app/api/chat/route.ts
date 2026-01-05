@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { CONFIG } from '@/lib/config'
 import { createClient } from '@/lib/db-client'
+import { generateResponseFromKnowledge } from '@/lib/knowledge-base'
 
 // Check if a message is a simple greeting
 function isGreeting(message: string): boolean {
@@ -101,104 +102,6 @@ Remember: You're not just providing information - you're being a supportive guid
 }
 
 const SYSTEM_PROMPT = getSystemPrompt() // Default prompt
-
-// Free AI model fallback - uses Hugging Face Inference API (no key required for public models)
-async function getFreeAIResponse(message: string): Promise<string> {
-  // Handle greetings immediately - provide helpful welcome message
-  if (isGreeting(message) || message.toLowerCase().trim().length < 5) {
-    return `Hey there! 👋 Great to meet you! I'm here to help you navigate your Swiss immigration journey. Think of me as your friendly guide who happens to know a lot about Swiss visas, permits, and all that good stuff.
-
-I totally get that immigration can feel overwhelming - there's a lot to figure out! But don't worry, we'll take it step by step. Whether you're just starting to explore or you're deep in the process, I'm here to help make things clearer.
-
-🇨🇭 **What I can help with:**
-- Understanding different permit types (L, B, G, C permits)
-- Navigating quotas and application processes
-- Citizenship pathways and requirements
-- Cantonal differences and strategies
-- Document requirements and timelines
-- And honestly, anything else related to Swiss immigration!
-
-📚 **Quick Resources:**
-- [Visa Types](/visas) | [Work Permits](/employment) | [Citizenship](/citizenship)
-- [EU/EFTA Pathway](/europeans) | [US/Canadian Pathway](/americans) | [Third-Country Pathway](/others)
-
-What's on your mind today? What would you like to know more about?`
-  }
-  
-  // First check if we have knowledge base content
-  const knowledgeResponse = generateResponseFromKnowledge(message)
-  if (knowledgeResponse) {
-    return knowledgeResponse
-  }
-  
-  // No topic restrictions - Grok can help with any question
-  // But we have deep knowledge of Swiss immigration
-  
-  try {
-    // Use Hugging Face's free Inference API with a public model
-    // Note: Some models may require API key, but we'll try without first
-    const hf = process.env.HUGGINGFACE_API_KEY 
-      ? new HfInference(process.env.HUGGINGFACE_API_KEY)
-      : new HfInference()
-    
-    // Try using a better free model - use a model that's good at following instructions
-    // Try multiple free models in order of preference
-    const models = [
-      'mistralai/Mistral-7B-Instruct-v0.2', // Good instruction following
-      'meta-llama/Llama-2-7b-chat-hf', // Good for conversations
-      'microsoft/DialoGPT-medium', // Fallback
-    ]
-    
-    let response = null
-    let lastError = null
-    
-    for (const model of models) {
-      try {
-        response = await hf.textGeneration({
-          model: model,
-          inputs: `${SYSTEM_PROMPT}\n\nUser: ${message}\n\nAssistant:`,
-          parameters: {
-            max_new_tokens: 500,
-            temperature: 0.8, // Higher temperature for more natural, human-like responses
-            return_full_text: false,
-          },
-        })
-        break // Success, exit loop
-      } catch (error: any) {
-        lastError = error
-        console.log(`Model ${model} failed, trying next...`)
-        continue
-      }
-    }
-    
-    if (!response) {
-      throw lastError || new Error('All models failed')
-    }
-
-    let generatedText = response.generated_text || ''
-    
-    // Clean up the response
-    if (generatedText.includes('Assistant:')) {
-      generatedText = generatedText.split('Assistant:')[1].trim()
-    }
-    
-    // Response is ready - no topic restrictions
-    
-    // Response is ready
-    
-    // Clean up and enhance the response
-    if (generatedText) {
-      generatedText = cleanResponseFormat(generatedText)
-      // Generic responses removed - let AI provide natural responses
-    }
-    
-    return generatedText || 'I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.'
-  } catch (error: any) {
-    console.error('Hugging Face API error:', error?.message || error)
-    // Fallback to a simple response
-    return 'I apologize, but I encountered an error processing your request. Please try rephrasing your question or contact support if the issue persists.'
-  }
-}
 
 // Simple rule-based fallback using knowledge base
 // Enhance response with relevant internal links ONLY when requested or needed
@@ -530,11 +433,9 @@ export async function POST(req: NextRequest) {
         
         // Try gemini-1.5-pro first, fallback to gemini-1.5-flash if not available
         let modelName = 'gemini-1.5-pro'
-        let model = genAI.getGenerativeModel({ 
+        let model = genAI.getGenerativeModel({
           model: modelName,
-          systemInstruction: {
-            parts: [{ text: systemPrompt }],
-          },
+          systemInstruction: systemPrompt,
           generationConfig: {
             temperature: CONFIG.ai.temperature,
             topP: 0.95,
@@ -570,11 +471,9 @@ export async function POST(req: NextRequest) {
           if (modelName === 'gemini-1.5-pro' && (modelError?.message?.includes('not found') || modelError?.message?.includes('404'))) {
             console.log('⚠️ gemini-1.5-pro not available, trying gemini-1.5-flash...')
             modelName = 'gemini-1.5-flash'
-            model = genAI.getGenerativeModel({ 
+            model = genAI.getGenerativeModel({
               model: modelName,
-              systemInstruction: {
-                parts: [{ text: systemPrompt }],
-              },
+              systemInstruction: systemPrompt,
               generationConfig: {
                 temperature: CONFIG.ai.temperature,
                 topP: 0.95,

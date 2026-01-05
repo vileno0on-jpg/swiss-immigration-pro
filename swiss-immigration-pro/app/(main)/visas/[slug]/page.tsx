@@ -7,7 +7,7 @@ import { Calendar, Clock, Tag, FileText } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import MainHeader from '@/components/layout/MainHeader'
-import { generateMetadata as generateMeta, generateFAQSchema, generateArticleSchema, formatLastUpdated } from '@/lib/seo/meta-helpers'
+import { generateMetadata as generateMeta, generateFAQSchema, generateArticleSchema, generateBreadcrumbSchema, formatLastUpdated } from '@/lib/seo/meta-helpers'
 
 // Parse frontmatter from markdown
 function parseFrontmatter(content: string): {
@@ -121,7 +121,7 @@ export async function generateMetadata({
     title: frontmatter.title || 'Swiss Visa Guide',
     description: frontmatter.description || '',
     keywords: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
-    image: frontmatter.ogImage,
+    image: frontmatter.ogImage || '/og-image.jpg', // Ensure og:image is always set
     url: `/visas/${slug}`,
     type: 'article',
     publishedTime: frontmatter.publishedAt,
@@ -163,12 +163,17 @@ export default async function VisaPage({
   const articleSchema = generateArticleSchema({
     title: frontmatter.title || 'Swiss Visa Guide',
     description: frontmatter.description || '',
-    image: frontmatter.ogImage,
+    image: frontmatter.ogImage || '/og-image.jpg', // Ensure og:image is set
     publishedTime: frontmatter.publishedAt || new Date().toISOString(),
     modifiedTime: frontmatter.updatedAt,
     author: frontmatter.author || 'Swiss Immigration Pro',
     url: `/visas/${slug}`,
   })
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Visas & Permits', url: '/visas' },
+    { name: frontmatter.title || 'Swiss Visa Guide', url: `/visas/${slug}` },
+  ])
 
   // Remove FAQ section from content (we'll render it separately)
   const contentWithoutFAQ = content.replace(/## Frequently Asked Questions\n[\s\S]*$/, '')
@@ -190,6 +195,13 @@ export default async function VisaPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(articleSchema),
+        }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
         }}
       />
 

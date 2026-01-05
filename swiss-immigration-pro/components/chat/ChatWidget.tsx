@@ -34,7 +34,6 @@ interface SessionUserMetadata {
   layer?: string
 }
 
-const DAILY_FREE_LIMIT = CONFIG.ai.freeDailyLimit
 
 // Typing animation component with professional, fluid typing effect
 function TypingMessage({ content, isActive }: { content: string; isActive: boolean }) {
@@ -234,7 +233,8 @@ export default function ChatWidget() {
   const canSendMessage = useMemo(() => {
     // Allow everyone (logged in or anonymous) to send messages
     if (userPack !== 'free') return true
-    return dailyMessages < DAILY_FREE_LIMIT
+    const dailyFreeLimit = CONFIG.ai.freeDailyLimit
+    return dailyMessages < dailyFreeLimit
   }, [dailyMessages, userPack])
 
   const createMessageId = useCallback(() => {
@@ -248,7 +248,8 @@ export default function ChatWidget() {
   const handleSend = useCallback(async () => {
     if (!canSendMessage) {
       if (!session?.user) {
-        setErrorMessage(`You've used all ${DAILY_FREE_LIMIT} free prompts today. Sign up for unlimited access!`)
+        const dailyFreeLimit = CONFIG.ai.freeDailyLimit
+        setErrorMessage(`You've used all ${dailyFreeLimit} free prompts today. Sign up for unlimited access!`)
       } else {
         setErrorMessage('Upgrade your plan to continue chatting.')
       }
@@ -364,10 +365,12 @@ export default function ChatWidget() {
     userPack,
   ])
 
+  const dailyFreeLimit = CONFIG.ai.freeDailyLimit
+
   const remainingMessages = useMemo(() => {
     if (userPack !== 'free') return null
-    return Math.max(0, DAILY_FREE_LIMIT - dailyMessages)
-  }, [dailyMessages, userPack])
+    return Math.max(0, dailyFreeLimit - dailyMessages)
+  }, [dailyMessages, userPack, dailyFreeLimit])
 
   const [mounted, setMounted] = useState(false)
 
@@ -437,7 +440,7 @@ export default function ChatWidget() {
                     exit={{ opacity: 0 }}
                     className="text-xs text-slate-400 mt-1"
                   >
-                    {remainingMessages} of {DAILY_FREE_LIMIT} free prompts remaining
+                    {remainingMessages} of {dailyFreeLimit} free prompts remaining
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -480,7 +483,7 @@ export default function ChatWidget() {
                     transition={{ delay: 0.2 }}
                     className="text-xs text-slate-700 font-medium"
                   >
-                    {remainingMessages} of {DAILY_FREE_LIMIT} free prompts available today
+                    {remainingMessages} of {dailyFreeLimit} free prompts available today
                     {!session?.user && remainingMessages > 0 && (
                       <span className="block mt-1.5 text-slate-500 font-normal">
                         No account needed - ask your questions now!
@@ -675,7 +678,7 @@ export default function ChatWidget() {
                       ? uploadedFile
                         ? 'Add a message (optional)...'
                         : 'Ask about Swiss immigration, visas, or permits...'
-                      : `You've used all ${DAILY_FREE_LIMIT} free prompts today. Sign up for unlimited access!`
+                      : `You've used all ${dailyFreeLimit} free prompts today. Sign up for unlimited access!`
                   }
                   disabled={!canSendMessage || isLoading}
                   className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300 bg-white text-slate-900 placeholder-slate-400 text-sm transition-all"
@@ -706,7 +709,7 @@ export default function ChatWidget() {
 
               {userPack === 'free' && remainingMessages !== null && remainingMessages > 0 && (
                 <p className="text-xs text-slate-600 text-center font-medium">
-                  {remainingMessages} of {DAILY_FREE_LIMIT} free prompts remaining today
+                  {remainingMessages} of {dailyFreeLimit} free prompts remaining today
                   {!session?.user && (
                     <span className="block mt-1.5">
                       <Link href="/auth/register" className="text-slate-900 hover:text-slate-700 underline underline-offset-2 font-semibold transition-colors">

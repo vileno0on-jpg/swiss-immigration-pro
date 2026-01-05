@@ -5,7 +5,7 @@ import { Calendar, Clock, Tag } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import MainHeader from '@/components/layout/MainHeader'
-import { generateMetadata as generateMeta, generateFAQSchema, generateArticleSchema, formatLastUpdated } from '@/lib/seo/meta-helpers'
+import { generateMetadata as generateMeta, generateFAQSchema, generateArticleSchema, generateBreadcrumbSchema, formatLastUpdated } from '@/lib/seo/meta-helpers'
 
 // Blog posts data - in production, this would come from a CMS or markdown files
 const BLOG_POSTS: Record<string, {
@@ -257,7 +257,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.description,
     keywords: post.tags,
-    image: post.ogImage,
+    image: post.ogImage || '/og-image.jpg', // Ensure og:image is set
     url: `/blog/${slug}`,
     type: 'article',
     publishedTime: post.publishedAt,
@@ -290,6 +290,11 @@ export default async function BlogPostPage({
     author: post.author,
     url: `/blog/${slug}`,
   })
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: post.title, url: `/blog/${slug}` },
+  ])
 
   return (
     <>
@@ -308,6 +313,13 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(articleSchema),
+        }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
         }}
       />
 

@@ -30,6 +30,7 @@ export default function VisasPage() {
               description: 'Temporary residence for up to 12 months',
               duration: '< 1 Year',
               icon: Shield,
+              slug: 'l-permit-guide',
               features: ['Job offer required', 'Quota-dependent', 'Renewable'],
               details: {
                 quota: '4,000 total (2025)',
@@ -43,6 +44,7 @@ export default function VisasPage() {
               description: 'Long-term residence for employed persons',
               duration: '1-5 Years',
               icon: Badge,
+              slug: 'b-permit-guide',
               features: ['Annual renewal', 'EU/EFTA priority', 'Quota restrictions'],
               details: {
                 quota: '4,500 total (2025)',
@@ -93,7 +95,7 @@ export default function VisasPage() {
               </ul>
 
               {/* Details Box */}
-              <div className="bg-blue-50 rounded-lg p-4 space-y-2 border border-blue-100">
+              <div className="bg-blue-50 rounded-lg p-4 space-y-2 border border-blue-100 mb-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-700 font-medium">Quota:</span>
                   <span className="text-gray-900 font-semibold">{visa.details.quota}</span>
@@ -111,6 +113,17 @@ export default function VisasPage() {
                   <span className="text-gray-900 font-semibold">{visa.details.extendable}</span>
                 </div>
               </div>
+
+              {/* Read Full Guide Link */}
+              {visa.slug && (
+                <Link
+                  href={`/visas/${visa.slug}`}
+                  className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  prefetch={false}
+                >
+                  Read Full Guide →
+                </Link>
+              )}
             </div>
             )
           })}
@@ -128,38 +141,46 @@ export default function VisasPage() {
                 title: 'C Permit',
                 subtitle: 'Settlement Permit',
                 description: 'Permanent residence after 5-10 years',
-              icon: Award
+                icon: Award,
+                slug: 'c-permit-guide'
               },
               {
                 title: 'EU Blue Card',
                 subtitle: 'High-Quality Workers',
                 description: 'Simplified process for highly qualified',
-              icon: Badge
+                icon: Badge
               },
               {
                 title: 'N Permit',
                 subtitle: 'Asylum Seekers',
                 description: 'For refugees and asylum cases',
-              icon: Shield
+                icon: Shield
               },
               {
                 title: 'CI Permit',
                 subtitle: 'Diplomatic',
                 description: 'For diplomats and international orgs',
-              icon: FileCheck
+                icon: FileCheck
               }
             ].map((perm, idx) => {
               const PermIcon = perm.icon
               return (
-              <div
+              <Link
                 key={perm.title}
-                className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 hover:shadow-md transition-all"
+                href={perm.slug ? `/visas/${perm.slug}` : '/visas'}
+                className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 hover:shadow-md transition-all block"
+                prefetch={false}
               >
                 <PermIcon className="w-10 h-10 text-blue-600 mx-auto mb-3" />
                 <div className="font-bold text-gray-900 mb-1">{perm.title}</div>
                 <div className="text-sm text-blue-600 mb-2">{perm.subtitle}</div>
                 <div className="text-xs text-gray-600">{perm.description}</div>
-              </div>
+                {perm.slug && (
+                  <div className="mt-3 text-sm text-blue-600 font-medium">
+                    View Guide →
+                  </div>
+                )}
+              </Link>
               )
             })}
           </div>

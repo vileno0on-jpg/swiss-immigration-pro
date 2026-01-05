@@ -35,8 +35,6 @@ interface SessionUserMetadata {
   layer?: string
 }
 
-const DAILY_FREE_LIMIT = CONFIG.ai.freeDailyLimit
-
 // Typing animation component with slower, more fluid typing
 function TypingMessage({ content, isActive }: { content: string; isActive: boolean }) {
   const [displayedText, setDisplayedText] = useState('')
@@ -187,7 +185,10 @@ export default function FloatingChatWidget() {
   }, [session, sessionMetadata])
 
   useEffect(() => {
-    setMounted(true)
+    // Ensure we're in browser environment before setting mounted
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      setMounted(true)
+    }
   }, [])
 
   // Add/remove class to body to adjust main content when sidebar is open
@@ -240,8 +241,9 @@ export default function FloatingChatWidget() {
 
   const canSendMessage = useMemo(() => {
     if (userPack !== 'free') return true
-    return dailyMessages < DAILY_FREE_LIMIT
-  }, [dailyMessages, userPack])
+    const dailyFreeLimit = CONFIG.ai.freeDailyLimit
+    return dailyMessages < dailyFreeLimit
+  }, [dailyMessages, userPack, session])
 
   const createMessageId = useCallback(() => {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -282,15 +284,18 @@ export default function FloatingChatWidget() {
     setIsLoading(true)
     setErrorMessage(null)
 
+    // Capture file before removing it
+    const fileToUpload = uploadedFile
+
     const userMessage: ChatMessage = {
       id: createMessageId(),
       role: 'user',
       content: input.trim(),
       timestamp: new Date(),
-      file: uploadedFile ? {
-        name: uploadedFile.file.name,
-        type: uploadedFile.file.type,
-        size: uploadedFile.file.size,
+      file: fileToUpload ? {
+        name: fileToUpload.file.name,
+        type: fileToUpload.file.type,
+        size: fileToUpload.file.size,
       } : undefined,
     }
 
@@ -309,8 +314,8 @@ export default function FloatingChatWidget() {
           formData.append('layer', layer)
         }
       }
-      if (uploadedFile) {
-        formData.append('file', uploadedFile.file)
+      if (fileToUpload) {
+        formData.append('file', fileToUpload.file)
       }
 
       const response = await fetch('/api/chat', {
@@ -348,19 +353,23 @@ export default function FloatingChatWidget() {
       setErrorMessage(message)
     } finally {
       setIsLoading(false)
-      if (uploadedFile) {
-        removeFile()
-      }
+      // File was already removed earlier, no need to remove again
     }
   }
 
   const remainingMessages = useMemo(() => {
     if (userPack !== 'free') return null
-    return Math.max(0, DAILY_FREE_LIMIT - dailyMessages)
+    const dailyFreeLimit = CONFIG.ai.freeDailyLimit
+    return Math.max(0, dailyFreeLimit - dailyMessages)
   }, [dailyMessages, userPack])
 
   // Don't render anything until mounted on client
-  if (!mounted || typeof document === 'undefined') {
+  if (!mounted) {
+    return null
+  }
+
+  // Ensure we're in browser environment before rendering
+  if (typeof document === 'undefined') {
     return null
   }
 
@@ -829,17 +838,19 @@ export default function FloatingChatWidget() {
   )
 
   // Render directly to body using portal - completely outside page layout
-  if (typeof document !== 'undefined') {
-    // Ensure portal container exists and is outside normal flow
-    let portalContainer = document.getElementById('swiss-chat-portal')
-    if (!portalContainer) {
-      portalContainer = document.createElement('div')
-      portalContainer.id = 'swiss-chat-portal'
-      portalContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 0; height: 0; z-index: 99999; pointer-events: none;'
-      document.body.appendChild(portalContainer)
-    }
-    return createPortal(chatWidgetContent, portalContainer)
+  // Ensure document and body are available before creating portal
+  if (typeof document === 'undefined' || !document.body) {
+    return null
+  }
+
+  // Ensure portal container exists and is outside normal flow
+  let portalContainer = document.getElementById('swiss-chat-portal')
+  if (!portalContainer) {
+    portalContainer = document.createElement('div')
+    portalContainer.id = 'swiss-chat-portal'
+    portalContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 0; height: 0; z-index: 99999; pointer-events: none;'
+    document.body.appendChild(portalContainer)
   }
   
-  return null
+  return createPortal(chatWidgetContent, portalContainer)
 }

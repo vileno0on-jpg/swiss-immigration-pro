@@ -101,7 +101,12 @@ export default function AdvancedSearch() {
 
         if (response.ok) {
           const data = await response.json()
-          setResults(data.results || [])
+          // Map API results back to full SEARCH_INDEX items to get icons
+          const resultsWithIcons = (data.results || []).map((apiResult: any) => {
+            const fullItem = SEARCH_INDEX.find(item => item.id === apiResult.id)
+            return fullItem || apiResult
+          })
+          setResults(resultsWithIcons)
           setAiSuggestion(data.aiSuggestion || null)
           setDirectAnswer(data.directAnswer || null)
           setHasAI(data.hasAI || false)
@@ -328,7 +333,7 @@ export default function AdvancedSearch() {
                   )}
 
                   {results.map((result, index) => {
-                    const Icon = result.icon
+                    const Icon = result.icon || FileText // Fallback icon if missing
                     return (
                       <Link
                         key={result.id}

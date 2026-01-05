@@ -190,3 +190,147 @@ export function formatLastUpdated(date: string | Date): string {
     day: 'numeric',
   })
 }
+
+/**
+ * Generate BreadcrumbList JSON-LD schema
+ */
+export function generateBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url.startsWith('http') ? item.url : `${SITE_URL}${item.url}`,
+    })),
+  }
+}
+
+/**
+ * Generate HowTo JSON-LD schema
+ */
+export function generateHowToSchema(options: {
+  name: string
+  description: string
+  steps: Array<{ name: string; text: string; image?: string }>
+  totalTime?: string
+  estimatedCost?: { currency: string; value: string }
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: options.name,
+    description: options.description,
+    ...(options.totalTime && { totalTime: options.totalTime }),
+    ...(options.estimatedCost && { estimatedCost: options.estimatedCost }),
+    step: options.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.text,
+      ...(step.image && { image: step.image.startsWith('http') ? step.image : `${SITE_URL}${step.image}` }),
+    })),
+  }
+}
+
+/**
+ * Generate VideoObject JSON-LD schema
+ */
+export function generateVideoSchema(options: {
+  name: string
+  description: string
+  thumbnailUrl: string
+  uploadDate: string
+  duration?: string
+  contentUrl?: string
+  embedUrl?: string
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: options.name,
+    description: options.description,
+    thumbnailUrl: options.thumbnailUrl.startsWith('http') ? options.thumbnailUrl : `${SITE_URL}${options.thumbnailUrl}`,
+    uploadDate: options.uploadDate,
+    ...(options.duration && { duration: options.duration }),
+    ...(options.contentUrl && { contentUrl: options.contentUrl }),
+    ...(options.embedUrl && { embedUrl: options.embedUrl }),
+  }
+}
+
+/**
+ * Generate Product JSON-LD schema for pricing pages
+ */
+export function generateProductSchema(options: {
+  name: string
+  description: string
+  image?: string
+  offers: {
+    price: string
+    priceCurrency: string
+    availability?: string
+    url?: string
+  }
+  aggregateRating?: {
+    ratingValue: string
+    reviewCount: string
+  }
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: options.name,
+    description: options.description,
+    ...(options.image && { 
+      image: options.image.startsWith('http') ? options.image : `${SITE_URL}${options.image}` 
+    }),
+    offers: {
+      '@type': 'Offer',
+      price: options.offers.price,
+      priceCurrency: options.offers.priceCurrency,
+      availability: options.offers.availability || 'https://schema.org/InStock',
+      ...(options.offers.url && { 
+        url: options.offers.url.startsWith('http') ? options.offers.url : `${SITE_URL}${options.offers.url}` 
+      }),
+    },
+    ...(options.aggregateRating && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: options.aggregateRating.ratingValue,
+        reviewCount: options.aggregateRating.reviewCount,
+      },
+    }),
+  }
+}
+
+/**
+ * Helper to inject common meta tags in <head>
+ * For use with Next.js Metadata API (already applied in generateMetadata)
+ */
+export function getCommonMetaTags(options: MetaHelpersOptions) {
+  const {
+    title,
+    description,
+    keywords = [],
+    image = '/og-image.jpg',
+    url = '',
+  } = options
+
+  const fullTitle = `${title} | ${SITE_NAME}`
+  const imageUrl = image.startsWith('http') ? image : `${SITE_URL}${image}`
+
+  return {
+    title: fullTitle,
+    description,
+    keywords: keywords.join(', '),
+    ogTitle: fullTitle,
+    ogDescription: description,
+    ogImage: imageUrl,
+    ogUrl: url ? `${SITE_URL}${url}` : SITE_URL,
+    twitterCard: 'summary_large_image',
+    twitterTitle: fullTitle,
+    twitterDescription: description,
+    twitterImage: imageUrl,
+  }
+}

@@ -6,8 +6,31 @@ import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { InitialQuizGate } from "@/components/quiz/InitialQuizGate";
 import ChatbotProvider from "@/components/chat/ChatbotProvider";
 
-// Note: For page-specific metadata, use the meta helpers from @/lib/seo/meta-helpers
-// Example: import { generateMetadata as generateMeta } from '@/lib/seo/meta-helpers'
+/**
+ * SEO Meta Helpers Usage:
+ * 
+ * For page-specific metadata, import and use meta helpers from @/lib/seo/meta-helpers:
+ * 
+ * Basic metadata:
+ *   import { generateMetadata as generateMeta } from '@/lib/seo/meta-helpers'
+ *   export const metadata = generateMeta({ title, description, keywords, image, url })
+ * 
+ * Structured data (JSON-LD):
+ *   - generateFAQSchema(faqs) - For FAQ sections
+ *   - generateArticleSchema(options) - For blog posts and articles
+ *   - generateBreadcrumbSchema(items) - For breadcrumb navigation
+ *   - generateHowToSchema(options) - For step-by-step guides
+ *   - generateProductSchema(options) - For pricing/product pages
+ *   - generateVideoSchema(options) - For video content
+ * 
+ * Utilities:
+ *   - formatLastUpdated(date) - Display relative time (e.g., "Updated 3 days ago")
+ *   - getCommonMetaTags(options) - Get all common meta tags as object
+ * 
+ * Example implementations:
+ *   - /app/(main)/blog/[slug]/page.tsx - Blog with FAQs and Article schema
+ *   - /app/(main)/visas/[slug]/page.tsx - Visa guides with Article schema
+ */
 
 const inter = Inter({
   subsets: ["latin"],

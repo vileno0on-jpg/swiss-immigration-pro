@@ -6,7 +6,7 @@ export async function GET() {
     console.log('Fetching stats...')
     const db = await createClient()
 
-    if (!supabase) {
+    if (!db) {
       console.error('Failed to create Supabase client')
       return NextResponse.json([], { status: 500 })
     }
