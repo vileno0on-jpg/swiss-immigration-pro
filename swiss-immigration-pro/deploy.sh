@@ -23,8 +23,3 @@ pm2 status
 EOF
 
 echo "🎉 Deployment finished!"
-
-
-
-
-
