@@ -34,7 +34,6 @@ import {
   LogOut
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChatbotIcon } from '@/components/icons/ChatbotIcon'
 
 // Types
 interface Consultation {
@@ -216,7 +215,7 @@ export default function SwissVirtualLawyer() {
           </button>
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
-              <ChatbotIcon className="w-4 h-4 text-blue-600" size={16} />
+              <HelpCircle className="w-4 h-4 text-blue-600" />
             </div>
             <span className="font-semibold text-gray-900">Swiss Legal Assistant</span>
             <Award className="w-4 h-4 text-amber-500" />
@@ -609,7 +608,7 @@ export default function SwissVirtualLawyer() {
                       className="flex gap-4"
                     >
                       <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm flex items-center justify-center ring-2 ring-blue-100">
-                        <ChatbotIcon className="w-4 h-4 text-white" size={16} />
+                        <HelpCircle className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 space-y-4">
                         <div className="prose prose-sm max-w-none">
@@ -692,7 +691,7 @@ export default function SwissVirtualLawyer() {
                   className="flex gap-4"
                 >
                   <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-sm flex items-center justify-center ring-2 ring-blue-100">
-                    <ChatbotIcon className="w-4 h-4 text-white" size={16} />
+                    <HelpCircle className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex gap-1.5 pt-2">
                     <motion.div

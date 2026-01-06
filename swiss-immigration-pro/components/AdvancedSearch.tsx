@@ -48,7 +48,6 @@ const SEARCH_INDEX: SearchResult[] = [
   // Resources
   { id: '21', title: 'CV Templates', description: '20+ Swiss-style CV templates', url: '/resources#cv', category: 'resource', icon: FileText, keywords: ['cv', 'resume', 'template', 'lebenslauf', 'curriculum vitae'] },
   { id: '22', title: 'Resources Library', description: 'Guides, PDFs, and checklists', url: '/resources', category: 'resource', icon: FileText, keywords: ['resources', 'library', 'pdf', 'download', 'checklist'] },
-  { id: '23', title: 'AI Chatbot', description: 'Get instant answers to your questions', url: '/#chat', category: 'tool', icon: Sparkles, keywords: ['chatbot', 'ai', 'assistant', 'help', 'questions', 'chat'] },
 ]
 
 export default function AdvancedSearch() {

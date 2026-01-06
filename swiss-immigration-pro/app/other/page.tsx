@@ -170,7 +170,70 @@ export default function OtherPage() {
         </div>
       </div>
 
-      {/* Pathways - Clean Grid */}
+      {/* Quota System Explanation */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 text-purple-600 font-semibold text-sm mb-4">
+                <span className="w-8 h-[2px] bg-purple-600"></span>
+                Understanding the System
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                The Annual Quota System: Your Key to Success
+              </h2>
+              <p className="text-lg text-slate-600 mb-6 leading-relaxed font-light">
+                Switzerland allocates <strong className="text-slate-900 font-semibold">8,500 work permits annually</strong> for third-country nationals. 
+                These permits are distributed across 26 cantons, with competition highest in Zurich and Geneva.
+              </p>
+              <div className="space-y-4 mb-8">
+                {[
+                  { title: 'Quota Timing', desc: 'Apply January-March for best availability. Cantons typically exhaust quotas by mid-year.' },
+                  { title: 'Canton Strategy', desc: 'Smaller cantons (Basel, St. Gallen, Aargau) have lower competition than major cities.' },
+                  { title: 'Salary Thresholds', desc: 'CHF 100,000+ annual salary significantly improves approval chances in quota system.' },
+                  { title: 'Industry Priority', desc: 'Tech, finance, pharma, and engineering roles receive priority consideration.' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-slate-900 text-sm">{item.title}</h4>
+                      <p className="text-slate-500 text-sm">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link 
+                href="/other/requirements"
+                className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700 transition-colors group"
+              >
+                View Complete Requirements
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-purple-600 rounded-3xl transform rotate-2 opacity-10"></div>
+              <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-purple-50 to-indigo-50 p-8">
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl p-6 shadow-md">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">8,500</div>
+                    <div className="text-sm text-slate-600">Annual B Permits Available</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-md">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">26</div>
+                    <div className="text-sm text-slate-600">Cantons Competing</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-md">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">Q1</div>
+                    <div className="text-sm text-slate-600">Best Application Period</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pathways - Enhanced Grid */}
       <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -178,7 +241,7 @@ export default function OtherPage() {
               Choose Your Pathway
             </h2>
             <p className="text-slate-600 text-lg font-light">
-              Your unique background determines your best route to Switzerland.
+              Your unique background determines your best route to Switzerland. Each pathway has specific requirements and advantages.
             </p>
           </div>
 
@@ -187,25 +250,29 @@ export default function OtherPage() {
               {
                 icon: Briefcase,
                 title: 'Employment',
-                desc: 'Work permit via sponsorship.',
+                desc: 'Work permit via employer sponsorship. Most common pathway for professionals.',
+                details: 'Requires job offer, salary meeting thresholds, and quota availability.',
                 color: 'bg-blue-50 text-blue-600'
               },
               {
                 icon: GraduationCap,
                 title: 'Education',
-                desc: 'Study and post-grad work.',
+                desc: 'Study in Switzerland, then convert to work permit. No quota needed for students.',
+                details: 'Bachelor\'s or Master\'s degree, then 6-month job search permit after graduation.',
                 color: 'bg-purple-50 text-purple-600'
               },
               {
                 icon: Heart,
                 title: 'Family',
-                desc: 'Reunification with residents.',
+                desc: 'Reunification with Swiss residents or permit holders.',
+                details: 'Spouse or children of B/C permit holders. Simplified process, no quota.',
                 color: 'bg-pink-50 text-pink-600'
               },
               {
                 icon: Landmark,
                 title: 'Investment',
-                desc: 'Business & entrepreneurship.',
+                desc: 'Business establishment or significant investment in Swiss economy.',
+                details: 'CHF 100,000+ investment, business plan, job creation for Swiss residents.',
                 color: 'bg-emerald-50 text-emerald-600'
               },
             ].map((item, idx) => (
@@ -218,10 +285,85 @@ export default function OtherPage() {
                   <item.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-500 mb-6">{item.desc}</p>
+                <p className="text-sm text-slate-500 mb-3 leading-relaxed">{item.desc}</p>
+                <p className="text-xs text-slate-400 mb-6 leading-relaxed">{item.details}</p>
                 <Link href="/other/visas" className="text-sm font-semibold text-slate-900 flex items-center gap-1 hover:gap-2 transition-all">
                   Learn More <ChevronRight className="w-3 h-3" />
                 </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Industry-Specific Guidance */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Industry-Specific Opportunities
+            </h2>
+            <p className="text-slate-600 text-lg font-light">
+              Switzerland prioritizes highly qualified professionals in key sectors. Your industry matters.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'Technology & IT',
+                desc: 'Software engineers, data scientists, and tech professionals are in high demand.',
+                stats: 'Highest approval rates',
+                icon: Zap,
+                color: 'text-blue-600 bg-blue-50'
+              },
+              {
+                title: 'Finance & Banking',
+                desc: 'Banking, asset management, and fintech roles receive priority consideration.',
+                stats: 'Strong salary benchmarks',
+                icon: TrendingUp,
+                color: 'text-emerald-600 bg-emerald-50'
+              },
+              {
+                title: 'Pharmaceuticals',
+                desc: 'Research, development, and manufacturing roles in pharma and biotech.',
+                stats: 'Canton priority sector',
+                icon: Award,
+                color: 'text-purple-600 bg-purple-50'
+              },
+              {
+                title: 'Engineering',
+                desc: 'Mechanical, electrical, and civil engineers needed across industries.',
+                stats: 'Steady demand',
+                icon: Building,
+                color: 'text-orange-600 bg-orange-50'
+              },
+              {
+                title: 'Healthcare',
+                desc: 'Doctors, nurses, and medical professionals with recognized qualifications.',
+                stats: 'Language requirements',
+                icon: Heart,
+                color: 'text-pink-600 bg-pink-50'
+              },
+              {
+                title: 'Consulting',
+                desc: 'Management consultants and business advisors for multinational firms.',
+                stats: 'International experience valued',
+                icon: Briefcase,
+                color: 'text-indigo-600 bg-indigo-50'
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                whileHover={{ y: -4 }}
+                className="bg-slate-50 p-6 rounded-xl border border-slate-200 hover:border-purple-300 transition-all"
+              >
+                <div className={`w-10 h-10 ${item.color} rounded-lg flex items-center justify-center mb-4`}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-600 mb-3 leading-relaxed">{item.desc}</p>
+                <div className="text-xs font-semibold text-purple-600 uppercase tracking-wide">{item.stats}</div>
               </motion.div>
             ))}
           </div>
@@ -275,32 +417,66 @@ export default function OtherPage() {
         </div>
       </section>
 
-      {/* Timeline - Vertical Modern */}
+      {/* Detailed Timeline - Enhanced */}
       <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Citizenship Timeline</h2>
-            <p className="text-slate-600">The long-term journey to becoming Swiss</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Your Complete Journey to Swiss Citizenship</h2>
+            <p className="text-slate-600 text-lg">From work permit to naturalization: a detailed roadmap for third-country nationals</p>
           </div>
 
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             {[
-              { year: 'Year 0', title: 'Arrival', desc: 'B Permit issued. Start integration.' },
-              { year: 'Year 5', title: 'Review', desc: 'Language check. Permit renewal.' },
-              { year: 'Year 10', title: 'Settlement', desc: 'C Permit eligibility (Permanent).' },
-              { year: 'Year 12', title: 'Citizenship', desc: 'Naturalization application.' },
+              { 
+                year: 'Year 0', 
+                title: 'Arrival & B Permit', 
+                desc: 'Initial work permit issued (1-5 years). Begin integration process, register with commune, open bank account, secure housing.',
+                milestones: ['Commune registration within 14 days', 'Health insurance activation', 'Language learning begins']
+              },
+              { 
+                year: 'Year 2-3', 
+                title: 'Permit Renewal', 
+                desc: 'First renewal assessment. Demonstrate employment stability, tax compliance, and integration progress.',
+                milestones: ['Employment continuity', 'Tax returns filed', 'Language progress (A2 level)']
+              },
+              { 
+                year: 'Year 5', 
+                title: 'Integration Review', 
+                desc: 'Comprehensive integration assessment. Language proficiency check (B1 oral, A2 written). Permit renewal decision.',
+                milestones: ['Language certificate (B1)', 'Community participation', 'Financial stability proof']
+              },
+              { 
+                year: 'Year 10', 
+                title: 'C Permit (Settlement)', 
+                desc: 'Eligibility for permanent residence permit. No more renewals needed. Full labor market access.',
+                milestones: ['10 years continuous residence', 'Clean criminal record', 'Financial independence', 'Integration confirmed']
+              },
+              { 
+                year: 'Year 12+', 
+                title: 'Citizenship Application', 
+                desc: 'Naturalization process begins. Requires C permit, language proficiency (B2), integration test, and community approval.',
+                milestones: ['B2 language certificate', 'Integration test passed', 'Municipality approval', 'Federal approval']
+              },
             ].map((item, idx) => (
-              <div key={idx} className="flex gap-6 mb-8 last:mb-0 group">
-                <div className="w-20 text-right pt-1">
-                  <span className="font-bold text-purple-600 text-sm">{item.year}</span>
+              <div key={idx} className="flex gap-6 mb-12 last:mb-0 group">
+                <div className="w-24 text-right pt-1 shrink-0">
+                  <span className="font-bold text-purple-600 text-base">{item.year}</span>
                 </div>
-                <div className="relative">
-                  <div className="w-3 h-3 bg-purple-200 rounded-full mt-2 group-hover:bg-purple-600 transition-colors ring-4 ring-white"></div>
-                  {idx !== 3 && <div className="absolute top-6 bottom-[-2rem] left-1.5 w-px bg-slate-200"></div>}
+                <div className="relative flex-1">
+                  <div className="w-4 h-4 bg-purple-200 rounded-full mt-1.5 group-hover:bg-purple-600 transition-colors ring-4 ring-white z-10"></div>
+                  {idx !== 4 && <div className="absolute top-7 bottom-[-3rem] left-2 w-0.5 bg-slate-200"></div>}
                 </div>
-                <div className="pb-8">
-                  <h3 className="font-bold text-slate-900">{item.title}</h3>
-                  <p className="text-sm text-slate-500 mt-1">{item.desc}</p>
+                <div className="pb-8 flex-1">
+                  <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-600 mb-3 leading-relaxed">{item.desc}</p>
+                  <ul className="space-y-1.5">
+                    {item.milestones.map((milestone, midx) => (
+                      <li key={midx} className="flex items-start text-xs text-slate-500">
+                        <CheckCircle className="w-3.5 h-3.5 text-purple-600 mr-2 shrink-0 mt-0.5" />
+                        <span>{milestone}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
@@ -308,17 +484,57 @@ export default function OtherPage() {
         </div>
       </section>
 
-      {/* Minimal CTA */}
-      <section className="py-24 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-6">Ready to start?</h2>
-          <div className="flex justify-center gap-4">
-            <Link href="/other/tools" className="bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors">
-              Free Assessment
+      {/* Enhanced CTA Section */}
+      <section className="py-24 px-4 bg-gradient-to-b from-purple-50/50 to-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <Target className="w-4 h-4" />
+            <span>Your Swiss Journey Starts Here</span>
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+            Ready to Make Switzerland
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              Your New Home?
+            </span>
+          </h2>
+
+          <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Take our <strong className="text-purple-600 font-semibold">comprehensive free assessment</strong> and discover your personalized path to Swiss residency.
+            No obligations, just clarity for your international move.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+            <Link
+              href="/other/tools"
+              className="group inline-flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-10 py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 hover:-translate-y-1"
+            >
+              <Target className="w-5 h-5" />
+              Start Free Assessment
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link href="/contact" className="text-slate-600 px-8 py-3 rounded-lg font-semibold hover:bg-slate-50 transition-colors">
-              Contact Us
+
+            <Link
+              href="/other/requirements"
+              className="inline-flex items-center justify-center gap-2 bg-white hover:bg-purple-50 text-purple-700 font-semibold px-8 py-4 rounded-xl transition-all duration-300 border-2 border-purple-200 hover:border-purple-300 shadow-sm"
+            >
+              <FileText className="w-5 h-5" />
+              View Requirements
             </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            {[
+              { icon: Clock, text: '5-Min Assessment', subtext: 'Quick & Comprehensive' },
+              { icon: Shield, text: 'Expert Guidance', subtext: 'Personalized Strategy' },
+              { icon: CheckCircle, text: 'No Commitment', subtext: '100% Free Service' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-purple-100 shadow-sm">
+                <item.icon className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+                <div className="font-bold text-slate-900 mb-1">{item.text}</div>
+                <div className="text-sm text-slate-600">{item.subtext}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

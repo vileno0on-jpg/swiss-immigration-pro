@@ -6,16 +6,16 @@ import { createClient } from '@/lib/db-client'
 
 const CONSULTATION_TYPES: Record<string, { name: string; price: number }> = {
   quick: {
-    name: 'Quick Consultation (30min)',
-    price: 20000 // CHF 200 in cents
+    name: 'Quick Guidance (30min)',
+    price: 8000 // CHF 80 in cents
   },
   full: {
     name: 'Full Review (60min)',
-    price: 50000 // CHF 500 in cents
+    price: 20000 // CHF 200 in cents
   },
   support: {
     name: 'Application Support Package',
-    price: 150000 // CHF 1500 in cents
+    price: 60000 // CHF 600 in cents
   }
 }
 

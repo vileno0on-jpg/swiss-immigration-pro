@@ -51,7 +51,20 @@ export default function ResumeEditor() {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
-  const TemplateComponent = getTemplateComponent(currentTemplateId)
+  const TemplateComponent = useMemo(() => {
+    try {
+      const templateId = currentTemplateId || 'swiss-classic'
+      const component = getTemplateComponent(templateId)
+      if (!component) {
+        console.error('Template component not found for:', templateId, 'Falling back to swiss-classic')
+        return getTemplateComponent('swiss-classic')
+      }
+      return component
+    } catch (error) {
+      console.error('Error loading template component:', error)
+      return getTemplateComponent('swiss-classic')
+    }
+  }, [currentTemplateId])
 
   // Calculate Swiss Standard Score (Simulated Logic)
   const cvScore = useMemo(() => {
@@ -313,7 +326,14 @@ export default function ResumeEditor() {
             </div>
 
             <div ref={printRef} className="relative">
-              <TemplateComponent data={resumeData} />
+              {TemplateComponent && typeof TemplateComponent === 'function' ? (
+                <TemplateComponent data={resumeData} />
+              ) : (
+                <div className="bg-white text-black p-8" style={{ width: '210mm', minHeight: '297mm' }}>
+                  <p className="text-red-600">Error: Template component not found. Please refresh the page.</p>
+                  <p className="text-gray-600 text-sm mt-2">Template ID: {currentTemplateId}</p>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

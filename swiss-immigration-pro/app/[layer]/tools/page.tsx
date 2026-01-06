@@ -3,11 +3,10 @@
 import ToolsContent from '@/components/tools/ToolsContent'
 import LayerHeader from '@/components/layout/LayerHeader'
 import { useParams } from 'next/navigation'
-import { use } from 'react'
 import { Globe, Star, AlertTriangle } from 'lucide-react'
 
 export default function LayerToolsPage() {
-  const params = use(params)
+  const params = useParams()
   const layerParam = params?.layer as string
   const layer = (layerParam === 'eu' || layerParam === 'us' || layerParam === 'other') 
     ? layerParam as 'eu' | 'us' | 'other'
@@ -15,13 +14,13 @@ export default function LayerToolsPage() {
 
   // Layer-specific badge configuration
   const badge = {
-    icon: layer === 'eu' ? <Star className="w-3.5 h-3.5" /> : layer === 'us' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
-    text: layer === 'eu' 
+    icon: layer === 'eu' ? <Star className="w-3.5 h-3.5" /> : layer === 'us' ? <Target className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layer === 'eu'
       ? 'EU/EFTA Freedom of Movement'
-      : layer === 'us' 
-      ? '2025 Quota Alert: Apply Early'
+      : layer === 'us'
+      ? 'US Citizen Priority: Fast-Track Processing'
       : 'Global Citizens Pathway',
-    bgColor: layer === 'eu' ? 'bg-blue-600' : layer === 'us' ? 'bg-slate-900' : 'bg-purple-600',
+    bgColor: layer === 'eu' ? 'bg-blue-600' : layer === 'us' ? 'bg-indigo-600' : 'bg-purple-600',
     textColor: 'text-white'
   }
 

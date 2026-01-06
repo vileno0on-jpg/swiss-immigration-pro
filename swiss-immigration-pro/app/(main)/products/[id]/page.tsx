@@ -177,10 +177,6 @@ export default function ProductPage() {
                   <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <span>Instant access after purchase</span>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>30-day money-back guarantee</span>
-                </div>
                 {product.type !== 'service' && (
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -224,8 +220,8 @@ export default function ProductPage() {
                   : 'You\'ll receive an email confirmation with next steps within 24 hours of purchase.'
               },
               {
-                q: 'Do you offer refunds?',
-                a: 'Yes, we offer a 30-day money-back guarantee. If you\'re not satisfied, contact us within 30 days for a full refund.'
+                q: 'What is your cancellation policy?',
+                a: 'You can cancel your purchase at any time. For digital products, access will continue until the end of your subscription period if applicable.'
               },
               {
                 q: 'Is this a subscription?',

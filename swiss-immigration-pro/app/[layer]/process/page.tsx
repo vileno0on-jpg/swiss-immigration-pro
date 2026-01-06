@@ -27,9 +27,16 @@ const getStepIcon = (stepTitle: string, stepIndex: number) => {
 export default function ProcessPage() {
   const params = use(params)
   const layerParam = params?.layer as string
-  const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
-    ? layerParam 
-    : 'others') as LayerType
+  // Map new route names to old layer names
+  const layerMap: Record<string, LayerType> = {
+    'eu': 'europeans',
+    'us': 'americans',
+    'other': 'others',
+    'europeans': 'europeans',
+    'americans': 'americans',
+    'others': 'others'
+  }
+  const layer = (layerMap[layerParam] || 'others') as LayerType
   
   const content = LAYER_CONTENT[layer]
 

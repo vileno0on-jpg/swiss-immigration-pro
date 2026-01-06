@@ -1,11 +1,42 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { CheckCircle, Crown, Sparkles, Shield, Star, Zap, MessageSquare, BookOpen, LayoutDashboard, Users, FileText, TrendingUp, Award } from 'lucide-react'
 import { PRICING_PACKS } from '@/lib/stripe'
 import { PricingPack } from '@/types'
+
+// Helper type to extract pack type from PRICING_PACKS
+type PackValue = typeof PRICING_PACKS[keyof typeof PRICING_PACKS]
+
+// FAQ items - defined as constant to ensure stable rendering and prevent hydration mismatches
+const FAQ_ITEMS = [
+  { 
+    id: 'switch-plans',
+    q: 'Can I switch plans later?', 
+    a: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle, and we\'ll prorate any differences accordingly.',
+    keywords: 'change pricing plan, upgrade subscription, switch plans'
+  },
+  { 
+    id: 'citizenship-one-time',
+    q: 'Is the Citizenship Pro pack a one-time fee?', 
+    a: 'Yes! The Citizenship Pro Pack is a one-time payment that gives you lifetime access to all current and future citizenship resources, including updates and new content as we add it.',
+    keywords: 'citizenship pack, one-time payment, lifetime access'
+  },
+  { 
+    id: 'cancellation-policy',
+    q: 'What is your cancellation policy?', 
+    a: 'You can cancel your subscription at any time with no penalties. Your access will continue until the end of your current billing period, ensuring you get full value from your purchase.',
+    keywords: 'cancel subscription, subscription cancellation, cancellation policy'
+  },
+  {
+    id: 'payment-methods',
+    q: 'What payment methods do you accept?',
+    a: 'We accept all major credit cards, debit cards, and bank transfers. All payments are processed securely through Stripe, one of the world\'s most trusted payment processors.',
+    keywords: 'payment methods, accepted payments, secure payments'
+  },
+] as const
 
 export default function PricingContent({ layer = 'default' }: { layer?: string }) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual')
@@ -37,31 +68,38 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
     }
   }, [layer])
 
-  // Generate JSON-LD structured data for SEO
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'OfferCatalog',
-    name: 'Swiss Immigration Pricing Plans',
-    description: 'Comprehensive pricing plans for Swiss immigration guidance, from free resources to premium citizenship roadmaps',
-    offers: Object.values(PRICING_PACKS).map((pack) => ({
-      '@type': pack.price === 0 ? 'Offer' : 'Product',
-      name: pack.name,
-      description: pack.description || pack.shortDescription || '',
-      price: pack.price,
-      priceCurrency: 'CHF',
-      availability: 'https://schema.org/InStock',
-      url: typeof window !== 'undefined' ? `${window.location.origin}/pricing` : '/pricing',
-      category: pack.id === 'citizenship' ? 'Citizenship Services' : pack.id === 'advanced' ? 'Advanced Immigration Services' : pack.id === 'immigration' ? 'Immigration Services' : 'Free Resources',
-      offers: pack.price > 0 ? {
-        '@type': 'Offer',
-        price: pack.price,
-        priceCurrency: 'CHF',
-        priceValidUntil: '2026-12-31',
-        availability: 'https://schema.org/InStock',
-        url: typeof window !== 'undefined' ? `${window.location.origin}/pricing` : '/pricing',
-      } : undefined,
-    })),
-  }
+  // Generate JSON-LD structured data for SEO - lazy evaluation to avoid initialization issues
+  const structuredData = useMemo(() => {
+    try {
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'OfferCatalog',
+        name: 'Swiss Immigration Pricing Plans',
+        description: 'Comprehensive pricing plans for Swiss immigration guidance, from free resources to premium citizenship roadmaps',
+        offers: (Object.values(PRICING_PACKS) as PackValue[]).map((pack) => ({
+          '@type': pack.price === 0 ? 'Offer' : 'Product',
+          name: pack.name,
+          description: pack.description || (pack as any).shortDescription || '',
+          price: pack.price,
+          priceCurrency: 'CHF',
+          availability: 'https://schema.org/InStock',
+          url: typeof window !== 'undefined' ? `${window.location.origin}/pricing` : '/pricing',
+          category: pack.id === 'citizenship' ? 'Citizenship Services' : pack.id === 'advanced' ? 'Advanced Immigration Services' : pack.id === 'immigration' ? 'Immigration Services' : 'Free Resources',
+          offers: pack.price > 0 ? {
+            '@type': 'Offer',
+            price: pack.price,
+            priceCurrency: 'CHF',
+            priceValidUntil: '2026-12-31',
+            availability: 'https://schema.org/InStock',
+            url: typeof window !== 'undefined' ? `${window.location.origin}/pricing` : '/pricing',
+          } : undefined,
+        })),
+      }
+    } catch (error) {
+      console.error('Error generating structured data:', error)
+      return null
+    }
+  }, [])
 
   const handleCheckout = async (packId: string) => {
     try {
@@ -99,10 +137,12 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
   return (
     <>
       {/* JSON-LD Structured Data for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
       
       <main className={`min-h-screen bg-white font-sans transition-colors duration-300`} itemScope itemType="https://schema.org/OfferCatalog">
         {/* Header Section with Light Background */}
@@ -165,7 +205,7 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
         {/* Pricing Cards Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 md:-mt-20 relative z-20 pb-12 sm:pb-16 md:pb-24" aria-label="Pricing plans">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {Object.values(PRICING_PACKS).map((pack: PricingPack, idx) => {
+            {(Object.values(PRICING_PACKS) as PackValue[]).map((pack, idx) => {
               const isPopular = pack.id === 'advanced'
               const price = billingCycle === 'annual' && pack.price > 0 ? Math.round(pack.price * 0.8) : pack.price
               const annualPrice = pack.price > 0 ? Math.round(pack.price * 0.8 * 12) : 0
@@ -185,10 +225,10 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                   aria-labelledby={`pack-${pack.id}-title`}
                 >
                   {/* Badge */}
-                  {(isPopular || pack.badge) && (
+                  {(isPopular || (pack as any).badge) && (
                     <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] sm:text-xs font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full shadow-lg flex items-center gap-1 whitespace-nowrap z-20">
                       <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3" aria-hidden="true" /> 
-                      {pack.badge || 'MOST POPULAR'}
+                      {(pack as any).badge || 'MOST POPULAR'}
                     </div>
                   )}
 
@@ -213,9 +253,9 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                         </>
                       )}
                     </div>
-                    {pack.shortDescription && (
+                    {(pack as any).shortDescription && (
                       <p className="text-xs sm:text-sm text-black mt-2 sm:mt-3 font-medium opacity-90 leading-relaxed" itemProp="description">
-                        {pack.shortDescription}
+                        {(pack as any).shortDescription}
                       </p>
                     )}
                     {pack.recommendedFor && (
@@ -315,7 +355,7 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
                   <thead className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                     <tr>
                       <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-xs sm:text-sm sticky left-0 bg-gradient-to-r from-blue-600 to-indigo-600 z-10">Features</th>
-                      {Object.values(PRICING_PACKS).map((pack) => (
+                      {(Object.values(PRICING_PACKS) as PackValue[]).map((pack) => (
                         <th key={pack.id} className={`px-3 sm:px-6 py-3 sm:py-4 text-center font-semibold text-xs sm:text-sm ${pack.id === 'advanced' ? 'bg-white/20' : ''}`}>
                           <div className="font-bold text-sm sm:text-lg">{pack.name}</div>
                           <div className="text-xs sm:text-sm font-normal opacity-90 mt-1">
@@ -442,35 +482,9 @@ export default function PricingContent({ layer = 'default' }: { layer?: string }
           <section className="mt-12 sm:mt-16 md:mt-32 max-w-3xl mx-auto px-4 sm:px-6" aria-label="Frequently asked questions">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 md:mb-12 text-center transition-colors">Frequently Asked Questions</h2>
             <div className="space-y-3 sm:space-y-4" itemScope itemType="https://schema.org/FAQPage">
-              {[
-                { 
-                  q: 'Can I switch plans later?', 
-                  a: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle, and we\'ll prorate any differences accordingly.',
-                  keywords: 'change pricing plan, upgrade subscription, switch plans'
-                },
-                { 
-                  q: 'Is the Citizenship Pro pack a one-time fee?', 
-                  a: 'Yes! The Citizenship Pro Pack is a one-time payment that gives you lifetime access to all current and future citizenship resources, including updates and new content as we add it.',
-                  keywords: 'citizenship pack, one-time payment, lifetime access'
-                },
-                { 
-                  q: 'What if I need to cancel my subscription?', 
-                  a: 'You can cancel your subscription at any time with no penalties. Your access will continue until the end of your current billing period, ensuring you get full value from your purchase.',
-                  keywords: 'cancel subscription, refund policy, subscription cancellation'
-                },
-                {
-                  q: 'Do you offer refunds?',
-                  a: 'We offer a 30-day money-back guarantee on all paid plans. If you\'re not satisfied with your purchase, contact us within 30 days for a full refund.',
-                  keywords: 'money back guarantee, refund policy, satisfaction guarantee'
-                },
-                {
-                  q: 'What payment methods do you accept?',
-                  a: 'We accept all major credit cards, debit cards, and bank transfers. All payments are processed securely through Stripe, one of the world\'s most trusted payment processors.',
-                  keywords: 'payment methods, accepted payments, secure payments'
-                },
-              ].map((item, idx) => (
+              {FAQ_ITEMS.map((item) => (
                 <article 
-                  key={idx} 
+                  key={item.id} 
                   className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all"
                   itemScope
                   itemType="https://schema.org/Question"

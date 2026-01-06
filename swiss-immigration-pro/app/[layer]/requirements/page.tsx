@@ -12,9 +12,16 @@ import LayerHeader from '@/components/layout/LayerHeader'
 export default function RequirementsPage() {
   const params = use(params)
   const layerParam = params?.layer as string
-  const layer = (['europeans', 'americans', 'others'].includes(layerParam) 
-    ? layerParam 
-    : 'others') as LayerType
+  // Map new route names to old layer names
+  const layerMap: Record<string, LayerType> = {
+    'eu': 'europeans',
+    'us': 'americans',
+    'other': 'others',
+    'europeans': 'europeans',
+    'americans': 'americans',
+    'others': 'others'
+  }
+  const layer = (layerMap[layerParam] || 'others') as LayerType
   
   const content = LAYER_CONTENT[layer]
   
@@ -76,13 +83,13 @@ export default function RequirementsPage() {
 
   // Layer-specific badge configuration
   const badge = {
-    icon: layer === 'europeans' ? <Star className="w-3.5 h-3.5" /> : layer === 'americans' ? <AlertTriangle className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
-    text: layer === 'europeans' 
+    icon: layer === 'europeans' ? <Star className="w-3.5 h-3.5" /> : layer === 'americans' ? <Target className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />,
+    text: layer === 'europeans'
       ? 'EU/EFTA Freedom of Movement'
-      : layer === 'americans' 
-      ? '2025 Quota Alert: Apply Early'
+      : layer === 'americans'
+      ? 'US Citizen Priority: Fast-Track Processing'
       : 'Global Citizens Pathway',
-    bgColor: layer === 'europeans' ? 'bg-blue-600' : layer === 'americans' ? 'bg-slate-900' : 'bg-purple-600',
+    bgColor: layer === 'europeans' ? 'bg-blue-600' : layer === 'americans' ? 'bg-indigo-600' : 'bg-purple-600',
     textColor: 'text-white'
   }
 

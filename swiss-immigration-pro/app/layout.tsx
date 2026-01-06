@@ -4,7 +4,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { InitialQuizGate } from "@/components/quiz/InitialQuizGate";
-import ChatbotProvider from "@/components/chat/ChatbotProvider";
 
 /**
  * SEO Meta Helpers Usage:
@@ -248,7 +247,6 @@ export default function RootLayout({
         <ClientErrorBoundary>
           <InitialQuizGate />
           {children}
-          <ChatbotProvider />
         </ClientErrorBoundary>
       </body>
     </html>

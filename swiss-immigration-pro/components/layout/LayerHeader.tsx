@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, LogOut, Shield, Settings, Globe, Star, AlertTriangle, Calendar, Mail } from 'lucide-react'
+import { Menu, X, User, LogOut, Shield, Settings, Globe, Star, AlertTriangle } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 
 import AdvancedSearch from '@/components/AdvancedSearch'
@@ -125,7 +125,7 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <nav className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between sm:h-20">
-            <Link href={homeHref} className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               {logoError ? (
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-2xl shadow-lg transition-transform duration-200 hover:scale-105">
                   🇨🇭
@@ -169,25 +169,6 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                 </Link>
               ))}
               
-              {/* Book Consultation & Contact Buttons */}
-              <div className="ml-2 flex items-center gap-1 border-l border-gray-200 pl-2">
-                <Link
-                  href="/consultation"
-                  className="flex items-center justify-center rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-2 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:from-indigo-700 hover:to-purple-700 hover:shadow-md min-w-[32px]"
-                  title="Book Consultation"
-                >
-                  <Calendar className="h-3.5 w-3.5 shrink-0" />
-                  <span className="hidden 2xl:inline ml-1.5 whitespace-nowrap">Consultation</span>
-                </Link>
-                <Link
-                  href={`/${safeLayer}/contact`}
-                  className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm min-w-[32px]"
-                  title="Contact Us"
-                >
-                  <Mail className="h-3.5 w-3.5 shrink-0" />
-                  <span className="hidden 2xl:inline ml-1.5 whitespace-nowrap">Contact</span>
-                </Link>
-              </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -290,27 +271,6 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
                   </Link>
                 ))}
 
-                {/* Book Consultation & Contact in Mobile Menu */}
-                <div className="border-t border-gray-200 pt-3 space-y-2">
-                  <Link
-                    href="/consultation"
-                    onClick={closeMenu}
-                    className="flex items-center gap-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-all active:from-indigo-700 active:to-purple-700 active:scale-[0.98] touch-manipulation"
-                    style={{ WebkitTapHighlightColor: 'transparent', minHeight: '44px' }}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    Consultation
-                  </Link>
-                  <Link
-                    href={`/${safeLayer}/contact`}
-                    onClick={closeMenu}
-                    className="flex items-center gap-2.5 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-all active:bg-gray-50 active:scale-[0.98] touch-manipulation"
-                    style={{ WebkitTapHighlightColor: 'transparent', minHeight: '44px' }}
-                  >
-                    <Mail className="h-4 w-4" />
-                    Contact
-                  </Link>
-                </div>
 
                 <div className="border-t border-gray-200 pt-3">
                   <div onClick={closeMenu}>
@@ -419,16 +379,6 @@ export default function LayerHeader({ layer, homeHref, customBadge }: LayerHeade
           )}
         </nav>
       </header>
-
-      {/* Layer-Specific Announcement Bar */}
-      {badge && (
-        <div className={`${badge.bgColor} ${badge.textColor} py-2 sm:py-2.5 px-3 sm:px-4 border-b-2 border-black`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-center px-2">
-            <span className="shrink-0">{badge.icon}</span>
-            <span className="leading-tight">{badge.text}</span>
-          </div>
-        </div>
-      )}
     </>
   )
 }

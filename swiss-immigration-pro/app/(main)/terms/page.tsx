@@ -207,7 +207,7 @@ export default function TermsOfServicePage() {
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <p className="text-gray-700 text-lg leading-relaxed">
-            Subscription fees are charged monthly or annually as selected. You may cancel your subscription at any time. Refunds are subject to our 30-day money-back guarantee policy. All prices are in CHF (Swiss Francs).
+            Subscription fees are charged monthly or annually as selected. You may cancel your subscription at any time. All prices are in CHF (Swiss Francs).
           </p>
         </div>
       </section>

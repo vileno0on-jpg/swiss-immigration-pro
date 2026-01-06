@@ -2,12 +2,11 @@
 
 import PricingContent from '@/components/pricing/PricingContent'
 import { useParams } from 'next/navigation'
-import { use } from 'react'
 import LayerHeader from '@/components/layout/LayerHeader'
 import { Star, AlertTriangle, Globe } from 'lucide-react'
 
 export default function LayerPricingPage() {
-  const params = use(params)
+  const params = useParams()
   const layerParam = params?.layer as string
   const layer = (layerParam === 'eu' || layerParam === 'us' || layerParam === 'other') 
     ? layerParam as 'eu' | 'us' | 'other'

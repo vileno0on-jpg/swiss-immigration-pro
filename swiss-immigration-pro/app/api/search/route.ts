@@ -20,7 +20,6 @@ const SEARCH_INDEX = [
   { id: '18', title: 'Simplified Naturalization', description: 'Marriage-based citizenship', url: '/citizenship#simplified', category: 'guide', keywords: ['simplified', 'marriage', 'spouse', '5 years', 'swiss spouse'] },
   { id: '21', title: 'CV Templates', description: '20+ Swiss-style CV templates', url: '/resources#cv', category: 'resource', keywords: ['cv', 'resume', 'template', 'lebenslauf', 'curriculum vitae'] },
   { id: '22', title: 'Resources Library', description: 'Guides, PDFs, and checklists', url: '/resources', category: 'resource', keywords: ['resources', 'library', 'pdf', 'download', 'checklist'] },
-  { id: '23', title: 'AI Chatbot', description: 'Get instant answers to your questions', url: '/#chat', category: 'tool', keywords: ['chatbot', 'ai', 'assistant', 'help', 'questions', 'chat'] },
   { id: '24', title: 'Apartment Finder', description: 'Find apartments across Switzerland (Homegate, ImmoScout24)', url: '/tools/apartment-finder', category: 'tool', keywords: ['apartment', 'housing', 'rent', 'home', 'flat', 'homegate', 'immoscout24', 'aggregator'] },
   { id: '25', title: 'Application Dossier Generator', description: 'Create professional Swiss-standard housing application packages', url: '/tools/dossier-generator', category: 'tool', keywords: ['dossier', 'housing', 'application', 'landlord', 'renting', 'documents', 'generator'] },
 ]

@@ -6,6 +6,8 @@ import { useResumeStore } from '@/store/resumeStore'
 import type { TemplateMetadata } from '@/types/resume'
 import { Check, Layout, ChevronDown, Sparkles, Image as ImageIcon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import SwissClassic from './templates/SwissClassic'
+import ModernZurich from './templates/ModernZurich'
 
 // Template metadata
 const AVAILABLE_TEMPLATES: TemplateMetadata[] = [
@@ -145,18 +147,14 @@ export default function TemplateSelector() {
 }
 
 // Template component mapper
-// import SwissClassic from './templates/SwissClassic'
-// import ModernZurich from './templates/ModernZurich'
-
 export function getTemplateComponent(componentKey: string) {
-  // Temporarily disabled - templates to be added
-  return null
-  // switch (componentKey) {
-  //   case 'swiss-classic':
-  //     return SwissClassic
-  //   case 'modern-zurich':
-  //     return ModernZurich
-  //   default:
-  //     return SwissClassic
-  // }
+  switch (componentKey) {
+    case 'swiss-classic':
+      return SwissClassic
+    case 'modern-zurich':
+      return ModernZurich
+    default:
+      // Always return SwissClassic as fallback
+      return SwissClassic
+  }
 }

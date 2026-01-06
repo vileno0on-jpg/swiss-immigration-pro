@@ -8,6 +8,8 @@ import { TranslationLoader } from '@/components/TranslationLoader'
 import ScrollToTop from '@/components/layout/ScrollToTop'
 import Footer from '@/components/layout/Footer'
 import { ToastProvider } from '@/components/providers/ToastProvider'
+import { ChatbotProvider } from '@/components/chatbot/ChatbotProvider'
+import ChatbotWidget from '@/components/chatbot/ChatbotWidget'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -20,13 +22,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <ToastProvider>
-        <TranslationLoader />
-        <InitialQuizGate />
-        <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
-          {children}
-        </main>
-        <Footer />
-        <ScrollToTop />
+        <ChatbotProvider>
+          <TranslationLoader />
+          <InitialQuizGate />
+          <main id="main-content" className="flex-1 transition-all duration-300 ease-out">
+            {children}
+          </main>
+          <Footer />
+          <ScrollToTop />
+          <ChatbotWidget />
+        </ChatbotProvider>
       </ToastProvider>
     </SessionProvider>
   )

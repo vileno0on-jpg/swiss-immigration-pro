@@ -157,19 +157,6 @@ export default function Home() {
                   View Pricing
                 </Link>
               </div>
-
-              <div className="flex gap-8 pt-8 border-t border-white/10">
-                {[
-                  { value: '96%', label: 'Success Rate' },
-                  { value: '18.5K+', label: 'Applications' },
-                  { value: '6-8', label: 'Weeks Avg.' }
-                ].map((stat, i) => (
-                  <div key={i}>
-                    <div className="text-2xl font-bold text-white tracking-tight">{stat.value}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wider font-medium">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
             </motion.div>
 
             {/* Hero Floating Cards - Glassmorphism */}
